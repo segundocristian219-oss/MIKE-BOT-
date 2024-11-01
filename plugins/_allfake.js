@@ -9,7 +9,7 @@ let img = catalogo
     forwardedNewsletterMessageInfo: {
       newsletterJid: "120363328554424977@newsletter",
       serverMessageId: 100,
-      newsletterName: '✨𝗧𝘄𝗶𝗻𝘀 𝗯𝗼𝘁𝘀✨💚❤️🩵',
+      newsletterName: '✨Twins bots✨💚❤️🩵',
     },
 	    externalAdReply: {
 				    showAdAttribution: true,
@@ -52,7 +52,7 @@ isForwarded: true,
 forwardedNewsletterMessageInfo: {
 newsletterJid: "120363328554424977@newsletter",
 serverMessageId: 100,
-newsletterName: '✨𝗧𝘄𝗶𝗻𝘀 𝗯𝗼𝘁𝘀✨💚❤️🩵',
+newsletterName: '✨Twins bots✨💚❤️🩵',
 },
 externalAdReply: { 
 showAdAttribution: true,
