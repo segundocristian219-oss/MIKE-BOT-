@@ -1,5 +1,5 @@
 {
-  "name": "Sisked-Bot",
+  "name": "Sofi-Bot",
   "version": "5.0.0",
   "description": "Super WhatsApp Bot Multi Device",
   "main": "index.js",
@@ -18,16 +18,16 @@
     "eslint": "eslint .",
     "eslintfix": "eslint --fix ."
   },
-  "homepage": "https://github.com/Andrea-Sis/Siske",
+  "homepage": "https://github.com/Sisked-Bot/Sofi-bot",
   "author": {
     "name": "Sisked"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Andrea-Sis/Siske.git"
+    "url": "git+https://github.com/Sisked-Bot/Sofi-bot.git"
   },
   "bugs": {
-    "url": "https://github.com/Andrea-Sis/Siske/issues"
+    "url": "https://github.com/Sisked-Bot/Sofi-bot/issues"
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
