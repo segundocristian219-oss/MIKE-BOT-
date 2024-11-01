@@ -7,9 +7,9 @@ let img = catalogo
     contextInfo: {
     	isForwarded: true,
     forwardedNewsletterMessageInfo: {
-      newsletterJid: "120363299667225383@newsletter",
+      newsletterJid: "120363328554424977@newsletter",
       serverMessageId: 100,
-      newsletterName: '𝑺𝑰𝑺𝑲𝑬𝑫-𝑩𝑶𝑻',
+      newsletterName: '✨𝗧𝘄𝗶𝗻𝘀 𝗯𝗼𝘁𝘀✨💚❤️🩵',
     },
 	    externalAdReply: {
 				    showAdAttribution: true,
@@ -18,7 +18,7 @@ let img = catalogo
 					mediaUrl: null,
 					description: null,
 					previewType: "PHOTO",
-					thumbnailUrl: 'https://qu.ax/FNsw.jpg',
+					thumbnailUrl: 'https://i.ibb.co/4jft6vs/file.jpg',
 		           sourceUrl: canal,
 		           mediaType: 1,
                    renderLargerThumbnail: false
@@ -50,17 +50,17 @@ global.rcanal = {
 contextInfo: {
 isForwarded: true,
 forwardedNewsletterMessageInfo: {
-newsletterJid: "120363299667225383@newsletter",
+newsletterJid: "120363328554424977@newsletter",
 serverMessageId: 100,
-newsletterName: '𝑺𝑰𝑺𝑲𝑬𝑫-𝑩𝑶𝑻',
+newsletterName: '✨𝗧𝘄𝗶𝗻𝘀 𝗯𝗼𝘁𝘀✨💚❤️🩵',
 },
 externalAdReply: { 
 showAdAttribution: true,
-title: '𝑺𝑰𝑺𝑲𝑬𝑫-𝑩𝑶𝑻',
-body: 'Super Bot de WhatsApp ⭐',
+title: '𝑺𝑶𝑭𝑰 - 𝑩𝑶𝑻',
+body: 'Sofi La Mejor',
 previewType: "PHOTO",
-thumbnailUrl: 'https://i.ibb.co/qBxdwZW/file.jpg',
-sourceUrl: 'https://www.instagram.com/sisked_1',
+thumbnailUrl: 'https://i.ibb.co/4jft6vs/file.jpg',
+sourceUrl: 'https://www.instagram.com/josssi_bot.ff',
 mediaType: 1,
 renderLargerThumbnail: false
 },},}
