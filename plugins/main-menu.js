@@ -32,20 +32,20 @@ const defaultMenu = {
 
 “ hello *%name*, Cómo se encuentra el día de hoy? ”
 
-┌ ─ ⬣「 *Info User* 」⬣
-│  〆 *👤 Nombre ∙* %name
-│  〆 *🍬 Dulces ∙* %limit
-│  〆 *⭐ XP ∙* %totalexp
-│  〆 *⚡ Nivel ∙* %level
-└ ─ ⬣
-%readmore
+*╭━〔*  *Info User* *〕*
+*┃➤* *👤 Nombre ∙* %name
+*┃➤* *🍬 Dulces ∙* %limit
+*┃➤* *⭐ XP ∙* %totalexp
+*┃➤* *⚡ Nivel ∙* %level
+ ╰━━━━━━
+ %readmore
 *~•~•~•~•~•~•~•~•~•~•~•~•~•~•~•~•~*
 
-\t\t\t𝐒 𝐈 𝐒 𝐊 𝐄 𝐃 - 𝐌 𝐄 𝐍 𝐔́
+\t\t\t𝑺 𝑶 𝑭 𝑰 - 𝐌 𝐄 𝐍 𝐔́
 `.trimStart(),
-header: '┌ ─ ⬣「 *%category* 」⬣',
-body: '│  〆 *%cmd*\n',
-footer: '└ ─ ⬣\n',
+header: '*╭━〔* *%category* *〕*',
+body: '*┃➤* *%cmd*\n',
+footer: ' ╰━━━━━━\n',
 after: '',
 }
 
