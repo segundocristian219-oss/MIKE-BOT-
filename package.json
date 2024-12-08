@@ -18,7 +18,7 @@
     "eslint": "eslint .",
     "eslintfix": "eslint --fix ."
   },
-  "homepage": "https://github.com/Sisked-Bot/Sofi-bot",
+  "homepage": "https://github.com/Sofia1269/Sofi",
   "author": {
     "name": "Sisked"
   },
@@ -27,7 +27,7 @@
     "url": "git+https://github.com/Sofia1269/Sofi.git"
   },
   "bugs": {
-    "url": "https://github.com/Sisked-Bot/Sofi-bot/issues"
+    "url": "https://github.com/Sofia1269/Sofi/issues"
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
