@@ -19,9 +19,9 @@ await m.react('✅')
 } catch {
 await m.react('✖️')
 }}
-handler.help = ['play *<búsqueda>*']
+handler.help = ['musica *<búsqueda>*']
 handler.tags = ['downloader']
-handler.command = ['play']
+handler.command = ['musica']
 export default handler
 
 async function search(query, options = {}) {
