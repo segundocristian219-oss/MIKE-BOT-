@@ -30,9 +30,9 @@ await m.react('✅');
 await m.react('✖️');
 }}
 
-handler.help = ['play <búsqueda>']
+handler.help = ['sound <búsqueda>']
 handler.tags = ['downloader']
-handler.command = ['play']
+handler.command = ['sound']
 
 export default handler
 
