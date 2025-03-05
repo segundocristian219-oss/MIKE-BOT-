@@ -1,9 +1,20 @@
-// Detecta si el mensaje contiene la palabra clave sin prefijo
-const palabraClave = 'hola';  // Cambia esto por la palabra que desees
-const textoRecibido = text.trim().toLowerCase();  // El texto recibido en el mensaje
 
-// Si el mensaje contiene la palabra clave
-if (textoRecibido === palabraClave.toLowerCase()) {
-    conn.sendPresenceUpdate('recording', m.chat);  // Actualiza la presencia de grabación
-    await conn.sendFile(m.chat, 'https://qu.ax/HPeS.mp3', `${palabraClave}.mp3`, null, m, true, { type: 'audioMessage' });
+    case 'hola':
+    conn.sendPresenceUpdate('recording', m.chat);
+    await conn.sendFile(m.chat, 'https://qu.ax/HPeS.mp3', 'hola.mp3', null, m, true, { type: 'audioMessage' });
+    break;
+
+default:
+    break;
 }
+
+} catch (err) {
+    console.error(err);
+    m.reply('Ocurrió un error al enviar el audio.');
+}
+};
+
+handler.customPrefix = /^(hola)/i;
+handler.command = new RegExp();
+
+export default handler;
