@@ -150,7 +150,13 @@ phoneNumber = `+${phoneNumber}`
 } while (!await isValidPhoneNumber(phoneNumber))
 rl.close()
 addNumber = phoneNumber.replace(/\D/g, '')
-  
+const PHONENUMBER_MCC = {
+  "52": "MX", "54": "AR", "55": "BR", "56": "CL", "57": "CO", "58": "VE",
+  "591": "BO", "592": "GY", "593": "EC", "595": "PY", "598": "UY", "51": "PE",
+  "506": "CR", "507": "PA", "504": "HN", "505": "NI", "502": "GT", "503": "SV",
+  "1": "US"
+ }
+   
 setTimeout(async () => {
 let codigo = await conn.requestPairingCode(addNumber)
 codigo = codigo?.match(/.{1,4}/g)?.join("-") || codigo
