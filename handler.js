@@ -144,7 +144,9 @@ export async function handler(chatUpdate) {
 
         let _user = global.db.data && global.db.data.users && global.db.data.users[m.sender]
 
-        const isROwner = [conn.decodeJid(global.conn.user.id), ...global.owner.map(([number]) => number)].map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').includes(m.sender)
+        const isROwner = [conn.decodeJid(global.conn.user.id),
+        ...global.owner.map(([number, tipo]) => number.replace(/[^0-9]/g, '') + (tipo === 'jid'? '@s.whatsapp.net': '@lid'))
+        ].includes(m.sender);
         const isOwner = isROwner || m.fromMe
         const isMods = isOwner || global.mods.map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').includes(m.sender)
         const isPrems = isROwner || global.prems.map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').includes(m.sender) || _user.prem == true
@@ -165,14 +167,37 @@ export async function handler(chatUpdate) {
 
         let usedPrefix
         
-        const groupMetadata = (m.isGroup ? ((conn.chats[m.chat] || {}).metadata || await this.groupMetadata(m.chat).catch(_ => null)) : {}) || {}
-        const participants = (m.isGroup ? groupMetadata.participants : []) || []
-        const user = (m.isGroup ? participants.find(u => conn.decodeJid(u.id) === m.sender) : {}) || {}
-        const bot = (m.isGroup ? participants.find(u => conn.decodeJid(u.id) == this.user.jid) : {}) || {}
-        const isRAdmin = user?.admin == 'superadmin' || false
-        const isAdmin = isRAdmin || user?.admin == 'admin' || false
-        const isBotAdmin = bot?.admin || false
-
+        let groupMetadata = {};
+if (m.isGroup) {
+  groupMetadata = conn.chats[m.chat]?.metadata;
+  if (!groupMetadata || Object.keys(groupMetadata).length === 0) {
+    try {
+      groupMetadata = await conn.groupMetadata(m.chat);
+      if (!conn.chats[m.chat]) conn.chats[m.chat] = {};
+      conn.chats[m.chat].metadata = groupMetadata;
+    } catch (e) {
+      groupMetadata = {};
+    }
+  }
+}
+const participants = m.isGroup
+  ? (await conn.groupMetadata(m.chat).catch(() => ({})))?.participants || []
+  : [];
+const user = (m.isGroup ? participants.find(u => conn.decodeJid(u.id) === m.sender) : {}) || {}
+const bot = m.isGroup
+  ? participants.find(u => {
+      const id = conn.decodeJid(u.id);
+      const botIds = [
+        conn.decodeJid(global.conn.user?.jid || ''),
+        conn.decodeJid(global.conn.user?.lid || '')
+      ];
+      return botIds.includes(id);
+    }) || {}
+  : {}; 
+const isRAdmin = user?.admin == 'superadmin' || false
+const isAdmin = isRAdmin || user?.admin == 'admin' || false
+const isBotAdmin = ['admin', 'superadmin'].includes(bot?.admin);
+  
         const ___dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), './plugins')
         for (let name in global.plugins) {
             let plugin = global.plugins[name]
