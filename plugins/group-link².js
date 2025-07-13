@@ -4,10 +4,9 @@ const handler = async (m, { conn, isAdmin }) => {
   conn.sendMessage(m.chat, { text: 'https://chat.whatsapp.com/' + await conn.groupInviteCode(m.chat) });
 };
 
-handler.command = /^link$/i; // sin prefijo, detecta solo "link"
+handler.customPrefix = /^(link)/i;
+handler.command = new RegExp;
 handler.group = true;
-handler.botAdmin = true;
-handler.customPrefix = /^link$/i;
-handler.explicit = true;
+handler.admin = true;
 
 export default handler;
