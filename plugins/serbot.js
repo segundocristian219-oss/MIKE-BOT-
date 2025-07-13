@@ -34,7 +34,7 @@ if (global.conns instanceof Array) {
   global.conns = [];
 }
 
-const MAX_SUBBOTS = 9999;
+const MAX_SUBBOTS = 2;
 
 async function loadSubbots() {
   const serbotFolders = fs.readdirSync('./' + global.jadi); // Changed to global.jadi assuming it's defined elsewhere
