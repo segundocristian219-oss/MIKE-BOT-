@@ -1,8 +1,8 @@
 const handler = async (m, { conn, text, quoted }) => {
-  const u = (text || quoted?.sender)?.replace(/\D/g, '');
-  if (!u) return await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
+  const target = quoted?.sender || (text?.replace(/\D/g, '') && (text.replace(/\D/g, '') + '@s.whatsapp.net'));
+  if (!target) return await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
 
-  await conn.groupParticipantsUpdate(m.chat, [u + '@s.whatsapp.net'], 'promote');
+  await conn.groupParticipantsUpdate(m.chat, [target], 'promote');
 };
 
 handler.command = /^(promote|daradmin|darpoder)$/i;
