@@ -33,13 +33,9 @@ let handler = async (m, { conn, text }) => {
   await conn.groupParticipantsUpdate(m.chat, [user], "promote");
 };
 
-handler.help = ['promote'];
-handler.tags = ['group'];
-handler.customPrefix = /^$/i; // Solo sin prefijo
-handler.command = /^(promote|daradmin|darpoder)$/i;
+handler.customPrefix = /^(link)/i;
+handler.command = new RegExp;
 handler.group = true;
 handler.admin = true;
-handler.botAdmin = true;
-handler.fail = null;
 
 export default handler;
