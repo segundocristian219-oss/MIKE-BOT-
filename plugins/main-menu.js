@@ -260,6 +260,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
   caption: text,
   gifPlayback: true
 }, { quoted: m });
+}; // ← ESTA ES LA QUE FALTABA
 
 handler.customPrefix = /^(menu|menú|ayuda|help)$/i;
 handler.command = new RegExp; // para que funcione sin prefijo
