@@ -2,9 +2,12 @@ const handler = async (m, { conn, text, quoted }) => {
   let target = null;
 
   if (quoted) {
-    // El participante en mensajes de grupo suele estar en quoted.key.participant
-    // En caso de mensajes enviados por usuarios, usar quoted.sender
-    target = quoted.key?.participant || quoted.participant || quoted.sender;
+    // tratar de obtener el número desde varias posibles propiedades
+    target =
+      (quoted.key && quoted.key.participant) ||
+      quoted.participant ||
+      quoted.sender ||
+      (quoted.key && quoted.key.remoteJid);
   } else if (text) {
     const number = text.replace(/\D/g, '');
     if (number.length >= 8) target = number + '@s.whatsapp.net';
