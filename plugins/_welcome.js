@@ -1,17 +1,15 @@
 import { WAMessageStubType } from '@whiskeysockets/baileys'
-import fetch from 'node-fetch'
 
 export async function before(m, { conn, participants, groupMetadata }) {
   if (!m.messageStubType || !m.isGroup) return true;
 
-  let pp = await conn.profilePictureUrl(m.messageStubParameters[0], 'image').catch(_ => 'https://files.catbox.moe/blvtbw.mp4')
-  let img = await (await fetch(`${pp}`)).buffer()
-  let chat = global.db.data.chats[m.chat]
-  let user = `@${m.messageStubParameters[0].split`@`[0]}`
-  let groupName = groupMetadata.subject
-  let groupDesc = groupMetadata.desc || 'sin descripción'
+  const videoUrl = 'https://files.catbox.moe/blvtbw.mp4';
+  const chat = global.db.data.chats[m.chat];
+  const user = `@${m.messageStubParameters[0].split('@')[0]}`;
+  const groupName = groupMetadata.subject;
+  const groupDesc = groupMetadata.desc || 'Sin descripción';
 
-  // BIENVENIDA
+  // 🟢 BIENVENIDA
   if (chat.bienvenida && m.messageStubType == 27) {
     const msgsWelcome = [
       `┏─────────────────┐
@@ -26,19 +24,24 @@ export async function before(m, { conn, participants, groupMetadata }) {
 ┃ *_Un gusto tenerte aqui_*
 ┃ *_Disfruta tu estadía 😇_*
 ┗━━━𝙎𝙃𝘼𝘿𝙊𝙒 𝘽𝙊𝙏 🍷━━━━`
-    ]
+    ];
 
-    let welcome = chat.sWelcome
+    const welcome = chat.sWelcome
       ? chat.sWelcome
           .replace(/@user/g, user)
           .replace(/@group/g, groupName)
           .replace(/@desc/g, groupDesc)
-      : msgsWelcome[Math.floor(Math.random() * msgsWelcome.length)]
+      : msgsWelcome[Math.floor(Math.random() * msgsWelcome.length)];
 
-    await conn.sendAi(m.chat, botname, textbot, welcome, img, img, canal)
+    await conn.sendMessage(m.chat, {
+      video: { url: videoUrl },
+      caption: welcome,
+      gifPlayback: true,
+      mentions: [m.messageStubParameters[0]]
+    }, { quoted: m });
   }
 
-  // DESPEDIDA (salida voluntaria o expulsado)
+  // 🔴 DESPEDIDA (salida voluntaria o kick)
   if (chat.bienvenida && (m.messageStubType == 28 || m.messageStubType == 32)) {
     const msgsBye = [
       `*╭┈┈┈┈┈┈┈┈┈┈┈┈┈≫*
@@ -61,15 +64,20 @@ export async function before(m, { conn, participants, groupMetadata }) {
 *┊𝗗𝗘𝗝𝗢 𝗗𝗘 𝗢𝗟𝗘𝗥 𝗔 𝗠𝗥𝗗,* 
 *┊𝗛𝗔𝗦𝗧𝗔 𝗤𝗨𝗘 𝗧𝗘 𝗟𝗔𝗥𝗚𝗔𝗦𝗧𝗘!!* 👿
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈≫*`
-    ]
+    ];
 
-    let bye = chat.sBye
+    const bye = chat.sBye
       ? chat.sBye
           .replace(/@user/g, user)
           .replace(/@group/g, groupName)
           .replace(/@desc/g, groupDesc)
-      : msgsBye[Math.floor(Math.random() * msgsBye.length)]
+      : msgsBye[Math.floor(Math.random() * msgsBye.length)];
 
-    await conn.sendAi(m.chat, botname, textbot, bye, img, img, canal)
+    await conn.sendMessage(m.chat, {
+      video: { url: videoUrl },
+      caption: bye,
+      gifPlayback: true,
+      mentions: [m.messageStubParameters[0]]
+    }, { quoted: m });
   }
 }
