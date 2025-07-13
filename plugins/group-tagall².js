@@ -37,7 +37,6 @@ const prefijoABandera = {
   '1721': '🇸🇽', '1264': '🇦🇮', '1473': '🇬🇩', '1869': '🇰🇳'
 };
   
-};
 
 function obtenerBandera(numero) {
   const prefijos = Object.keys(prefijoABandera).sort((a, b) => b.length - a.length);
