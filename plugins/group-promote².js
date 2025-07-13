@@ -30,7 +30,7 @@ export default handler;
 
 
 
-async (m, { conn, quoted }) => {
+let handler = async (m, { conn, quoted }) => {
   if (!quoted) 
     return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
 
@@ -47,3 +47,4 @@ handler.command = new RegExp;
 handler.group = true;
 handler.admin = true;
 handler.botAdmin = true;
+  
