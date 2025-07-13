@@ -1,8 +1,6 @@
-async function handler(m, { conn }) {
-  let group = m.chat;
-  let link = 'https://chat.whatsapp.com/' + await conn.groupInviteCode(group);
-  conn.reply(m.chat, link, m);
-}
+const handler = async (m, { conn }) => {
+  conn.reply(m.chat, 'https://chat.whatsapp.com/' + await conn.groupInviteCode(m.chat), m);
+};
 
 handler.help = ['link'];
 handler.tags = ['grupo'];
