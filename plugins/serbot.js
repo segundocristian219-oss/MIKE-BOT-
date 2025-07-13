@@ -27,14 +27,15 @@ let crm3 = "Sinfo-Donar.js";
 let crm4 = " _autoresponder.js info-bot.js";
 let drm1 = "";
 let drm2 = "";
-let rtx = "xd";
+let rtx = "*¡Bienvenido a la conexión Sub Bot! ✨🌀*\n\n*Para unirte, ¡escanea este código QR con otro dispositivo o PC! 📱💻*\n\n`1` » Toca los *tres puntos* en la esquina superior derecha.\n`2` » Selecciona *'Dispositivos vinculados'*.\n`3` » ¡Escanea este QR y listo para iniciar sesión! 🎉\n\n*⚠️ Este código QR caduca en 45 segundos. ¡Conéctate rápido!*";
+let rtx2 = "*¡Conexión Sub Bot por Código! ✨🌀*\n\n*Usa este código único para convertirte en un Sub Bot. ¡Es rápido y seguro! 🚀*\n\n`1` » Toca los *tres puntos* en la esquina superior derecha.\n`2` » Selecciona *'Dispositivos vinculados'*.\n`3` » Elige *'Vincular con el número de teléfono'*.\n`4` » ¡Introduce el *código* que te proporcionaremos a continuación! 👇\n\n*🔒 Este código solo funciona para ti. ¡No lo compartas!*";
 
 if (global.conns instanceof Array) {
 } else {
   global.conns = [];
 }
 
-const MAX_SUBBOTS = 2;
+const MAX_SUBBOTS = 9999;
 
 async function loadSubbots() {
   const serbotFolders = fs.readdirSync('./' + global.jadi); // Changed to global.jadi assuming it's defined elsewhere
@@ -271,8 +272,8 @@ let handler = async (msg, { conn, args, usedPrefix, command, isOwner }) => {
               forwardingScore: 999,
               isForwarded: true,
               forwardedNewsletterMessageInfo: {
-                newsletterJid: '120363422161687949@newsletter',
-                newsletterName: 's',
+                newsletterJid: '120363419364337473@newsletter',
+                newsletterName: 'sᥲsᥙkᥱ ᑲ᥆𝗍 mძ 🌀',
                 serverMessageId: -1
               }
             }
@@ -286,8 +287,8 @@ let handler = async (msg, { conn, args, usedPrefix, command, isOwner }) => {
               forwardingScore: 999,
               isForwarded: true,
               forwardedNewsletterMessageInfo: {
-                newsletterJid: '120363422161687949@newsletter',
-                newsletterName: 's',
+                newsletterJid: '120363419364337473@newsletter',
+                newsletterName: 'sᥲsᥙkᥱ ᑲ᥆𝗍 mძ 🌀',
                 serverMessageId: -1
               }
             }
@@ -302,8 +303,8 @@ let handler = async (msg, { conn, args, usedPrefix, command, isOwner }) => {
               forwardingScore: 999,
               isForwarded: true,
               forwardedNewsletterMessageInfo: {
-                newsletterJid: '120363422161687949@newsletter',
-                newsletterName: 's',
+                newsletterJid: '120363419364337473@newsletter',
+                newsletterName: 'sᥲsᥙkᥱ ᑲ᥆𝗍 mძ 🌀',
                 serverMessageId: -1
               }
             }
@@ -454,6 +455,6 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 async function joinChannels(conn) {
-  await conn.newsletterFollow("120363422161687949@newsletter")
-  conn.newsletterFollow("120363422161687949@newsletter")
+  await conn.newsletterFollow("120363414007802886@newsletter")
+  conn.newsletterFollow("120363419364337473@newsletter")
 }
