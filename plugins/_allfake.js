@@ -57,7 +57,7 @@ newsletterName: '𝗦𝗵𝗮𝗱𝗼𝘄 𝗕𝗼𝘁 🍷',
 externalAdReply: { 
 showAdAttribution: true,
 title: '𝗦𝗵𝗮𝗱𝗼𝘄 - 𝗕𝗼𝘁 🍷',
-body: '𝑪𝒓𝒊𝒔𝒕𝒊𝒂𝒏 𝒅𝒐 𝒎𝒆𝒋𝒐𝒓 🍷',
+body: '𝗖𝗿𝗶𝘀𝘁𝗶𝗮𝗻 𝗱𝗼 𝗺𝗲𝗷𝗼𝗿 🍷',
 previewType: "PHOTO",
 thumbnailUrl: 'https://files.catbox.moe/iydxk1.jpg',
 sourceUrl: 'https://www.instagram.com/baki_hm66?igsh=cHk1eW1uZXF2ZWsy',
