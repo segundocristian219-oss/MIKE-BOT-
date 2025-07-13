@@ -30,21 +30,35 @@ export default handler;
 
 
 
-let handler = async (m, { conn, quoted }) => {
-  if (!quoted) 
-    return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
+const handler = async (m, { conn, participants }) => {
+  const texto = (m.text || '').trim().toLowerCase()
 
-  let user = quoted.participant || quoted.sender || quoted.key?.participant;
+  // Activadores exactos sin prefijo
+  if (!/^promote$|^ascender$|^admin$/i.test(texto)) return
+  if (!m.isGroup) return
 
-  if (!user || user.length < 15 || user.length > 25)
-    return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
+  const userSender = participants.find(u => u.id === m.sender)
+  const botSender = participants.find(u => u.id === conn.user.jid)
 
-  await conn.groupParticipantsUpdate(m.chat, [user], 'promote');
-};
+  if (!userSender?.admin) return
+  if (!botSender?.admin) return
 
-handler.customPrefix = /^(promote)$/i;  // Solo para mensaje que diga exactamente "promote"
-handler.command = new RegExp;
-handler.group = true;
-handler.admin = true;
-handler.botAdmin = true;
+  const targets = m.mentionedJid?.length
+    ? m.mentionedJid
+    : m.quoted
+    ? [m.quoted.sender]
+    : []
+
+  if (!targets.length) return
+
+  try {
+    await conn.groupParticipantsUpdate(m.chat, targets, 'promote')
+  } catch (err) {}
+}
+
+handler.customPrefix = /^promote$|^ascender$|^admin$/i
+handler.command = new RegExp // solo sin prefijo
+handler.group = true
+handler.admin = true
+handler.botAdmin = true
   
