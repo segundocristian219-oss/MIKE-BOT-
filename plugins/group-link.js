@@ -1,9 +1,6 @@
-const handler = async (m, { conn }) => {
-  conn.reply(m.chat, 'https://chat.whatsapp.com/' + await conn.groupInviteCode(m.chat), m);
-};
+const handler = async (m, { conn }) =>
+  conn.sendMessage(m.chat, { text: 'https://chat.whatsapp.com/' + await conn.groupInviteCode(m.chat) });
 
-handler.help = ['link'];
-handler.tags = ['grupo'];
 handler.command = ['link', 'enlace'];
 handler.group = true;
 handler.botAdmin = true;
