@@ -18,9 +18,9 @@
     "eslint": "eslint .",
     "eslintfix": "eslint --fix ."
   },
-  "homepage": "https://github.com/Sofia1269/Sofi",
+  "homepage": "https://github.com/AngelDown12",
   "author": {
-    "name": "Sisked"
+    "name": "Angel"
   },
   "repository": {
     "type": "git",
