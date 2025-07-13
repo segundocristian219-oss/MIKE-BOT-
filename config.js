@@ -43,7 +43,7 @@ global.miniurl = 'https://example.com/siskedurl.jpg'
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
 global.group = 'https://chat.whatsapp.com/JultL94aPtb5AzIeeuDvpX'
-global.canal = 'https://whatsapp.com/channel/0029VamyjBXJuyACXCuuHm3l'
+global.canal = 'https://whatsapp.com/channel/0029VbAljWiK5cDEavnj9U3z'
 
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
