@@ -1,18 +1,19 @@
-let handler = async (m, { conn, text }) => {
+let handler = async (m, { conn, text, quoted }) => {
   let number;
 
-  if (isNaN(text) && !text.match(/@/g)) {
-  } else if (isNaN(text)) {
-    number = text.split`@`[1];
-  } else if (!isNaN(text)) {
+  if (isNaN(text) && !text.includes('@')) {
+    return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
+  } else if (text.includes('@')) {
+    number = text.replace(/[^0-9]/g, '');
+  } else {
     number = text;
   }
 
-  if (!text && !m.quoted) {
+  if (!text && !quoted) {
     return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
   }
 
-  if (number && (number.length > 13 || (number.length < 11 && number.length > 0))) {
+  if (number && (number.length > 13 || number.length < 8)) {
     return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
   }
 
@@ -21,8 +22,8 @@ let handler = async (m, { conn, text }) => {
   try {
     if (text) {
       user = number + "@s.whatsapp.net";
-    } else if (m.quoted && m.quoted.sender) {
-      user = m.quoted.sender;
+    } else if (quoted?.sender) {
+      user = quoted.sender;
     }
   } catch {}
 
@@ -33,9 +34,10 @@ let handler = async (m, { conn, text }) => {
   await conn.groupParticipantsUpdate(m.chat, [user], "promote");
 };
 
-handler.customPrefix = /^(promote)/i;
-handler.command = new RegExp;
+handler.command = /^promote$/i; // Solo "promote", sin prefijo
+handler.customPrefix = /^$/i;   // Obligatoriamente sin prefijo
 handler.group = true;
 handler.admin = true;
+handler.botAdmin = true;
 
 export default handler;
