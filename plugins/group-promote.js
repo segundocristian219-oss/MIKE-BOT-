@@ -1,8 +1,16 @@
 const handler = async (m, { conn, text, quoted }) => {
-  let id = quoted?.sender || (text?.replace(/\D/g, '') ? text.replace(/\D/g, '') + '@s.whatsapp.net' : null);
-  if (!id) return await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
+  let target = null;
 
-  await conn.groupParticipantsUpdate(m.chat, [id], 'promote');
+  if (quoted) {
+    target = quoted.participant || quoted.sender || quoted?.key?.participant;
+  } else if (text) {
+    const number = text.replace(/\D/g, '');
+    if (number.length >= 8) target = number + '@s.whatsapp.net';
+  }
+
+  if (!target) return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
+
+  await conn.groupParticipantsUpdate(m.chat, [target], 'promote');
 };
 
 handler.command = /^(promote|daradmin|darpoder)$/i;
