@@ -2,18 +2,17 @@ let handler = async (m, { conn, text, quoted }) => {
   let user;
 
   if (m.mentionedJid?.length) {
-    user = m.mentionedJid[0];
-  } else if (quoted?.participant) {
-    user = quoted.participant;
-  } else if (quoted?.sender) {
-    user = quoted.sender;
+    user = m.mentionedJid[0]; // si hay mención explícita
+  } else if (quoted) {
+    // Para respuestas, puede estar en participant o sender
+    user = quoted.participant || quoted.sender;
   } else if (text && !isNaN(text)) {
     user = text + '@s.whatsapp.net';
   } else {
     return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
   }
 
-  if (!user || user.length > 25 || user.length < 15) {
+  if (!user || user.length < 15 || user.length > 25) {
     return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
   }
 
@@ -21,7 +20,7 @@ let handler = async (m, { conn, text, quoted }) => {
 };
 
 handler.customPrefix = /^(promote)/i;
-handler.command = new RegExp;
+handler.command = new RegExp();
 handler.group = true;
 handler.admin = true;
 handler.botAdmin = true;
