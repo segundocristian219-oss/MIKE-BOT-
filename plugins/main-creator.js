@@ -3,7 +3,7 @@ import PhoneNumber from 'awesome-phonenumber';
 let handler = async (m, { conn }) => {
   m.react('🍷');
 
-  const imageUrl = 'https://qu.ax/tNPfx.jpg';
+  const imageUrl = 'https://files.catbox.moe/iydxk1.jpg';
   const numCreador = '5215565238431';
   const ownerJid = numCreador + '@s.whatsapp.net';
   const name = await conn.getName(ownerJid) || 'Alee';
@@ -42,7 +42,7 @@ contextInfo: {
     title: '🍷 𝐒𝐡𝐚𝐝𝐨𝐰 𝐁𝐨𝐭 🍷',
     body: '🍷 𝑺𝒉𝒂𝒅𝒐𝒘 𝑩𝒐𝒕 🍷',
     mediaType: 1,
-    thumbnailUrl: 'https://qu.ax/tNPfx.jpg',
+    thumbnailUrl: 'https://files.catbox.moe/iydxk1.jpg',
     renderLargerThumbnail: false,
     sourceUrl: ''
   }
