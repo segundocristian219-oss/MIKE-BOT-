@@ -31,7 +31,7 @@ global.author = '{\n "bot": {\n   "name": "𝙎𝙃𝘼𝘿𝙊𝙒 - 𝗕𝗢�
 global.wait = '𝙎𝙃𝘼𝘿𝙊𝙒 - 𝗕𝗢𝗧 🍷'
 global.botname = '𝙎𝙃𝘼𝘿𝙊𝙒 - 𝗕𝗢𝗧 🍷'
 global.textbot = `𝑾𝒉𝒂𝒕𝒔𝒂𝒑𝒑 𝙎𝙃𝘼𝘿𝙊𝙒 𝗕𝗢𝗧 🍷`
-global.listo = '𝑭𝒊𝒏𝒂𝒍𝒊𝒛𝒂𝒅𝒐 🍷'
+global.listo = '𝗙𝗶𝗻𝗮𝗹𝗶𝘇𝗮𝗱𝗼 🍷'
 global.namechannel = '𝙎𝙃𝘼𝘿𝙊𝙒 𝗕𝗢𝗧 🍷'
 global.baileys = '@whiskeysockets/baileys'
 
