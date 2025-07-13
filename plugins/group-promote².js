@@ -3,10 +3,10 @@ let handler = async (m, { conn, text, quoted }) => {
 
   if (m.mentionedJid?.length) {
     number = m.mentionedJid[0].split('@')[0];
+  } else if (quoted?.sender) {
+    number = quoted.sender.split('@')[0];
   } else if (!isNaN(text)) {
     number = text;
-  } else if (!text && quoted) {
-    number = quoted.sender.split('@')[0];
   } else {
     return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
   }
