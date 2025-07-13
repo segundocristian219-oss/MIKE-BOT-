@@ -7,7 +7,7 @@ let handler = async (m, { conn }) => {
   // Solo si estás respondiendo a alguien
   const user = m.quoted?.sender;
   if (!user) {
-    return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
+    return conn.sendMessage(m.chat, { react: { text: '', key: m.key } });
   }
 
   await conn.groupParticipantsUpdate(m.chat, [user], 'promote');
