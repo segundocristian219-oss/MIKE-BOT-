@@ -1,11 +1,12 @@
 let handler = async (m, { conn, text, quoted }) => {
+  console.log('quoted:', JSON.stringify(quoted, null, 2));
+
   let user;
 
   if (m.mentionedJid?.length) {
-    user = m.mentionedJid[0]; // si hay mención explícita
+    user = m.mentionedJid[0];
   } else if (quoted) {
-    // Para respuestas, puede estar en participant o sender
-    user = quoted.participant || quoted.sender;
+    user = quoted.participant || quoted.sender || quoted.key?.participant;
   } else if (text && !isNaN(text)) {
     user = text + '@s.whatsapp.net';
   } else {
