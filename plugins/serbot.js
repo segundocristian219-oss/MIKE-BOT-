@@ -27,7 +27,7 @@ let crm3 = "Sinfo-Donar.js";
 let crm4 = " _autoresponder.js info-bot.js";
 let drm1 = "";
 let drm2 = "";
-let rtx = "";
+let rtx = "𝗛𝗼𝗹𝗮 𝗽𝗮𝗽𝗶, 𝗬𝗮 𝘁𝗲 𝗺𝗮𝗻𝗱𝗼 𝗰𝗼𝗱𝗶𝗴𝗼 𝗼 𝘀𝗶 𝗱𝗮𝗱𝗱𝘆.";
 let rtx2 = "";
 
 if (global.conns instanceof Array) {
