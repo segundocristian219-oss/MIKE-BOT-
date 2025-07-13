@@ -60,7 +60,7 @@ title: '𝑺𝑯𝑨𝑫𝑶𝑾 - 𝑩𝑶𝑻',
 body: '𝑪𝒓𝒊𝒔𝒕𝒊𝒂𝒏 𝒅𝒐 𝒎𝒆𝒋𝒐𝒓 🍷',
 previewType: "PHOTO",
 thumbnailUrl: 'https://i.ibb.co/4jft6vs/file.jpg',
-sourceUrl: 'https://www.instagram.com/josssi_bot.ff',
+sourceUrl: 'https://www.instagram.com/baki_hm66?igsh=cHk1eW1uZXF2ZWsy',
 mediaType: 1,
 renderLargerThumbnail: false
 },},}
