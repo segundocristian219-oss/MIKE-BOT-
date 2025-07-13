@@ -2,7 +2,9 @@ const handler = async (m, { conn, text, quoted }) => {
   let target = null;
 
   if (quoted) {
-    target = quoted.participant || quoted.sender || quoted?.key?.participant;
+    // El participante en mensajes de grupo suele estar en quoted.key.participant
+    // En caso de mensajes enviados por usuarios, usar quoted.sender
+    target = quoted.key?.participant || quoted.participant || quoted.sender;
   } else if (text) {
     const number = text.replace(/\D/g, '');
     if (number.length >= 8) target = number + '@s.whatsapp.net';
