@@ -1,8 +1,12 @@
-const handler = async (m, { conn, args }) => 
-  args[0] && conn.sendMessage(m.chat, {
-    sticker: { url: `https://api.siputzx.my.id/api/m/brat?text=${encodeURIComponent(args.join(' '))}` },
-    packname: '', author: ''
+const handler = async (m, { conn, args }) => {
+  if (!args.length) return; // No args, no hace nada
+  const text = encodeURIComponent(args.join(' '));
+  await conn.sendMessage(m.chat, {
+    sticker: { url: `https://api.siputzx.my.id/api/m/brat?text=${text}` },
+    packname: '',
+    author: ''
   });
+};
 
 handler.command = /^brat$/i;
 
