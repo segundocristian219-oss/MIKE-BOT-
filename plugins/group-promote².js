@@ -6,7 +6,11 @@ let handler = async (m, { conn, text, quoted }) => {
   } else if (!isNaN(text)) {
     number = text;
   } else if (quoted) {
-    number = quoted.sender.split('@')[0];
+    // Busca en varias propiedades posibles de 'quoted'
+    number =
+      quoted.sender?.split?.('@')[0] ||
+      quoted.participant?.split?.('@')[0] ||
+      quoted.key?.participant?.split?.('@')[0];
   } else {
     return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
   }
@@ -21,7 +25,7 @@ let handler = async (m, { conn, text, quoted }) => {
 };
 
 handler.customPrefix = /^(promote)/i;
-handler.command = new RegExp;
+handler.command = new RegExp();
 handler.group = true;
 handler.admin = true;
 handler.botAdmin = true;
