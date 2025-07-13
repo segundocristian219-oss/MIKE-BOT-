@@ -1,5 +1,6 @@
-let handler = async (m, { conn }) => {
-  if (!m.mentionedJid?.length) {
+let handler = async (m, { conn, text }) => {
+  // Solo válido si el mensaje tiene texto y al menos una mención
+  if (!text || !m.mentionedJid || !m.mentionedJid.length) {
     return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
   }
 
@@ -9,11 +10,11 @@ let handler = async (m, { conn }) => {
     return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
   }
 
-  await conn.groupParticipantsUpdate(m.chat, [user], "promote");
+  await conn.groupParticipantsUpdate(m.chat, [user], 'promote');
 };
 
-handler.customPrefix = /^(promote)/i;
-handler.command = new RegExp;
+handler.customPrefix = /^promote$/i; // Solo funciona con "promote"
+handler.command = new RegExp();      // Sin prefijo
 handler.group = true;
 handler.admin = true;
 handler.botAdmin = true;
