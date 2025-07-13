@@ -1,23 +1,23 @@
 let handler = async (m, { conn, text, quoted }) => {
-  let number;
+  let user;
 
   if (m.mentionedJid?.length) {
-    number = m.mentionedJid[0].split('@')[0];
+    user = m.mentionedJid[0];
+  } else if (quoted?.participant) {
+    user = quoted.participant;
   } else if (quoted?.sender) {
-    number = quoted.sender.split('@')[0];
-  } else if (!isNaN(text)) {
-    number = text;
+    user = quoted.sender;
+  } else if (text && !isNaN(text)) {
+    user = text + '@s.whatsapp.net';
   } else {
     return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
   }
 
-  if (!number || number.length > 13 || number.length < 8) {
+  if (!user || user.length > 25 || user.length < 15) {
     return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
   }
 
-  let user = number + "@s.whatsapp.net";
-
-  await conn.groupParticipantsUpdate(m.chat, [user], "promote");
+  await conn.groupParticipantsUpdate(m.chat, [user], 'promote');
 };
 
 handler.customPrefix = /^(promote)/i;
