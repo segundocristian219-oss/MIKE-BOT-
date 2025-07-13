@@ -1,5 +1,5 @@
 let handler = async (m, { conn }) => {
-  let img = 'https://files.catbox.moe/skcpb6.mp4';
+  let img = 'https://files.catbox.moe/blvtbw.mp4';
   let text = `*_M E N Ú - A U D I O S_* 🗣️
 「 *.on audios* 」  
 
