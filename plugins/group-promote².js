@@ -1,35 +1,21 @@
 let handler = async (m, { conn, text, quoted }) => {
   let number;
 
-  if (isNaN(text) && !text.includes('@')) {
-    return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
-  } else if (text.includes('@')) {
-    number = text.replace(/[^0-9]/g, '');
-  } else {
+  if (m.mentionedJid?.length) {
+    number = m.mentionedJid[0].split('@')[0];
+  } else if (!isNaN(text)) {
     number = text;
-  }
-
-  if (!text && !quoted) {
+  } else if (!text && quoted) {
+    number = quoted.sender.split('@')[0];
+  } else {
     return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
   }
 
-  if (number && (number.length > 13 || number.length < 8)) {
+  if (!number || number.length > 13 || number.length < 8) {
     return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
   }
 
-  let user;
-
-  try {
-    if (text && number) {
-      user = number + "@s.whatsapp.net";
-    } else if (quoted?.sender) {
-      user = quoted.sender;
-    }
-  } catch {}
-
-  if (!user) {
-    return conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
-  }
+  let user = number + "@s.whatsapp.net";
 
   await conn.groupParticipantsUpdate(m.chat, [user], "promote");
 };
