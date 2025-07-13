@@ -4,9 +4,9 @@ const handler = async (m, { conn }) =>
        m.reply('☠️ Intruso eliminado.'))
     : m.reply('_Menciona al usuario que deseas eliminar._');
 
-handler.command = ['kick', 'expulsar', 'eliminar'];
+handler.customPrefix = /^(kick)/i;
+handler.command = new RegExp;
 handler.group = true;
 handler.admin = true;
-handler.botAdmin = true;
 
 export default handler;
