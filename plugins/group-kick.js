@@ -4,7 +4,7 @@ const handler = async (m, { conn }) =>
        m.reply('☠️ Intruso eliminado.'))
     : m.reply('_Menciona al usuario que deseas eliminar._');
 
-handler.command = ['kick', 'expulsar', 'eliminar'] 
+handler.command = ['kick'] 
 handler.admin = true
 handler.group = true
 handler.botAdmin = true
