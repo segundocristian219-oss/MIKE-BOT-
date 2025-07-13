@@ -36,6 +36,21 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
       chat.modoadmin = isEnable          
       break
 
+
+
+          case 'jadibotmd':
+    case 'serbot':
+    case 'subbots':
+      isAll = true;
+      if (!isOwner) {
+        global.dfail('rowner', m, conn);
+        throw false;
+      }
+      bot.jadibotmd = isEnable;
+      break;
+
+
+
       case 'detect': case 'avisos':
       if (!m.isGroup) {
       if (!isOwner) {
