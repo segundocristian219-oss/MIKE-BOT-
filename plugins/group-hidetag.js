@@ -103,4 +103,5 @@ const handler = async (msg, { conn, args }) => {
 };
 
 handler.command = ["tag"];
-module.exports = handler;
+
+export default handler;
