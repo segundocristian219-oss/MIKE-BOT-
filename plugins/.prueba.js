@@ -1,17 +1,22 @@
-import { toBuffer } from 'microbuffer'
-
 let handler = async (m, { conn }) => {
-  if (!m.msg || !m.msg.fileSha256) return;
-  
-  // Mostrar el hash en base64 (para que lo puedas copiar)
-  let hash = m.msg.fileSha256.toString('base64');
-  console.log('Sticker recibido - Hash:', hash);
+  if (!m.stickerMessage && m.mtype !== 'stickerMessage') return;
 
-  await m.reply(`🧩 Hash del sticker:\n${hash}`);
+  try {
+    const buffer = await conn.download(m.msg);
+    const hash = m.msg.fileSha256?.toString('base64');
+
+    if (!hash) return m.reply('❌ No se pudo obtener el hash del sticker.');
+
+    console.log('🧩 Hash:', hash);
+    await m.reply(`🧩 Hash del sticker:\n${hash}`);
+  } catch (e) {
+    console.error(e);
+    await m.reply('⚠️ Error al procesar el sticker.');
+  }
 };
 
 handler.customPrefix = /.*/;
-handler.command = new RegExp; // se ejecuta siempre
+handler.command = new RegExp;
 handler.private = false;
 
 export default handler;
