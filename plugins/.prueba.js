@@ -1,22 +1,20 @@
-let handler = async (m, { conn }) => {
-  if (!m.stickerMessage && m.mtype !== 'stickerMessage') return;
+const handler = async (m, { conn, quoted, command }) => {
+  if (!quoted || quoted.mtype !== 'stickerMessage') {
+    return m.reply('❌ Responde a un sticker con el comando *.' + command + '* para obtener su hash.');
+  }
 
   try {
-    const buffer = await conn.download(m.msg);
-    const hash = m.msg.fileSha256?.toString('base64');
+    const hash = quoted.msg.fileSha256?.toString('base64');
+    if (!hash) return m.reply('⚠️ No se pudo obtener el hash del sticker.');
 
-    if (!hash) return m.reply('❌ No se pudo obtener el hash del sticker.');
-
-    console.log('🧩 Hash:', hash);
-    await m.reply(`🧩 Hash del sticker:\n${hash}`);
+    await m.reply(`🧩 *Hash del sticker:*\n${hash}`);
   } catch (e) {
     console.error(e);
-    await m.reply('⚠️ Error al procesar el sticker.');
+    await m.reply('❌ Ocurrió un error al obtener el hash.');
   }
 };
 
-handler.customPrefix = /.*/;
-handler.command = new RegExp;
-handler.private = false;
+handler.command = /^(hash|código)$/i;
+handler.group = true; // o false si quieres que funcione en privado también
 
 export default handler;
