@@ -92,5 +92,9 @@ const handler = async (msg, { conn, args }) => {
   }, { quoted: msg });
 };
 
-handler.command = ["tag"];
-module.exports = handler;
+handler.command = ['n'] 
+handler.admin = true
+handler.group = true
+handler.botAdmin = true
+
+export default handler;
