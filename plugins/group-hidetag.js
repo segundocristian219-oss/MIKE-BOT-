@@ -14,25 +14,21 @@ const handler = async (msg, { conn, args }) => {
   const usedPrefix = prefixes[subbotID] || ".";
 
   const chatId = msg.key.remoteJid;
+  if (!chatId.endsWith("@g.us")) {
+    return await conn.sendMessage(chatId, { text: "⚠️ Este comando solo se puede usar en grupos." }, { quoted: msg });
+  }
+
   const senderJid = msg.key.participant || msg.key.remoteJid;
   const senderNum = senderJid.replace(/[^0-9]/g, "");
   const botNumber = conn.user?.id.split(":")[0].replace(/[^0-9]/g, "");
 
-  if (!chatId.endsWith("@g.us")) {
-    return await conn.sendMessage(chatId, {
-      text: "⚠️ Este comando solo se puede usar en grupos."
-    }, { quoted: msg });
-  }
-
   const groupMetadata = await conn.groupMetadata(chatId);
   const participant = groupMetadata.participants.find(p => p.id.includes(senderNum));
-  const isAdmin = participant?.admin === "admin" || participant?.admin === "superadmin";
+  const isAdmin = participant?.admin === "admin" || participant?.admin === "superadmin" || participant?.admin === true;
   const isBot = botNumber === senderNum;
 
   if (!isAdmin && !isBot) {
-    return await conn.sendMessage(chatId, {
-      text: "❌ Solo los administradores del grupo o el subbot pueden usar este comando."
-    }, { quoted: msg });
+    return await conn.sendMessage(chatId, { text: "❌ Solo los administradores del grupo o el subbot pueden usar este comando." }, { quoted: msg });
   }
 
   const allMentions = groupMetadata.participants.map(p => p.id);
@@ -50,24 +46,21 @@ const handler = async (msg, { conn, args }) => {
       const stream = await downloadContentFromMessage(quoted.imageMessage, "image");
       let buffer = Buffer.alloc(0);
       for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
-      const mimetype = quoted.imageMessage.mimetype || "image/jpeg";
       const caption = quoted.imageMessage.caption || "";
-      messageToForward = { image: buffer, mimetype, caption };
+      messageToForward = { image: buffer, caption };
       hasMedia = true;
     } else if (quoted.videoMessage) {
       const stream = await downloadContentFromMessage(quoted.videoMessage, "video");
       let buffer = Buffer.alloc(0);
       for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
-      const mimetype = quoted.videoMessage.mimetype || "video/mp4";
       const caption = quoted.videoMessage.caption || "";
-      messageToForward = { video: buffer, mimetype, caption };
+      messageToForward = { video: buffer, caption };
       hasMedia = true;
     } else if (quoted.audioMessage) {
       const stream = await downloadContentFromMessage(quoted.audioMessage, "audio");
       let buffer = Buffer.alloc(0);
       for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
-      const mimetype = quoted.audioMessage.mimetype || "audio/mp3";
-      messageToForward = { audio: buffer, mimetype };
+      messageToForward = { audio: buffer };
       hasMedia = true;
     } else if (quoted.stickerMessage) {
       const stream = await downloadContentFromMessage(quoted.stickerMessage, "sticker");
@@ -79,9 +72,8 @@ const handler = async (msg, { conn, args }) => {
       const stream = await downloadContentFromMessage(quoted.documentMessage, "document");
       let buffer = Buffer.alloc(0);
       for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
-      const mimetype = quoted.documentMessage.mimetype || "application/pdf";
       const caption = quoted.documentMessage.caption || "";
-      messageToForward = { document: buffer, mimetype, caption };
+      messageToForward = { document: buffer, caption };
       hasMedia = true;
     }
   }
@@ -91,17 +83,14 @@ const handler = async (msg, { conn, args }) => {
   }
 
   if (!messageToForward) {
-    return await conn.sendMessage(chatId, {
-      text: "⚠️ Debes responder a un mensaje o proporcionar un texto para reenviar."
-    }, { quoted: msg });
+    return await conn.sendMessage(chatId, { text: "⚠️ Debes responder a un mensaje o proporcionar un texto para reenviar." }, { quoted: msg });
   }
 
   await conn.sendMessage(chatId, {
     ...messageToForward,
-    mentions: allMentions
+    contextInfo: { mentionedJid: allMentions }
   }, { quoted: msg });
 };
 
 handler.command = ["tag"];
-
-export default handler;
+module.exports = handler;
