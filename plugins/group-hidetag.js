@@ -1,8 +1,12 @@
 const fs = require("fs");
 const path = require("path");
-const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
 
-const handler = async (msg, { conn, args }) => {
+const handler = async (m, { conn, args, isAdmin, isBotAdmin, isOwner }) => {
+  if (!m.isGroup) return global.dfail('group', m, conn);
+  if (!isAdmin && !isOwner) return global.dfail('admin', m, conn);
+  if (!isBotAdmin) return global.dfail('botAdmin', m, conn);
+
+  // Leer prefix (opcional, si lo usas)
   const rawID = conn.user?.id || "";
   const subbotID = rawID.split(":")[0] + "@s.whatsapp.net";
 
@@ -13,88 +17,61 @@ const handler = async (msg, { conn, args }) => {
   }
   const usedPrefix = prefixes[subbotID] || ".";
 
-  const chatId = msg.key.remoteJid;
-  if (!chatId.endsWith("@g.us")) {
-    return await conn.sendMessage(chatId, { text: "⚠️ Este comando solo se puede usar en grupos." }, { quoted: msg });
-  }
+  const chatId = m.chat;
+  const users = m.isGroup ? (await conn.groupMetadata(chatId)).participants.map(p => p.id) : [];
 
-  const senderJid = msg.key.participant || msg.key.remoteJid;
-  const senderNum = senderJid.replace(/[^0-9]/g, "");
-  const botNumber = conn.user?.id.split(":")[0].replace(/[^0-9]/g, "");
-
-  const groupMetadata = await conn.groupMetadata(chatId);
-  const participant = groupMetadata.participants.find(p => p.id.includes(senderNum));
-  const isAdmin = participant?.admin === "admin" || participant?.admin === "superadmin" || participant?.admin === true;
-  const isBot = botNumber === senderNum;
-
-  if (!isAdmin && !isBot) {
-    return await conn.sendMessage(chatId, { text: "❌ Solo los administradores del grupo o el subbot pueden usar este comando." }, { quoted: msg });
-  }
-
-  const allMentions = groupMetadata.participants.map(p => p.id);
   let messageToForward = null;
-  let hasMedia = false;
 
-  if (msg.message?.extendedTextMessage?.contextInfo?.quotedMessage) {
-    const quoted = msg.message.extendedTextMessage.contextInfo.quotedMessage;
+  // Si hay mensaje citado
+  if (m.quoted) {
+    try {
+      const quoted = m.quoted;
+      const mime = (quoted.msg || quoted)?.mimetype || '';
+      const isMedia = /image|video|audio|sticker|document/.test(mime);
 
-    if (quoted.conversation) {
-      messageToForward = { text: quoted.conversation };
-    } else if (quoted.extendedTextMessage?.text) {
-      messageToForward = { text: quoted.extendedTextMessage.text };
-    } else if (quoted.imageMessage) {
-      const stream = await downloadContentFromMessage(quoted.imageMessage, "image");
-      let buffer = Buffer.alloc(0);
-      for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
-      const caption = quoted.imageMessage.caption || "";
-      messageToForward = { image: buffer, caption };
-      hasMedia = true;
-    } else if (quoted.videoMessage) {
-      const stream = await downloadContentFromMessage(quoted.videoMessage, "video");
-      let buffer = Buffer.alloc(0);
-      for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
-      const caption = quoted.videoMessage.caption || "";
-      messageToForward = { video: buffer, caption };
-      hasMedia = true;
-    } else if (quoted.audioMessage) {
-      const stream = await downloadContentFromMessage(quoted.audioMessage, "audio");
-      let buffer = Buffer.alloc(0);
-      for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
-      messageToForward = { audio: buffer };
-      hasMedia = true;
-    } else if (quoted.stickerMessage) {
-      const stream = await downloadContentFromMessage(quoted.stickerMessage, "sticker");
-      let buffer = Buffer.alloc(0);
-      for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
-      messageToForward = { sticker: buffer };
-      hasMedia = true;
-    } else if (quoted.documentMessage) {
-      const stream = await downloadContentFromMessage(quoted.documentMessage, "document");
-      let buffer = Buffer.alloc(0);
-      for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
-      const caption = quoted.documentMessage.caption || "";
-      messageToForward = { document: buffer, caption };
-      hasMedia = true;
+      if (isMedia) {
+        const media = await quoted.download();
+        if (!media) return m.reply('❌ No se pudo descargar el contenido citado.');
+
+        if (/image/.test(mime)) {
+          messageToForward = { image: media, caption: args.join(" ") || "" };
+        } else if (/video/.test(mime)) {
+          messageToForward = { video: media, caption: args.join(" ") || "", mimetype: 'video/mp4' };
+        } else if (/audio/.test(mime)) {
+          messageToForward = { audio: media, mimetype: 'audio/mpeg', ptt: false };
+        } else if (/sticker/.test(mime)) {
+          messageToForward = { sticker: media };
+        } else if (/document/.test(mime)) {
+          messageToForward = { document: media, caption: args.join(" ") || "" };
+        }
+      } else {
+        // Texto simple
+        const citado = quoted.text || quoted.body || '';
+        messageToForward = { text: args.join(" ") ? `${args.join(" ")}\n\n${citado}` : citado };
+      }
+    } catch (e) {
+      return m.reply("❌ Error al procesar el mensaje citado.");
     }
   }
 
-  if (!hasMedia && args.join(" ").trim().length > 0) {
+  // Si no hay mensaje citado, tomar texto que mandaron
+  if (!messageToForward) {
+    if (args.join(" ").trim().length === 0)
+      return m.reply("⚠️ Debes responder a un mensaje o proporcionar un texto para reenviar.");
+
     messageToForward = { text: args.join(" ") };
   }
 
-  if (!messageToForward) {
-    return await conn.sendMessage(chatId, { text: "⚠️ Debes responder a un mensaje o proporcionar un texto para reenviar." }, { quoted: msg });
-  }
-
+  // Enviar con mención a todos
   await conn.sendMessage(chatId, {
     ...messageToForward,
-    contextInfo: { mentionedJid: allMentions }
-  }, { quoted: msg });
+    mentions: users
+  }, { quoted: m });
 };
 
-handler.command = ['n'] 
-handler.admin = true
-handler.group = true
-handler.botAdmin = true
+handler.command = ['tag', 'n'];
+handler.admin = true;
+handler.botAdmin = true;
+handler.group = true;
 
-export default handler;
+module.exports = handler;
