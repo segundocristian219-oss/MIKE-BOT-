@@ -9,7 +9,7 @@ let img = catalogo
     forwardedNewsletterMessageInfo: {
       newsletterJid: "120363422161687949@newsletter",
       serverMessageId: 100,
-      newsletterName: '𝗦𝗵𝗮𝗱𝗼𝘄 𝗕𝗼𝘁 🍷',
+      newsletterName: '𝗔𝗻𝗴𝗲𝗹 𝗯𝗼𝘁 🎭',
     },
 	    externalAdReply: {
 				    showAdAttribution: true,
@@ -52,12 +52,12 @@ isForwarded: true,
 forwardedNewsletterMessageInfo: {
 newsletterJid: "120363422161687949@newsletter",
 serverMessageId: 100,
-newsletterName: '𝗦𝗵𝗮𝗱𝗼𝘄 𝗕𝗼𝘁 🍷',
+newsletterName: '𝗔𝗻𝗴𝗲𝗹 𝗯𝗼𝘁 🎭',
 },
 externalAdReply: { 
 showAdAttribution: true,
-title: '𝗦𝗵𝗮𝗱𝗼𝘄 - 𝗕𝗼𝘁 🍷',
-body: '𝗖𝗿𝗶𝘀𝘁𝗶𝗮𝗻 𝗱𝗼 𝗺𝗲𝗷𝗼𝗿 🍷',
+title: '𝗔𝗻𝗴𝗲𝗹 𝗯𝗼𝘁 🎭',
+body: '𝗔𝗻𝗴𝗲𝗹 𝗯𝗼𝘁 🎭',
 previewType: "PHOTO",
 thumbnailUrl: 'https://files.catbox.moe/iydxk1.jpg',
 sourceUrl: 'https://www.instagram.com/baki_hm66?igsh=cHk1eW1uZXF2ZWsy',
