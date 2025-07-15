@@ -43,7 +43,7 @@ global.miniurl = 'https://n.uguu.se/kJAscemb.jpg'
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
 global.group = 'https://chat.whatsapp.com/Gjj9moSuTInEh1P3BnfsAp?mode=ac_c'
-global.canal = ''
+global.canal = 'https://whatsapp.com/channel/0029VbAe8TMHgZWirR5n1Y1P'
 
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
