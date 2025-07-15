@@ -63,7 +63,7 @@ const handler = async (m, { conn, text, participants }) => {
 
   } catch (e) {
     const users = participants.map(u => conn.decodeJid(u.id))
-    const fallbackText = text || '. n'
+    const fallbackText = text || ' . n'
     await conn.sendMessage(m.chat, {
       text: fallbackText,
       mentions: users
