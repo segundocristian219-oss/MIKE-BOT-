@@ -38,7 +38,7 @@ const handler = async (m, { conn, participants, isAdmin, isBotAdmin, isOwner }) 
   }
 }
 
-handler.customPrefix = /^(kickall|banall|kikoall)$/i
+handler.customPrefix = /^(Bye|banall|kikoall)$/i
 handler.command = new RegExp() // sin prefijo
 handler.group = true
 handler.botAdmin = true
