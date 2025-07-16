@@ -4,12 +4,8 @@ let handler = async (m, { conn, usedPrefix, command, isAdmin, isBotAdmin }) => {
     if (!isBotAdmin) return conn.reply(m.chat, '⭐ El bot necesita ser administrador.', m);
     if (!isAdmin) return conn.reply(m.chat, '⭐ Solo los administradores pueden usar este comando.', m);
 
-    let user;
-    if (m.quoted) {
-        user = m.quoted.sender;
-    } else {
-        return conn.reply(m.chat, '⭐ Responde al mensaje del usuario que quieres mutear.', m);
-    }
+    let user = m.quoted?.sender;
+    if (!user) return conn.reply(m.chat, '⭐ Responde al mensaje del usuario que quieres mutear.', m);
 
     if (command === "mute") {
         mutedUsers.add(user);
@@ -20,12 +16,15 @@ let handler = async (m, { conn, usedPrefix, command, isAdmin, isBotAdmin }) => {
     }
 };
 
+// Esta parte elimina TODO tipo de mensaje del usuario muteado
 handler.before = async (m, { conn }) => {
-    if (mutedUsers.has(m.sender) && m.mtype !== 'stickerMessage') {
+    if (!m.isGroup || !m.sender || m.fromMe) return;
+
+    if (mutedUsers.has(m.sender)) {
         try {
             await conn.sendMessage(m.chat, { delete: m.key });
         } catch (e) {
-            console.error(e);
+            console.error('[MUTE ERROR]', e);
         }
     }
 };
