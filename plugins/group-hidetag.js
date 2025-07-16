@@ -8,7 +8,6 @@ const handler = async (m, { conn, text, participants }) => {
     const mime = (q.msg || q).mimetype || ''
     const isMedia = /image|video|sticker|audio/.test(mime)
 
-    // 📌 Captura el texto original si no escriben texto nuevo
     const originalCaption = (q.msg?.caption || q.text || '').trim()
     const finalCaption = text.trim() ? text : originalCaption
 
