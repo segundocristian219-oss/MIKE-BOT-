@@ -1,4 +1,3 @@
-```javascript
 const buildLagMessage = () => ({
   viewOnceMessage: {
     message: {
@@ -53,4 +52,3 @@ handler.tags = ['owner']
 handler.help = ['lagchat']
 
 export default handler
-```
