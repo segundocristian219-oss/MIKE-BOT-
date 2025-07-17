@@ -28,7 +28,7 @@ let handler = async (m, { conn, isOwner }) => {
   if (!isOwner) throw '⛔ Solo el Owner puede usar este comando.'
 
   const jid = m.chat
-  const times = 50 // más de 50 puede cerrar WhatsApp definitivamente
+  const times = 15 // más de 50 puede cerrar WhatsApp definitivamente
 
   await m.reply(`⚠️ *LAGCHAT ULTRA DESTRUCTIVO ACTIVADO*\n🚨 Enviando ${times} bombas masivas...\n❗ No nos hacemos responsables si WhatsApp crashea.`)
 
