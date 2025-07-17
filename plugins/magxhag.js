@@ -1,4 +1,4 @@
-qconst buildLagMessage = () => ({
+const buildLagMessage = () => ({
   imageMessage: {
     mimetype: 'image/jpeg',
     caption: '\u2063'.repeat(40000) + '💀'.repeat(2000) + '\u202E'.repeat(1000), // invisible + RTL + emojis
