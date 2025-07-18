@@ -24,7 +24,7 @@ let handler = async (m, { conn }) => {
     }
   }
 }
-handler.customPrefix = /^(kick)/i;
+handler.customPrefix = /^(del)/i;
 handler.command = new RegExp;
 handler.group = true;
 handler.admin = true;
