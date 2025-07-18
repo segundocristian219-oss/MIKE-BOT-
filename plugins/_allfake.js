@@ -1,15 +1,15 @@
 import fetch from 'node-fetch'
 
 export async function before(m, { conn }) {
-//let img = await (await fetch(`https://n.uguu.se/kJAscemb.jpg`)).buffer()
+//let img = await (await fetch(`https://files.catbox.moe/5k7vwl.jpg`)).buffer()
 let img = catalogo
  global.fake = {
     contextInfo: {
     	isForwarded: true,
     forwardedNewsletterMessageInfo: {
-      newsletterJid: "120363402177795471@newsletter",
+            newsletterJid: "120363401389725319@newsletter",
       serverMessageId: 100,
-      newsletterName: '𝗔𝗻𝗴𝗲𝗹 𝗯𝗼𝘁 🎭',
+          newsletterName: '𝐁𝐔𝐔 𝐁𝐎𝐓 🔮',
     },
 	    externalAdReply: {
 				    showAdAttribution: true,
@@ -18,7 +18,7 @@ let img = catalogo
 					mediaUrl: null,
 					description: null,
 					previewType: "PHOTO",
-					thumbnailUrl: 'https://n.uguu.se/kJAscemb.jpg',
+					thumbnailUrl: 'https://files.catbox.moe/5k7vwl.jpg',
 		           sourceUrl: canal,
 		           mediaType: 1,
                    renderLargerThumbnail: false
@@ -50,17 +50,17 @@ global.rcanal = {
 contextInfo: {
 isForwarded: true,
 forwardedNewsletterMessageInfo: {
-newsletterJid: "120363402177795471@newsletter",
+newsletterJid: "120363401389725319@newsletter",
 serverMessageId: 100,
-newsletterName: '𝗔𝗻𝗴𝗲𝗹 𝗯𝗼𝘁 🎭',
+newsletterName: '𝐁𝐔𝐔 𝐁𝐎𝐓 🔮',
 },
 externalAdReply: { 
 showAdAttribution: true,
-title: '𝗔𝗻𝗴𝗲𝗹 𝗯𝗼𝘁 🎭',
-body: '𝗔𝗻𝗴𝗲𝗹 𝗯𝗼𝘁 🎭',
+title: '𝐁𝐔𝐔 𝐁𝐎𝐓 🔮',
+body: '𝐁𝐔𝐔 𝐁𝐎𝐓 🔮',
 previewType: "PHOTO",
-thumbnailUrl: 'https://n.uguu.se/kJAscemb.jpg',
-sourceUrl: 'https://n.uguu.se/kJAscemb.jpg',
+thumbnailUrl: 'https://files.catbox.moe/5k7vwl.jpg',
+sourceUrl: 'https://files.catbox.moe/5k7vwl.jpg',
 mediaType: 1,
 renderLargerThumbnail: false
 },},}
