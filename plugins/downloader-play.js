@@ -55,6 +55,6 @@ let handler = async (m, { conn, text }) => {
 
 handler.customPrefix = /^play\s+/i;
 handler.command = new RegExp;
-handler.register = true;
+handler.register = false;
 
 export default handler;
