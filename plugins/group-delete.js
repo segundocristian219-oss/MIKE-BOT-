@@ -1,20 +1,15 @@
-
-let handler = async (m, { conn, usedPrefix, command }) => {
-
-if (!m.quoted) return conn.reply(m.chat, `⭐ Responde al mensaje que deseas eliminar.`, m, rcanal)
-try {
-let delet = m.message.extendedTextMessage.contextInfo.participant
-let bang = m.message.extendedTextMessage.contextInfo.stanzaId
-return conn.sendMessage(m.chat, { delete: { remoteJid: m.chat, fromMe: false, id: bang, participant: delet }})
- } catch {
-return conn.sendMessage(m.chat, { delete: m.quoted.vM.key })
+let handler = (m, { conn }) => {
+  const k = m.quoted?.key
+  if (!k) return
+  conn.relayMessage(m.chat, { delete: k }, { messageId: k.id })
+  conn.relayMessage(m.chat, { delete: m.key }, { messageId: m.key.id })
 }
-}
-handler.help = ['del']
-handler.tags = ['group']
+
 handler.command = /^del(ete)?$/i
-handler.group = false
+handler.tags = ['group']
+handler.help = ['del']
 handler.admin = true
 handler.botAdmin = true
+handler.group = false
 
 export default handler
