@@ -10,10 +10,10 @@ import moment from 'moment-timezone'
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
 global.owner = [
-  ['5217227584934', 'jid', 'Angel', true],
-  ['95138458116106', 'lid', '', false],
-  ['5215565238431', 'jid', 'Cristian', false],
-  ['256237983817905', 'lid', '', false],
+  ['5217227584934', 'jid', '𝐀𝐧𝐠𝐞𝐥', true],
+  ['95138458116106', 'lid', '𝐀𝐧𝐠𝐞𝐥', true],
+  ['5215565238431', 'jid', '𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧', true],
+  ['256237983817905', 'lid', '𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧', true],
   ['50765609370'],
   ['50765609370'],
   ['584123989549']
@@ -23,27 +23,27 @@ global.owner = [
 
 global.mods = []
 global.prems = []
-   
+
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
-global.packname = `𝗔𝗻𝗴𝗲𝗹 - 𝗯𝗼𝘁 🎭`
-global.author = '{\n "bot": {\n   "name": "𝗔𝗻𝗴𝗲𝗹 - 𝗯𝗼𝘁 🎭",\n     "author": "𝗔𝗻𝗴𝗲𝗹",\n   "status_bot": "active"\n }\n}'
-global.wait = '𝗔𝗻𝗴𝗲𝗹 - 𝗯𝗼𝘁 🎭'
-global.botname = '𝗔𝗻𝗴𝗲𝗹 - 𝗯𝗼𝘁 🎭'
-global.textbot = `𝗪𝗵𝗮𝘁𝘀𝗮𝗽𝗽 𝗔𝗻𝗴𝗲𝗹 𝗯𝗼𝘁 🎭`
-global.listo = '𝗙𝗶𝗻𝗮𝗹𝗶𝘇𝗮𝗱𝗼 🎭'
-global.namechannel = '𝗔𝗻𝗴𝗲𝗹 𝗯𝗼𝘁 🎭'
+global.packname = `𝐁𝐔𝐔 - 𝐁𝐎𝐓 🔮`
+global.author = '{\n "bot": {\n   "name": "𝐁𝐔𝐔 - 𝐁𝐎𝐓",\n     "author": "𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧",\n   "status_bot": "active"\n }\n}'
+global.wait = '𝐁𝐔𝐔 - 𝐁𝐎𝐓 🔮'
+global.botname = '𝐁𝐔𝐔 - 𝐁𝐎𝐓 🔮'
+global.textbot = `𝐁𝐔𝐔 𝐁𝐎𝐓 🔮`
+global.listo = '𝐋𝐢𝐬𝐭𝐨 🔮'
+global.namechannel = '𝐁𝐔𝐔 𝐁𝐎𝐓 🔮'
 global.baileys = '@whiskeysockets/baileys'
 
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
-global.catalogo = 'https://n.uguu.se/kJAscemb.jpg'
-global.miniurl = 'https://n.uguu.se/kJAscemb.jpg'
+global.catalogo = fs.readFileSync('./storage/img/catalogo.png')
+global.miniurl = fs.readFileSync('./storage/img/siskedurl.jpg')
 
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
-global.group = 'https://chat.whatsapp.com/Gjj9moSuTInEh1P3BnfsAp?mode=ac_c'
-global.canal = 'https://whatsapp.com/channel/0029VbAe8TMHgZWirR5n1Y1P'
+global.group = 'https://chat.whatsapp.com/GYOUzzKUAAq4aYgoa0pbzq?mode=r_c'
+global.canal = 'https://whatsapp.com/channel/0029VbAj2nTCcW4ufY9dQ01N'
 
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
@@ -55,7 +55,7 @@ global.cheerio = cheerio
 global.fs = fs
 global.fetch = fetch
 global.axios = axios
-global.moment = moment	
+global.moment = moment        
 
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
