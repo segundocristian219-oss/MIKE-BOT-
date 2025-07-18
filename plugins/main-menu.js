@@ -45,7 +45,7 @@ const defaultMenu = {
 \t\t\t𝐁 𝐔 𝐔 𝐁 𝐎 𝐓
 `.trimStart(),
 header: '┣━━━ *〔* *%category* *〕*━━━┫',
-body: '*┃⋗ 🔮* *%cmd*\n',
+body: '*┃⋗ 🍷* *%cmd*\n',
 footer: '┗━━━━━━━━━━━━━━┛\n',
 after: '',
 }
