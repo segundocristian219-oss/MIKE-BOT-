@@ -24,11 +24,9 @@ let handler = async (m, { conn }) => {
     }
   }
 }
-handler.help = ['del']
-handler.tags = ['group']
-handler.command = /^del(ete)?$/i
-handler.group = false
-handler.admin = true
-handler.botAdmin = true
+handler.customPrefix = /^(kick)/i;
+handler.command = new RegExp;
+handler.group = true;
+handler.admin = true;
 
-export default handler
+export default handler;
