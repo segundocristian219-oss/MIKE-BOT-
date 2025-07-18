@@ -1,65 +1,71 @@
-import fetch from 'node-fetch'
-import FormData from 'form-data'
+import fs from "fs"
+import path from "path"
+import fetch from "node-fetch"
+import Jimp from "jimp"
+import FormData from "form-data"
+import { fileURLToPath } from "url"
 
-let handler = async (m, { conn, usedPrefix, command }) => {
-  const quoted = m.quoted ? m.quoted : m
-  const mime = quoted.mimetype || quoted.msg?.mimetype || ''
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
-
-  if (!/image\/(jpe?g|png)/i.test(mime)) {
-    await conn.sendMessage(m.chat, { react: { text: '❗', key: m.key } })
-    return m.reply(`${emojis} Envía o *responde a una imagen* con el comando:\n*${usedPrefix + command}*`)
-  }
-
+const handler = async (m, { conn }) => {
   try {
-    await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
+    const q = m.quoted || m
+    const mime = (q.msg || q).mimetype || q.mediaType || ""
 
-  conn.reply(m.chat, `${emojis} Mejorando la calidad de la imagen....`, m, fake)  
-    const media = await quoted.download()
-    const ext = mime.split('/')[1]
-    const filename = `mejorada_${Date.now()}.${ext}`
-
-    const form = new FormData()
-    form.append('image', media, { filename, contentType: mime })
-    form.append('scale', '2')
-
-    const headers = {
-      ...form.getHeaders(),
-      'accept': 'application/json',
-      'x-client-version': 'web',
-      'x-locale': 'es'
+    if (!/^image\/(jpe?g|png)$/.test(mime)) {
+      return m.reply('🪐 Responde a una imagen JPG o PNG.')
     }
 
-    const res = await fetch('https://api2.pixelcut.app/image/upscale/v1', {
-      method: 'POST',
-      headers,
+    await conn.sendMessage(m.chat, { text: `⏳ Mejorando Su Imagen Espere Un Momento.\n> ${dev}` }, { quoted: m })
+
+    const buffer = await q.download()
+    const image = await Jimp.read(buffer)
+    image.resize(800, Jimp.AUTO)
+
+    const tmp = path.join(__dirname, `tmp_${Date.now()}.jpg`)
+    await image.writeAsync(tmp)
+
+    const pene = await uploadToUguu(tmp)
+    if (!pene) throw new Error('Lo Sentimos La Api Fue Un Fracaso Total, Bueno Todas son asi😿')
+
+    const enhanced = await upscaleImage(pene)
+    await conn.sendFile(m.chat, enhanced, 'hd.jpg', '', m)
+    await conn.sendMessage(m.chat, { text: "✅ Imagen mejorada." }, { quoted: m })
+
+  } catch (err) {
+    conn.reply(m.chat, `*Error:* ${err.message}\n > 🕊️.`, m)
+  }
+}
+
+handler.help = ['upscale']
+handler.tags = ['tools']
+handler.command = ['hd', 'remini', 'upscale']
+
+export default handler
+
+async function uploadToUguu(filePath) {
+  const form = new FormData()
+  form.append("files[]", fs.createReadStream(filePath))
+
+  try {
+    const res = await fetch("https://uguu.se/upload.php", {
+      method: "POST",
+      headers: form.getHeaders(),
       body: form
     })
 
     const json = await res.json()
-
-    if (!json?.result_url || !json.result_url.startsWith('http')) {
-      throw new Error('No se pudo obtener la imagen mejorada desde Pixelcut.')
-    }
-
-    const resultBuffer = await (await fetch(json.result_url)).buffer()
-
-    await conn.sendMessage(m.chat, {
-      image: resultBuffer,
-      caption: `
-✨ Tu imagen ha sido mejorada al doble de resolución.
-`.trim()
-    }, { quoted: m })
-
-    await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
-  } catch (err) {
-    await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
-    m.reply(`❌ Falló la mejora de imagen:\n${err.message || err}`)
+    await fs.promises.unlink(filePath)
+    return json.files?.[0]?.url
+  } catch {
+    await fs.promises.unlink(filePath)
+    return null
   }
 }
 
-handler.help = ['hd']
-handler.tags = ['herramientas', 'imagen']
-handler.command = /^hd$/i
-
-export default handler
+async function upscaleImage(url) {
+  const res = await fetch(`https://api.siputzx.my.id/api/iloveimg/upscale?image=${encodeURIComponent(url)}`)
+  if (!res.ok) throw new Error("No se pudo mejorar la imagen.")
+  return await res.buffer()
+}
