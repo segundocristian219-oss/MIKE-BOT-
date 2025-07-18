@@ -27,12 +27,10 @@ let handler = async (m, { conn, text, participants, command }) => {
 
     if (command === 'fankick') {
         mensaje += `\n\n🧹 *Eliminando a todos los fantasmas...*`
-
-        // Eliminar a todos los fantasmas en una sola llamada
         await conn.groupParticipantsUpdate(m.chat, sider, 'remove')
         mensaje += `\n✅ *Fantasmas eliminados exitosamente.*`
     } else {
-        mensaje += `\n\n\n𝙽𝙾𝚃𝙰: 𝙴𝚂𝚃𝙾 𝙽𝙾 𝙿𝚄𝙴𝙳𝙴 𝚂𝙴𝚁 𝟷𝟶𝟶% 𝙲𝙾𝚁𝚁𝙴𝙲𝚃𝙾, 𝙴𝙻 𝙱𝙾𝚃 𝙸𝙽𝙸𝙲𝙸𝙰 𝙴𝙻 𝙲𝙾𝙽𝚃𝙴𝙾 𝙳𝙴 𝙼𝙴𝙽𝚂𝙰𝙹𝙴𝚂 𝙳𝙴𝚂𝙳𝙴 𝙻𝙰 𝙰𝙲𝚃𝙸𝚅𝙰𝙲𝙸𝙾𝙽 𝙴𝙽 𝙴𝚂𝚃𝙴 𝙶𝚁𝚄𝙿𝙾`
+        mensaje += `\n\n*_ELIMINANDOS COMO NO SE ACTIVEN_*\n𝙽𝙾𝚃𝙰: 𝙴𝚂𝚃𝙾 𝙽𝙾 𝙿𝚄𝙴𝙳𝙴 𝚂𝙴𝚁 𝟷𝟶𝟶% 𝙲𝙾𝚁𝚁𝙴𝙲𝚃𝙾, 𝙴𝙻 𝙱𝙾𝚃 𝙸𝙽𝙸𝙲𝙸𝙰 𝙴𝙻 𝙲𝙾𝙽𝚃𝙴𝙾 𝙳𝙴 𝙼𝙴𝙽𝚂𝙰𝙹𝙴𝚂 𝙳𝙴𝚂𝙳𝙴 𝙻𝙰 𝙰𝙲𝚃𝙸𝚅𝙰𝙲𝙸𝙾𝙽 𝙴𝙽 𝙴𝚂𝚃𝙴 𝙶𝚁𝚄𝙿𝙾\n\n🧹 *Si deseas eliminar a todos los fantasmas, ejecuta:*\n.fankick`
     }
 
     conn.reply(m.chat, mensaje, null, { mentions: sider })
