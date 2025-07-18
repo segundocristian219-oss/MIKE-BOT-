@@ -1,1 +1,1 @@
-SHADOW BOT ALV
+bot all
