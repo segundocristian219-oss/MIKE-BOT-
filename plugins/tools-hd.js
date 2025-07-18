@@ -9,8 +9,6 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const handler = async (m, { conn }) => {
-  const dev = "Bot zzz 🍷" // Puedes personalizar este nombre
-
   try {
     const q = m.quoted || m
     const mime = (q.msg || q).mimetype || q.mediaType || ""
@@ -19,7 +17,8 @@ const handler = async (m, { conn }) => {
       return m.reply("🪐 𝗥𝗲𝘀𝗽𝗼𝗻𝗱𝗲 𝗮 𝘂𝗻𝗮 𝗶𝗺𝗮𝗴𝗲𝗻 𝗷𝗽𝗴 𝗼 𝗽𝗻𝗴 🍷.")
     }
 
-    await conn.sendMessage(m.chat, { text: `⏳ 𝗠𝗲𝗷𝗼𝗿𝗮𝗻𝗱𝗼 𝘁𝘂 𝗶𝗺𝗮𝗴𝗲𝗻... 𝗲𝘀𝗽𝗲𝗿𝗮 🍷\n> ${dev}` }, { quoted: m })
+    // Reacciona con ⌛ mientras procesa
+    await conn.sendMessage(m.chat, { react: { text: "⌛", key: m.key } })
 
     const buffer = await q.download()
     const image = await Jimp.read(buffer)
@@ -29,12 +28,14 @@ const handler = async (m, { conn }) => {
     await image.writeAsync(tmp)
 
     const uploadedUrl = await uploadToUguu(tmp)
-    if (!uploadedUrl) throw new Error('❌ 𝗟𝗮 𝗔𝗣𝗜 𝗳𝗮𝗹𝗹ó 𝗲𝗻 𝘀𝘂𝗯𝗶𝗿 𝗹𝗮 𝗶𝗺𝗮𝗴𝗲𝗻 🍷.')
+    if (!uploadedUrl) throw new Error('❌ 𝗙𝗮𝗹𝗹ó 𝗹𝗮 𝘀𝘂𝗯𝗶𝗱𝗮 𝗮 𝗹𝗮 𝗔𝗣𝗜.')
 
     const enhancedBuffer = await upscaleImage(uploadedUrl)
 
     await conn.sendFile(m.chat, enhancedBuffer, 'imagen-hd.jpg', '', m)
-    await conn.sendMessage(m.chat, { text: "✅ 𝗜𝗺𝗮𝗴𝗲𝗻 𝗺𝗲𝗷𝗼𝗿𝗮𝗱𝗮 𝗰𝗼𝗻 é𝘅𝗶𝘁𝗼 🍷." }, { quoted: m })
+
+    // Reacciona con ✅ al terminar
+    await conn.sendMessage(m.chat, { react: { text: "✅", key: m.key } })
 
   } catch (err) {
     console.error(err)
@@ -49,7 +50,7 @@ handler.register = true
 
 export default handler
 
-// Función para subir imagen a uguu
+// Subir imagen a uguu.se
 async function uploadToUguu(filePath) {
   const form = new FormData()
   form.append("files[]", fs.createReadStream(filePath))
@@ -66,12 +67,12 @@ async function uploadToUguu(filePath) {
     return json.files?.[0]?.url
   } catch (e) {
     await fs.promises.unlink(filePath)
-    console.error("Error subiendo a uguu:", e)
+    console.error("Error al subir a uguu:", e)
     return null
   }
 }
 
-// Función para mejorar la imagen con API externa
+// Usar API para mejorar la imagen
 async function upscaleImage(url) {
   const res = await fetch(`https://api.siputzx.my.id/api/iloveimg/upscale?image=${encodeURIComponent(url)}`)
   if (!res.ok) throw new Error("❌ No se pudo mejorar la imagen.")
