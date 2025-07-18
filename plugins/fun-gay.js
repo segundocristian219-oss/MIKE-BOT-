@@ -1,13 +1,11 @@
-let handler = async (m, { groupMetadata }) => {
-   let who = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : m.sender
-   let nro = (100).getRandom()
-   await m.reply(`@${who.split("@")[0]} es ${nro}% Gay 🏳️‍🌈.`, null, { mentions: [who] })
-}
+const handler = async (m, {conn}) => {
+  const who = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.fromMe ? conn.user.jid : m.sender;
+  await conn.sendFile(m.chat, global.API('https://some-random-api.com', '/canvas/gay', {
+    avatar: await conn.profilePictureUrl(who, 'image').catch((_) => 'https://telegra.ph/file/24fa902ead26340f3df2c.png'),
+  }), 'error.png', '*🏳️‍🌈 𝙼𝙸𝚁𝙴𝙽 𝙰 𝙴𝚂𝚃𝙴 𝙶𝙰𝚈 🏳️‍🌈*', m);
+};
 
-handler.help = ['gay2']
-handler.tags = ['fun']
-handler.command = ['cekgay', 'gay2']
-
-handler.group = true
-
-export default handler
+handler.help = ['gay'];
+handler.tags = ['maker'];
+handler.command = /^(gay)$/i;
+export default handler;
