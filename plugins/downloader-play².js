@@ -27,9 +27,8 @@ let handler = async (m, { conn, text }) => {
 
     await conn.sendMessage(m.chat, {
       image: { url: cover },
-      caption: `
-🎵 *Título:* ${title}
-👤 *Artista:* ${artist}
+      caption: `🎵 *Título:* ${title}
+📺 *Canal:* ${artist}
 ⏱️ *Duración:* ${duration}
 🌐 *Spotify:* ${url}`
     }, { quoted: m });
