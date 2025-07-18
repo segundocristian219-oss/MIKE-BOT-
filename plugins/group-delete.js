@@ -2,18 +2,14 @@ let handler = async (m, { conn }) => {
   if (!m.quoted) return
   let { remoteJid, fromMe, id, participant } = m.quoted.key
 
-  try {
-    await conn.sendMessage(remoteJid, {
-      delete: {
-        remoteJid,
-        fromMe,
-        id,
-        participant: participant || remoteJid
-      }
-    })
-  } catch (e) {
-    console.error('❌ Error eliminando mensaje:', e)
-  }
+
+try {
+let delet = m.message.extendedTextMessage.contextInfo.participant
+let bang = m.message.extendedTextMessage.contextInfo.stanzaId
+return conn.sendMessage(m.chat, { delete: { remoteJid: m.chat, fromMe: false, id: bang, participant: delet }})
+ } catch {
+return conn.sendMessage(m.chat, { delete: m.quoted.vM.key })
+}
 }
 
 handler.command = /^del(ete)?$/i
