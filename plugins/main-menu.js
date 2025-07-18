@@ -42,7 +42,7 @@ const defaultMenu = {
  %readmore
 *~•~•~•~•~•~•~•~•~•~•~•~•~•~•~•~•~*
 
-\t\t\t𝐁 𝐔 𝐔 𝐁 𝐎 𝐓
+\t\t\tS H A D O W B O T
 `.trimStart(),
 header: '┣━━━ *〔* *%category* *〕*━━━┫',
 body: '*┃⋗ 🍷* *%cmd*\n',
