@@ -20,7 +20,7 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
       }
       chat.bienvenida = isEnable
       break
-  
+
     case 'document':
     case 'documento':
     isUser = true
@@ -36,21 +36,6 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
       chat.modoadmin = isEnable          
       break
 
-
-
-          case 'jadibotmd':
-    case 'serbot':
-    case 'subbots':
-      isAll = true;
-      if (!isOwner) {
-        global.dfail('rowner', m, conn);
-        throw false;
-      }
-      bot.jadibotmd = isEnable;
-      break;
-
-
-
       case 'detect': case 'avisos':
       if (!m.isGroup) {
       if (!isOwner) {
@@ -63,8 +48,8 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
       }
       chat.detect = isEnable
       break
-    
-      case 'jadibotmd': case 'modojadibot': case 'serbotmd': case 'modoserbot': 
+
+      case 'subbots': case 'reyesitos': case 'tletletle': case 'Xd': 
       isAll = true
       if (!isROwner) {
       global.dfail('rowner', m, conn)
@@ -118,7 +103,7 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
       }}
       chat.audios = isEnable          
       break
-      
+
       case 'nsfw':
       case 'modohorny':
        if (m.isGroup) {
