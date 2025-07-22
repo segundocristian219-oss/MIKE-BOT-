@@ -1,58 +1,45 @@
-import fetch from 'node-fetch';
+let handler = async (m, { conn, text, args, usedPrefix, command }) => {
+  if (!text) return m.reply(`🚫 *Debes escribir el nombre de una canción o video para buscar.*\n\n📌 Uso: ${usedPrefix + command} <título o link>`)
 
-let handler = async (m, { conn, text }) => {
-  if (!text) {
-    return m.reply(
-      `╭─⬣「 *𝐁𝐚𝐫𝐝𝐨𝐜𝐤 𝐁𝐨𝐭* 」⬣
-│ ≡◦ 🎧 *Uso correcto del comando:*
-│ ≡◦ play shakira soltera
-╰─⬣`
-    );
-  }
+  const fetch = await import('node-fetch').then(m => m.default || m)
 
-  try {
-    const res = await fetch(`https://api.nekorinn.my.id/downloader/spotifyplay?q=${encodeURIComponent(text)}`);
-    const json = await res.json();
+  const apis = [
+    url => `https://api.siputzx.my.id/api/d/ytmp4?url=${url}`,
+    url => `https://api.zenkey.my.id/api/download/ytmp4?apikey=zenkey&url=${url}`,
+    url => `https://axeel.my.id/api/download/video?url=${encodeURIComponent(url)}`,
+    url => `https://delirius-apiofc.vercel.app/download/ytmp4?url=${url}`
+  ]
 
-    if (!json.status || !json.result?.downloadUrl) {
-      return m.reply(
-        `╭─⬣「 *𝐁𝐚𝐫𝐝𝐨𝐜𝐤 𝐁𝐨𝐭* 」⬣
-│ ≡◦ ❌ *No se encontró resultado para:* ${text}
-╰─⬣`
-      );
+  const ytSearch = await fetch(`https://aemt.me/yts?query=${encodeURIComponent(text)}`)
+    .then(res => res.json()).catch(() => null)
+
+  if (!ytSearch?.data || !ytSearch.data[0]) return m.reply('❌ No se encontraron resultados.')
+
+  const video = ytSearch.data[0]
+  const videoUrl = `https://www.youtube.com/watch?v=${video.id}`
+
+  let result, success = false
+
+  for (let api of apis) {
+    try {
+      const res = await fetch(api(videoUrl))
+      const json = await res.json()
+      if (json?.url || json?.result?.url) {
+        result = json.url || json.result.url
+        success = true
+        break
+      }
+    } catch (e) {
+      continue
     }
-
-    const { title, artist, duration, cover, url } = json.result.metadata;
-    const audio = json.result.downloadUrl;
-
-    await conn.sendMessage(m.chat, {
-      image: { url: cover },
-      caption: `🎵 *Título:* ${title}
-📺 *Canal:* ${artist}
-⏱️ *Duración:* ${duration}
-🌐 *Spotify:* ${url}`
-    }, { quoted: m });
-
-    await conn.sendMessage(m.chat, {
-      audio: { url: audio },
-      mimetype: 'audio/mp4',
-      ptt: false,
-      fileName: `${title}.mp3`
-    }, { quoted: m });
-
-  } catch (e) {
-    console.error(e);
-    return m.reply(
-      `╭─⬣「 *𝐁𝐚𝐫𝐝𝐨𝐜𝐤 𝐁𝐨𝐭* 」⬣
-│ ≡◦ ⚠️ *Error al procesar la solicitud.*
-│ ≡◦ Intenta nuevamente más tarde.
-╰─⬣`
-    );
   }
-};
 
-handler.help = ['spotify <nombre>'];
-handler.tags = ['descargas'];
-handler.command = /^play$/i;
+  if (!success) return m.reply('⚠️ Todas las fuentes fallaron, intenta más tarde.')
 
-export default handler;
+  let caption = `📽 *Título:* ${video.title}\n📊 *Vistas:* ${video.views}\n⏱ *Duración:* ${video.timestamp}\n🔗 *Link:* ${videoUrl}`
+
+  await conn.sendFile(m.chat, result, video.title + '.mp4', caption, m)
+}
+
+handler.command = /^play$/i
+export default handler
