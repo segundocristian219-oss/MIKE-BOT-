@@ -7,9 +7,9 @@ let img = catalogo
     contextInfo: {
             isForwarded: true,
     forwardedNewsletterMessageInfo: {
-      newsletterJid: "120363401389725319@newsletter",
+      newsletterJid: "",
       serverMessageId: 100,
-      newsletterName: '𝐁𝐔𝐔 𝐁𝐎𝐓 🔮',
+      newsletterName: '',
     },
             externalAdReply: {
                                     showAdAttribution: true,
@@ -50,17 +50,17 @@ global.rcanal = {
 contextInfo: {
 isForwarded: true,
 forwardedNewsletterMessageInfo: {
-newsletterJid: "120363401389725319@newsletter",
+newsletterJid: "",
 serverMessageId: 100,
-newsletterName: '𝐁𝐔𝐔 𝐁𝐎𝐓 🔮',
+newsletterName: '',
 },
 externalAdReply: { 
 showAdAttribution: true,
 title: '𝐁𝐔𝐔 - 𝐁𝐎𝐓 🔮',
-body: '𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧 🕷️',
+body: '',
 previewType: "PHOTO",
 thumbnailUrl: 'https://files.catbox.moe/5k7vwl.jpg',
-sourceUrl: 'https://www.instagram.com/baki_hm66?igsh=cHk1eW1uZXF2ZWsy',
+sourceUrl: '',
 mediaType: 1,
 renderLargerThumbnail: false
 },},}
