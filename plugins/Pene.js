@@ -24,24 +24,39 @@ export default handler
 // Función para generar mensaje con diseño nuevo
 // --------------------------
 function generarVersus(escuadra, suplentes) {
-  return `*4 𝗩𝗘𝗥𝗦𝗨𝗦 4*
+  return `    12 𝐕𝐄𝐑𝐒𝐔𝐒 12
+    
+    𝐇𝐎𝐑𝐀𝐑𝐈𝐎
+    🇲🇽 𝐌𝐄𝐗 : ${horaUsuario}
+    🇨🇴 𝐂𝐎𝐋 : ${horaAdelantada}
+    𝐂𝐎𝐋𝐎𝐑 𝐃𝐄 𝐑𝐎𝐏𝐀: ${colorRopa}
 
-┌───┤ *MODO:* vv2 ├───
-│ ⏰ *HORARIO*
-│ • 10:00pm MÉXICO 🇲🇽
-│ • 11:00pm COLOMBIA 🇨🇴
-│
-│ *» ESCUADRA:*
-${formatSlots(escuadra, 4, '👑')}
-│
-│ *» SUPLENTE:*
-${formatSlots(suplentes, 4, '♣')}
-└────────────────────
-
-*Solo reacciona con :*
-│ ❤️ → Participar
-│ 👍 → Suplente
-│ 👎 → Salir de la lista`
+    ¬ 𝐉𝐔𝐆𝐀𝐃𝐎𝐑𝐄𝐒 𝐏𝐑𝐄𝐒𝐄𝐍𝐓𝐄𝐒
+    
+          𝗘𝗦𝗖𝗨𝗔𝗗𝗥𝗔 1
+    
+    👑 ┇ 
+    🥷🏻 ┇  
+    🥷🏻 ┇ 
+    🥷🏻 ┇ 
+          
+         𝗘𝗦𝗖𝗨𝗔𝗗𝗥𝗔 2
+    
+    👑 ┇ 
+    🥷🏻 ┇ 
+    🥷🏻 ┇ 
+    🥷🏻 ┇ 
+    
+         𝗘𝗦𝗖𝗨𝗔𝗗𝗥𝗔 3
+    
+    👑 ┇ 
+    🥷🏻 ┇ 
+    🥷🏻 ┇ 
+    🥷🏻 ┇ 
+    
+    ㅤʚ 𝐒𝐔𝐏𝐋𝐄𝐍𝐓𝐄:
+    🥷🏻 ┇ 
+    🥷🏻 ┇`
 }
 
 function formatSlots(arr, total, icon) {
