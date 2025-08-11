@@ -1,8 +1,8 @@
 // ==========================
-//  SISTEMA VERSUS 4 VS 4 (Lista nueva en cada reacción)
+//  SISTEMA VERSUS 4 VS 4 (ds6/meta compatible)
 // ==========================
 
-let versusData = {} // Guardará el estado por mensaje
+let versusData = {} // Guarda el estado por mensaje
 
 // --------------------------
 // Comando .versus
@@ -11,6 +11,7 @@ let handler = async (m, { conn }) => {
   const template = generarVersus([], []) // lista vacía
   const sent = await conn.sendMessage(m.chat, { text: template, mentions: [] })
 
+  // Guardar estado del versus
   versusData[sent.key.id] = {
     chat: m.chat,
     escuadra: [],
@@ -50,18 +51,20 @@ function formatSlots(arr, total, icon) {
 }
 
 // --------------------------
-// Listener de reacciones
+// Listener de reacciones (ds6/meta)
 // --------------------------
-conn.ev.on('messages.reaction', async updates => {
-  for (const update of updates) {
-    let msgID = update.key.id
+conn.ev.on('messages.upsert', async ({ messages }) => {
+  for (let msg of messages) {
+    if (!msg.message || !msg.message.reactionMessage) continue // Solo reacciones
+
+    let msgID = msg.message.reactionMessage.key.id
     let data = versusData[msgID]
-    if (!data) continue
+    if (!data) continue // No es un versus activo
 
-    let user = update.key.participant || update.key.remoteJid
-    let emoji = update.reaction
+    let user = msg.key.participant || msg.key.remoteJid
+    let emoji = msg.message.reactionMessage.text
 
-    // Eliminar duplicados
+    // Quitar duplicados
     data.escuadra = data.escuadra.filter(u => u !== user)
     data.suplentes = data.suplentes.filter(u => u !== user)
 
@@ -70,11 +73,11 @@ conn.ev.on('messages.reaction', async updates => {
     } else if (emoji === '👍') {
       if (data.suplentes.length < 4) data.suplentes.push(user)
     } else if (emoji === '👎') {
-      // ya se eliminó arriba
+      // salir ya hecho
     } else continue
 
     // Borrar mensaje viejo
-    await conn.sendMessage(data.chat, { delete: update.key })
+    await conn.sendMessage(data.chat, { delete: msg.message.reactionMessage.key })
 
     // Mandar lista nueva
     let nuevoTexto = generarVersus(data.escuadra, data.suplentes)
