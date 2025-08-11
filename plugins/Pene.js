@@ -1,10 +1,76 @@
 let versusData = {} // Guarda el estado por mensaje
 
 // --------------------------
-// Comando .versus
+// Comando .versus [hora] [zona]
+// Ejemplos: ".versus 4 pm mx", ".versus 16 co"
 // --------------------------
-let handler = async (m, { conn }) => {
-  const template = generarVersus([], [], [], [], []) // 3 escuadras + suplentes vacíos
+let handler = async (m, { conn, args }) => {
+  // args = ["4", "pm", "mx"] o ["16", "co"] o []
+  let horaInput = null
+  let zonaInput = null
+
+  // Buscar hora y zona
+  if (args.length > 0) {
+    // Intentamos parsear la zona (último arg si es 'mx' o 'co')
+    const lastArg = args[args.length - 1].toLowerCase()
+    if (lastArg === 'mx' || lastArg === 'co') {
+      zonaInput = lastArg
+      args.pop()
+    }
+
+    // Lo que queda en args puede ser ["4", "pm"] o ["16"] o ["4", "am"]
+    const timeStr = args.join(' ').toUpperCase().trim() // ej "4 PM", "16", "4 AM"
+
+    // Regex para hora + optional am/pm
+    const match = timeStr.match(/^(\d{1,2})(?:\s*(AM|PM))?$/i)
+    if (match) {
+      let hour = parseInt(match[1])
+      const ampm = match[2] || null
+
+      if (ampm) {
+        if (ampm === 'PM' && hour < 12) hour += 12
+        if (ampm === 'AM' && hour === 12) hour = 0
+      }
+      if (hour >= 0 && hour <= 23) {
+        horaInput = hour
+      }
+    }
+  }
+
+  // Si no hay zona, asumimos mx por defecto
+  if (!zonaInput) zonaInput = 'mx'
+
+  // Función para convertir y formatear horarios para mostrar
+  function format12h(h) {
+    let ampm = h >= 12 ? 'PM' : 'AM'
+    let hour12 = h % 12
+    if (hour12 === 0) hour12 = 12
+    return `${hour12} ${ampm}`
+  }
+
+  // Convertir horas para ambas zonas
+  // México UTC-6, Colombia UTC-5 (Colombia +1 respecto a México)
+  // Dependiendo de zonaInput, interpretamos horaInput en esa zona y calculamos la otra zona
+
+  let mexHora, colHora
+
+  if (horaInput === null) {
+    // Sin hora, dejar vacío
+    mexHora = '  '
+    colHora = '  '
+  } else if (zonaInput === 'mx') {
+    mexHora = horaInput
+    colHora = (horaInput + 1) % 24
+  } else { // zonaInput === 'co'
+    colHora = horaInput
+    mexHora = (horaInput + 23) % 24 // -1 mod 24
+  }
+
+  // Formatear para mostrar
+  const mexText = (horaInput === null) ? '  ' : format12h(mexHora)
+  const colText = (horaInput === null) ? '  ' : format12h(colHora)
+
+  const template = generarVersus([], [], [], [], mexText, colText)
   const sent = await conn.sendMessage(m.chat, { text: template, mentions: [] })
 
   versusData[sent.key.id] = {
@@ -12,7 +78,9 @@ let handler = async (m, { conn }) => {
     escuadra1: [],
     escuadra2: [],
     escuadra3: [],
-    suplentes: []
+    suplentes: [],
+    mexText,
+    colText
   }
 }
 handler.command = /^versus$/i
@@ -21,8 +89,7 @@ export default handler
 // --------------------------
 // Función para generar mensaje con diseño nuevo y slots rellenados
 // --------------------------
-function generarVersus(esc1, esc2, esc3, suplentes) {
-  // Helper para formatear una escuadra de 4 jugadores, con un ícono especial para el primero (👑) y el resto (🥷🏻)
+function generarVersus(esc1, esc2, esc3, suplentes, mexText = '  ', colText = '  ') {
   function formatEscuadra(arr) {
     let out = ''
     for (let i = 0; i < 4; i++) {
@@ -37,7 +104,6 @@ function generarVersus(esc1, esc2, esc3, suplentes) {
     return out.trimEnd()
   }
 
-  // Formatear suplentes (2 slots)
   function formatSuplentes(arr) {
     let out = ''
     for (let i = 0; i < 2; i++) {
@@ -53,8 +119,8 @@ function generarVersus(esc1, esc2, esc3, suplentes) {
   return `    12 𝐕𝐄𝐑𝐒𝐔𝐒 12
     
     𝐇𝐎𝐑𝐀𝐑𝐈𝐎
-    🇲🇽 𝐌𝐄𝐗 : 
-    🇨🇴 𝐂𝐎𝐋 : 
+    🇲🇽 𝐌𝐄𝐗 : ${mexText}
+    🇨🇴 𝐂𝐎𝐋 : ${colText}
     𝐂𝐎𝐋𝐎𝐑 𝐃𝐄 𝐑𝐎𝐏𝐀: 
 
     ¬ 𝐉𝐔𝐆𝐀𝐃𝐎𝐑𝐄𝐒 𝐏𝐑𝐄𝐒𝐄𝐍𝐓𝐄𝐒
@@ -86,40 +152,28 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
     let user = msg.key.participant || msg.key.remoteJid
     let emoji = msg.message.reactionMessage.text
 
-    // Primero eliminar usuario de todas las listas para evitar duplicados
     data.escuadra1 = data.escuadra1.filter(u => u !== user)
     data.escuadra2 = data.escuadra2.filter(u => u !== user)
     data.escuadra3 = data.escuadra3.filter(u => u !== user)
     data.suplentes = data.suplentes.filter(u => u !== user)
 
-    // Asignar según emoji y espacio disponible
     if (emoji === '❤️') {
-      // Prioridad: escuadra1, escuadra2, escuadra3 con máximo 4 jugadores cada una
       if (data.escuadra1.length < 4) data.escuadra1.push(user)
       else if (data.escuadra2.length < 4) data.escuadra2.push(user)
       else if (data.escuadra3.length < 4) data.escuadra3.push(user)
-      // Si las 3 están llenas, no hace nada
     } else if (emoji === '👍') {
       if (data.suplentes.length < 2) data.suplentes.push(user)
     } else if (emoji === '👎') {
-      // Si quieres quitar al usuario de todas las listas ya se hizo arriba
-      // No reingresa en ninguna lista
+      // Ya eliminado arriba
     } else continue
 
-    // Borrar mensaje anterior
-    try {
-      await conn.sendMessage(data.chat, { delete: msg.message.reactionMessage.key })
-    } catch (e) {
-      // ignorar si no se puede borrar
-    }
-
-    // Generar texto nuevo con las menciones correctas
-    let nuevoTexto = generarVersus(data.escuadra1, data.escuadra2, data.escuadra3, data.suplentes)
-
-    // Unir todas las menciones para que etiquete correctamente
+    let nuevoTexto = generarVersus(data.escuadra1, data.escuadra2, data.escuadra3, data.suplentes, data.mexText, data.colText)
     let mentions = [...data.escuadra1, ...data.escuadra2, ...data.escuadra3, ...data.suplentes]
 
-    // Enviar nuevo mensaje y actualizar el id en el objeto versusData
+    try {
+      await conn.sendMessage(data.chat, { delete: msg.message.reactionMessage.key })
+    } catch {}
+
     let sent = await conn.sendMessage(data.chat, {
       text: nuevoTexto,
       mentions
