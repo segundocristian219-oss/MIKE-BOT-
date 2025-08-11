@@ -52,17 +52,14 @@ function formatSlots(arr, total, icon) {
 // --------------------------
 // Listener de reacciones
 // --------------------------
-conn.ev.on('messages.update', async updates => {
+conn.ev.on('messages.reaction', async updates => {
   for (const update of updates) {
-    if (!update.message) continue
-    if (!update.message.reactionMessage) continue
-
     let msgID = update.key.id
     let data = versusData[msgID]
     if (!data) continue
 
-    let user = update.key.participant
-    let emoji = update.message.reactionMessage.text
+    let user = update.key.participant || update.key.remoteJid
+    let emoji = update.reaction
 
     // Eliminar duplicados
     data.escuadra = data.escuadra.filter(u => u !== user)
@@ -73,7 +70,7 @@ conn.ev.on('messages.update', async updates => {
     } else if (emoji === '👍') {
       if (data.suplentes.length < 4) data.suplentes.push(user)
     } else if (emoji === '👎') {
-      // ya lo eliminamos arriba
+      // ya se eliminó arriba
     } else continue
 
     // Borrar mensaje viejo
