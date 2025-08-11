@@ -1,8 +1,8 @@
 // ==========================
-//  SISTEMA VERSUS 4 VS 4
+//  SISTEMA VERSUS 4 VS 4 (Lista nueva en cada reacción)
 // ==========================
 
-let versusData = {} // Guardará el estado de cada mensaje
+let versusData = {} // Guardará el estado por mensaje
 
 // --------------------------
 // Comando .versus
@@ -11,7 +11,6 @@ let handler = async (m, { conn }) => {
   const template = generarVersus([], []) // lista vacía
   const sent = await conn.sendMessage(m.chat, { text: template, mentions: [] })
 
-  // Guardamos info para ese mensaje
   versusData[sent.key.id] = {
     chat: m.chat,
     escuadra: [],
@@ -77,12 +76,18 @@ conn.ev.on('messages.update', async updates => {
       // ya lo eliminamos arriba
     } else continue
 
-    // Editar el mensaje original
+    // Borrar mensaje viejo
+    await conn.sendMessage(data.chat, { delete: update.key })
+
+    // Mandar lista nueva
     let nuevoTexto = generarVersus(data.escuadra, data.suplentes)
-    await conn.sendMessage(data.chat, {
+    let sent = await conn.sendMessage(data.chat, {
       text: nuevoTexto,
-      edit: { remoteJid: data.chat, id: msgID, fromMe: false },
       mentions: [...data.escuadra, ...data.suplentes]
     })
+
+    // Actualizar ID del mensaje en versusData
+    delete versusData[msgID]
+    versusData[sent.key.id] = data
   }
 })
