@@ -4,7 +4,7 @@ let versusData = {} // Guarda el estado por mensaje
 // Comando .versus
 // --------------------------
 let handler = async (m, { conn }) => {
-  const template = generarVersus([], [], [], []) // 3 escuadras + suplentes vacíos
+  const template = generarVersus([], [], [], [], []) // 3 escuadras + suplentes vacíos
   const sent = await conn.sendMessage(m.chat, { text: template, mentions: [] })
 
   versusData[sent.key.id] = {
@@ -86,30 +86,46 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
     let user = msg.key.participant || msg.key.remoteJid
     let emoji = msg.message.reactionMessage.text
 
-    // Quitar usuario de todas las listas para evitar duplicados
+    // Primero eliminar usuario de todas las listas para evitar duplicados
     data.escuadra1 = data.escuadra1.filter(u => u !== user)
     data.escuadra2 = data.escuadra2.filter(u => u !== user)
     data.escuadra3 = data.escuadra3.filter(u => u !== user)
     data.suplentes = data.suplentes.filter(u => u !== user)
 
-    // Agregar según emoji y espacio disponible
+    // Asignar según emoji y espacio disponible
     if (emoji === '❤️') {
+      // Prioridad: escuadra1, escuadra2, escuadra3 con máximo 4 jugadores cada una
       if (data.escuadra1.length < 4) data.escuadra1.push(user)
       else if (data.escuadra2.length < 4) data.escuadra2.push(user)
       else if (data.escuadra3.length < 4) data.escuadra3.push(user)
+      // Si las 3 están llenas, no hace nada
     } else if (emoji === '👍') {
       if (data.suplentes.length < 2) data.suplentes.push(user)
     } else if (emoji === '👎') {
-      // Ya eliminado arriba, no reingresa
+      // Si quieres quitar al usuario de todas las listas ya se hizo arriba
+      // No reingresa en ninguna lista
     } else continue
 
+    // Borrar mensaje anterior
+    try {
+      await conn.sendMessage(data.chat, { delete: msg.message.reactionMessage.key })
+    } catch (e) {
+      // ignorar si no se puede borrar
+    }
+
+    // Generar texto nuevo con las menciones correctas
     let nuevoTexto = generarVersus(data.escuadra1, data.escuadra2, data.escuadra3, data.suplentes)
+
+    // Unir todas las menciones para que etiquete correctamente
     let mentions = [...data.escuadra1, ...data.escuadra2, ...data.escuadra3, ...data.suplentes]
 
-    try {
-      await conn.modifyMessage(data.chat, msgID, { text: nuevoTexto, mentions })
-    } catch (e) {
-      console.log('Error editando mensaje:', e)
-    }
+    // Enviar nuevo mensaje y actualizar el id en el objeto versusData
+    let sent = await conn.sendMessage(data.chat, {
+      text: nuevoTexto,
+      mentions
+    })
+
+    delete versusData[msgID]
+    versusData[sent.key.id] = data
   }
 })
