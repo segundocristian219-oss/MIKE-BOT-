@@ -86,7 +86,7 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
     let user = msg.key.participant || msg.key.remoteJid
     let emoji = msg.message.reactionMessage.text
 
-    // Eliminar usuario de todas las listas para evitar duplicados
+    // Quitar usuario de todas las listas para evitar duplicados
     data.escuadra1 = data.escuadra1.filter(u => u !== user)
     data.escuadra2 = data.escuadra2.filter(u => u !== user)
     data.escuadra3 = data.escuadra3.filter(u => u !== user)
@@ -100,20 +100,16 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
     } else if (emoji === '👍') {
       if (data.suplentes.length < 2) data.suplentes.push(user)
     } else if (emoji === '👎') {
-      // Usuario eliminado de listas arriba, no reingresa
+      // Ya eliminado arriba, no reingresa
     } else continue
 
     let nuevoTexto = generarVersus(data.escuadra1, data.escuadra2, data.escuadra3, data.suplentes)
     let mentions = [...data.escuadra1, ...data.escuadra2, ...data.escuadra3, ...data.suplentes]
 
-    // Editar mensaje con el mismo id (no borrar ni crear otro)
-    await conn.sendMessage(data.chat, {
-      text: nuevoTexto,
-      mentions
-    }, {
-      messageId: msgID
-    })
-
-    // No se actualiza la clave en versusData porque el id no cambia
+    try {
+      await conn.modifyMessage(data.chat, msgID, { text: nuevoTexto, mentions })
+    } catch (e) {
+      console.log('Error editando mensaje:', e)
+    }
   }
 })
