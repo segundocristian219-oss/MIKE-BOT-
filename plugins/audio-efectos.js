@@ -2,7 +2,7 @@ import { unlinkSync, readFileSync } from 'fs'
 import { join } from 'path'
 import { exec } from 'child_process'
 
-let handler = async (m, { conn, args, __dirname, usedPrefix, command }) => {
+let handler = async (m, { conn, __dirname, command, usedPrefix }) => {
   try {
     let q = m.quoted ? m.quoted : m
     let mime = ((m.quoted ? m.quoted : m.msg).mimetype || '')
@@ -29,10 +29,10 @@ let handler = async (m, { conn, args, __dirname, usedPrefix, command }) => {
         await unlinkSync(media)
         if (err) return await m.reply('_*Error al procesar el audio*_')
         let buff = await readFileSync(filename)
-        await conn.sendFile(m.chat, buff, ran, null, null, true, {
-          type: 'audioMessage',
-          ptt: true
-        })
+
+        // Enviar mensaje de voz "limpio" sin citar, con ptt:true
+        await conn.sendMessage(m.chat, buff, 'audioMessage', { ptt: true })
+
         await unlinkSync(filename)
       })
     } else {
