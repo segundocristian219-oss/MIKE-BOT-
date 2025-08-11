@@ -1,6 +1,6 @@
 let handler = async (m, { conn }) => {
   if (!m.quoted) 
-    return conn.reply(m.chat, `⭐ Responde al mensaje que deseas eliminar.`, m, rcanal)
+    return conn.reply(m.chat, `☁️ Responde al mensaje que deseas eliminar.`, m, rcanal)
 
   try {
     const contextInfo = m.message.extendedTextMessage?.contextInfo
@@ -16,11 +16,11 @@ let handler = async (m, { conn }) => {
     })
   } catch {
     try {
-      // fallback: eliminar mensaje citado por la clave del mensaje citado
+
       await conn.sendMessage(m.chat, { delete: m.quoted.vM.key })
     } catch {
-      // Si falla todo, opcional: puedes enviar un mensaje de error
-      return conn.reply(m.chat, '❌ No se pudo eliminar el mensaje.', m, rcanal)
+
+      return conn.reply(m.chat, '☁️ No se pudo eliminar el mensaje.', m, rcanal)
     }
   }
 }
