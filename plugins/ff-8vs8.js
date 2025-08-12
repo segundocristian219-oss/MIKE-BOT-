@@ -74,9 +74,9 @@ let handler = async (m, { conn, args }) => {
     colText
   }
 }
-handler.help = ['4vs4']
+handler.help = ['8vs8']
 handler.tags = ['freefire']
-handler.command = /^\.?(4vs4|vs4)$/i
+handler.command = /^\.?(8vs8|vs8)$/i
 handler.group = true
 handler.botAdmin = true
 export default handler
