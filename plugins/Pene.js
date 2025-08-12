@@ -24,7 +24,7 @@ let handler = async (m, { conn, args }) => {
     args.pop()
   } else {
     // No se especificó país válido
-    await conn.sendMessage(m.chat, { text: '𝐓𝐢𝐞𝐧𝐞𝐬 𝐪𝐮𝐞 𝐞𝐬𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐫 𝐞𝐥 𝐩𝐚𝐢́𝐬 𝐯𝐚́𝐥𝐢𝐝𝐨 𝐞𝐧 𝐞𝐥 𝐜𝐨𝐦𝐚𝐧𝐝𝐨.\nEjemplo: 𝟑 𝐩𝐦 𝐦𝐱, 𝟏𝟔 𝐜𝐨, 𝟒 𝐩𝐦 𝐦é𝐱𝐢𝐜𝐨' })
+    await conn.sendMessage(m.chat, { text: '𝐓𝐢𝐞𝐧𝐞𝐬 𝐪𝐮𝐞 𝐞𝐬𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐫 𝐞𝐥 𝐩𝐚𝐢́𝐬 𝐯𝐚́𝐥𝐢𝐝𝐨 𝐞𝐧 𝐞𝐥 𝐜𝐨𝐦𝐚𝐧𝐝𝐨.\nEjemplo: 𝟑 𝐩𝐦 𝐦𝐱, 𝟒 𝐩𝐦 𝐦é𝐱𝐢𝐜𝐨' })
     return
   }
 
