@@ -5,6 +5,11 @@ let versusData = {} // Guarda el estado por mensaje
 // Ejemplos: ".versus 4 pm mx", ".versus 16 co"
 // --------------------------
 let handler = async (m, { conn, args }) => {
+  if (args.length === 0) {
+    await conn.sendMessage(m.chat, { text: 'Tiene que especificar la hora a la que se jugará' })
+    return
+  }
+
   // args = ["4", "pm", "mx"] o ["16", "co"] o []
   let horaInput = null
   let zonaInput = null
@@ -122,7 +127,7 @@ function generarVersus(esc1, esc2, esc3, suplentes, mexText = '  ', colText = ' 
   return `*12 𝐕𝐄𝐑𝐒𝐔𝐒 12*
 
 
-*𝐇𝐎𝐑𝐀𝐑𝐈𝐎S*;  
+*𝐇𝐎𝐑𝐀𝐑𝐈𝐎𝐒*;  
 
 *🇲🇽 𝐌𝐄𝐗𝐈𝐂𝐎* : ${mexText}  
 *🇨🇴 𝐂𝐎𝐋𝐎𝐌𝐁𝐈𝐀* : ${colText}
