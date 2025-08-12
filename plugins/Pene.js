@@ -6,7 +6,7 @@ let versusData = {} // Guarda el estado por mensaje
 // --------------------------
 let handler = async (m, { conn, args }) => {
   if (args.length === 0) {
-    await conn.sendMessage(m.chat, { text: 'Tiene que especificar la hora a la que se jugará' })
+    await conn.sendMessage(m.chat, { text: '𝐓𝐢𝐞𝐧𝐞𝐬 𝐪𝐮𝐞 𝐞𝐬𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐫 𝐋𝐚 𝐇𝐨𝐫𝐚 𝐞𝐧 𝐥𝐚 𝐪𝐮𝐞 𝐒𝐞 𝐉𝐮𝐠𝐚𝐫𝐚 ❇️' })
     return
   }
 
