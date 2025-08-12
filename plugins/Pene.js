@@ -116,7 +116,7 @@ function generarVersus(esc1, esc2, esc3, suplentes, mexText = '  ', colText = ' 
     return out.trimEnd()
   }
 
-  return `         12 𝐕𝐄𝐑𝐒𝐔𝐒 12
+  return `             12 𝐕𝐄𝐑𝐒𝐔𝐒 12
 
 
 *𝐇𝐎𝐑𝐀𝐑𝐈𝐎S*;  
@@ -139,7 +139,7 @@ ${formatEscuadra(esc2)}
 
 ${formatEscuadra(esc3)}
 
-ㅤʚ *𝐒𝐔𝐏𝐋𝐄𝐍𝐓𝐄*:
+ㅤʚ *𝐒𝐔𝐏𝐋𝐄𝐍𝐓𝐄𝐒*:
 
 ${formatSuplentes(suplentes)}
 
