@@ -117,6 +117,10 @@ function generarVersus(esc1, esc2, esc3, suplentes, mexText = '  ', colText = ' 
   }
 
   return `
+
+𝐌𝐎𝐃𝐎 𝐃𝐄 𝐉𝐔𝐄𝐆𝐎: 12 𝐕𝐄𝐑𝐒𝐔𝐒 12 🌴
+
+
 𝐇𝐎𝐑𝐀𝐑𝐈𝐎S;  
 
 🇲🇽 𝐌𝐄𝐗 : ${mexText}  
