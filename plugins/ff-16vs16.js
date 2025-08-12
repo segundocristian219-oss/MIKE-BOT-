@@ -100,7 +100,7 @@ function generarVersus(esc1, esc2, esc3, esc4, suplentes, mexText = '  ', colTex
     return out.trimEnd()
   }
 
-  return `*12 𝐕𝐄𝐑𝐒𝐔𝐒 12*
+  return `*16 𝐕𝐄𝐑𝐒𝐔𝐒 16*
 
 *𝐇𝐎𝐑𝐀𝐑𝐈𝐎𝐒*;  
 *🇲🇽 MEXICO* : ${mexText}  
