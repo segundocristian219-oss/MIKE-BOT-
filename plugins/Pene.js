@@ -197,5 +197,3 @@ versusData[sent.key.id] = data
 }
 })
 
-Agregalo acá
-
