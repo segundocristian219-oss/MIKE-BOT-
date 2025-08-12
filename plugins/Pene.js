@@ -142,7 +142,7 @@ ${formatEscuadra(esc3)}
 
 ${formatSuplentes(suplentes)}
 
-𝖲𝗈𝗅𝗈 𝗋𝖾𝖺𝖼𝖼𝗂𝗈𝗇𝖺 𝖼𝗈𝗇:
+*𝖲𝗈𝗅𝗈 𝗋𝖾𝖺𝖼𝖼𝗂𝗈𝗇𝖺 𝖼𝗈𝗇:*
 
 > 「 ❤️ 」𝖯𝖺𝗋𝗍𝗂𝖼𝗂𝗉𝖺𝗋
 > 「 👍 」𝖲𝗎𝗉𝗅𝖾𝗇𝗍𝖾
