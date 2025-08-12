@@ -83,8 +83,11 @@ let handler = async (m, { conn, args }) => {
     colText
   }
 }
-handler.command = /^versus$/i
-export default handler
+handler.help = ['12vs12']
+handler.tags = ['freefire']
+handler.command = /^(12vs12|vs12)$/i;
+handler.group = true;
+handler.botAdmin = true;
 
 // --------------------------
 // Función para generar mensaje con diseño nuevo y slots rellenados
