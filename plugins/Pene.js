@@ -24,7 +24,7 @@ let handler = async (m, { conn, args }) => {
     args.pop()
   } else {
     // No se especificó país válido
-    await conn.sendMessage(m.chat, { text: '𝐓𝐢𝐞𝐧𝐞𝐬 𝐪𝐮𝐞 𝐞𝐬𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐫 𝐞𝐥 𝐩𝐚𝐢́𝐬 𝐯𝐚́𝐥𝐢𝐝𝐨 𝐞𝐧 𝐞𝐥 𝐜𝐨𝐦𝐚𝐧𝐝𝐨.\nEjemplo: 𝟑 𝐩𝐦 𝐦𝐱, 𝟒 𝐩𝐦 𝐦é𝐱𝐢𝐜𝐨' })
+    await conn.sendMessage(m.chat, { text: '𝐓𝐢𝐞𝐧𝐞𝐬 𝐪𝐮𝐞 𝐞𝐬𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐫 𝐞𝐥 𝐩𝐚𝐢́𝐬 𝐯𝐚́𝐥𝐢𝐝𝐨 𝐞𝐧 𝐞𝐥 𝐜𝐨𝐦𝐚𝐧𝐝𝐨.\nEjemplo: 𝟑 𝐩𝐦 𝐦𝐱, 𝟏𝟔 𝐜𝐨, 𝟒 𝐩𝐦 𝐦é𝐱𝐢𝐜𝐨' })
     return
   }
 
@@ -97,8 +97,6 @@ handler.group = true
 handler.botAdmin = true
 export default handler
 
-// Resto del código (generarVersus y listener) igual que antes
-
 // --------------------------
 // Función para generar mensaje con diseño nuevo y slots rellenados
 // --------------------------
@@ -158,9 +156,11 @@ ${formatSuplentes(suplentes)}
 
 *𝖲𝗈𝗅𝗈 𝗋𝖾𝖺𝖼𝖼𝗂𝗈𝗇𝖺 𝖼𝗈𝗇:*
 
-> 「 ❤️ 」𝖯𝖺𝗋𝗍𝗂𝖼𝗂𝗉𝖺𝗋
-> 「 👍 」𝖲𝗎𝗉𝗅𝖾𝗇𝗍𝖾
-> 「 👎 」𝖲𝖺𝗅𝗂𝗋 𝖽𝖾 𝗅𝖺 𝗅𝗂𝗌𝗍𝖺`
+> 「 ❤️ 」𝖯𝖺𝗋𝗍𝗂𝖼𝗂𝗉𝖺𝗋  
+> 「 👍 」𝖲𝗎𝗉𝗅𝖾𝗇𝗍𝖾  
+> 「 👎 」𝖲𝖺𝗅𝗂𝗋 𝖽𝖾 𝗅𝖺 𝗅𝗂𝗌𝗍𝖺  
+> 「 ❌ 」 (Admin) 𝗥𝗲𝗶𝗻𝗶𝗰𝗶𝗮𝗿 𝗹𝗮 𝗹𝗶𝘀𝘁𝗮  
+`
 }
 
 // --------------------------
@@ -177,10 +177,47 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
     let user = msg.key.participant || msg.key.remoteJid  
     let emoji = msg.message.reactionMessage.text  
 
-    data.escuadra1 = data.escuadra1.filter(u => u !== user)  
-    data.escuadra2 = data.escuadra2.filter(u => u !== user)  
-    data.escuadra3 = data.escuadra3.filter(u => u !== user)  
-    data.suplentes = data.suplentes.filter(u => u !== user)  
+    // Si reaccionó alguien fuera de la lista y pone 👎, ignorar
+    const isInAnyList = data.escuadra1.includes(user) || data.escuadra2.includes(user) || data.escuadra3.includes(user) || data.suplentes.includes(user)
+    if (emoji === '👎' && !isInAnyList) {
+      continue
+    }
+
+    // Obtener si el user es admin en el grupo
+    let isAdmin = false
+    try {
+      let groupMetadata = await conn.groupMetadata(data.chat)
+      let participant = groupMetadata.participants.find(p => p.id === user)
+      isAdmin = participant?.admin === 'admin' || participant?.admin === 'superadmin'
+    } catch {}
+
+    // Si admin reacciona con ❌: reiniciar lista y mandar mensaje vacío
+    if (emoji === '❌' && isAdmin) {
+      data.escuadra1 = []
+      data.escuadra2 = []
+      data.escuadra3 = []
+      data.suplentes = []
+
+      let nuevoTexto = generarVersus(data.escuadra1, data.escuadra2, data.escuadra3, data.suplentes, data.mexText, data.colText)
+      try {
+        await conn.sendMessage(data.chat, { delete: msg.message.reactionMessage.key })
+      } catch {}
+
+      let sent = await conn.sendMessage(data.chat, {
+        text: nuevoTexto,
+        mentions: []
+      })
+
+      delete versusData[msgID]
+      versusData[sent.key.id] = data
+      continue
+    }
+
+    // Quitar usuario de todas las listas para manejar su nueva reacción (o eliminar)
+    data.escuadra1 = data.escuadra1.filter(u => u !== user)
+    data.escuadra2 = data.escuadra2.filter(u => u !== user)
+    data.escuadra3 = data.escuadra3.filter(u => u !== user)
+    data.suplentes = data.suplentes.filter(u => u !== user)
 
     if (emoji === '❤️') {  
       if (data.escuadra1.length < 4) data.escuadra1.push(user)  
@@ -189,8 +226,10 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
     } else if (emoji === '👍') {  
       if (data.suplentes.length < 2) data.suplentes.push(user)  
     } else if (emoji === '👎') {  
-      // Ya eliminado arriba  
-    } else continue  
+      // Si el usuario estaba en lista, ya fue removido arriba, solo ignorar
+    } else {
+      continue  
+    }
 
     let nuevoTexto = generarVersus(data.escuadra1, data.escuadra2, data.escuadra3, data.suplentes, data.mexText, data.colText)  
     let mentions = [...data.escuadra1, ...data.escuadra2, ...data.escuadra3, ...data.suplentes]  
