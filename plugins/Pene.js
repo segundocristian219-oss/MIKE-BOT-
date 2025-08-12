@@ -1,49 +1,56 @@
 let versusData = {} // Guarda el estado por mensaje
 
-// --------------------------
-// Comando .versus [hora] [zona]
-// Ejemplos: ".versus 4 pm mx", ".versus 16 co"
-// --------------------------
+// Lista de aliases para cada país, en minúsculas sin coma
+const aliasesMX = ['mx', 'méxico', 'mexico', 'méx', 'mex']
+const aliasesCO = ['co', 'colombia', 'col']
+
 let handler = async (m, { conn, args }) => {
   if (args.length === 0) {
-    await conn.sendMessage(m.chat, { text: '𝐓𝐢𝐞𝐧𝐞𝐬 𝐪𝐮𝐞 𝐞𝐬𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐫 𝐋𝐚 𝐇𝐨𝐫𝐚 𝐞𝐧 𝐥𝐚 𝐪𝐮𝐞 𝐒𝐞 𝐉𝐮𝐠𝐚𝐫𝐚 ❇️' })
+    await conn.sendMessage(m.chat, { text: '𝐓𝐢𝐞𝐧𝐞𝐬 𝐪𝐮𝐞 𝐞𝐬𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐫 𝐥𝐚 𝐡𝐨𝐫𝐚 𝐲 𝐞𝐥 𝐩𝐚𝐢́𝐬 𝐞𝐧 𝐥𝐚 𝐪𝐮𝐞 𝐬𝐞 𝐣𝐮𝐠𝐚𝐫𝐚 ❇️' })
     return
   }
 
-  // args = ["4", "pm", "mx"] o ["16", "co"] o []
-  let horaInput = null
+  // Buscamos y limpiamos la coma si hay en el último argumento
+  let lastArgRaw = args[args.length - 1]
+  let lastArg = lastArgRaw.toLowerCase().replace(/,$/, '') // quita coma al final
+
+  // Verificar si el último argumento es un alias válido de país
   let zonaInput = null
-
-  // Buscar hora y zona
-  if (args.length > 0) {
-    // Intentamos parsear la zona (último arg si es 'mx' o 'co')
-    const lastArg = args[args.length - 1].toLowerCase()
-    if (lastArg === 'mx' || lastArg === 'co') {
-      zonaInput = lastArg
-      args.pop()
-    }
-
-    // Lo que queda en args puede ser ["4", "pm"] o ["16"] o ["4", "am"]  
-    const timeStr = args.join(' ').toUpperCase().trim() // ej "4 PM", "16", "4 AM"  
-
-    // Regex para hora + optional am/pm  
-    const match = timeStr.match(/^(\d{1,2})(?:\s*(AM|PM))?$/i)  
-    if (match) {  
-      let hour = parseInt(match[1])  
-      const ampm = match[2] || null  
-
-      if (ampm) {  
-        if (ampm === 'PM' && hour < 12) hour += 12  
-        if (ampm === 'AM' && hour === 12) hour = 0  
-      }  
-      if (hour >= 0 && hour <= 23) {  
-        horaInput = hour  
-      }  
-    }
+  if (aliasesMX.includes(lastArg)) {
+    zonaInput = 'mx'
+    args.pop()
+  } else if (aliasesCO.includes(lastArg)) {
+    zonaInput = 'co'
+    args.pop()
+  } else {
+    // No se especificó país válido
+    await conn.sendMessage(m.chat, { text: '𝐓𝐢𝐞𝐧𝐞𝐬 𝐪𝐮𝐞 𝐞𝐬𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐫 𝐞𝐥 𝐩𝐚𝐢́𝐬 𝐯𝐚́𝐥𝐢𝐝𝐨 𝐞𝐧 𝐞𝐥 𝐜𝐨𝐦𝐚𝐧𝐝𝐨.\nEjemplo: 𝟑 𝐩𝐦 𝐦𝐱, 𝟏𝟔 𝐜𝐨, 𝟒 𝐩𝐦 𝐦é𝐱𝐢𝐜𝐨' })
+    return
   }
 
-  // Si no hay zona, asumimos mx por defecto
-  if (!zonaInput) zonaInput = 'mx'
+  // Lo que queda en args es la hora: ej ["3", "pm"] o ["16"] etc.
+  const timeStr = args.join(' ').toUpperCase().trim()
+
+  // Regex para hora + optional am/pm  
+  const match = timeStr.match(/^(\d{1,2})(?:\s*(AM|PM))?$/i)  
+  let horaInput = null
+  if (match) {  
+    let hour = parseInt(match[1])  
+    const ampm = match[2] || null  
+
+    if (ampm) {  
+      if (ampm === 'PM' && hour < 12) hour += 12  
+      if (ampm === 'AM' && hour === 12) hour = 0  
+    }  
+    if (hour >= 0 && hour <= 23) {  
+      horaInput = hour  
+    }  
+  }
+
+  if (horaInput === null) {
+    await conn.sendMessage(m.chat, { text: '𝐇𝐨𝐫𝐚 𝐢𝐧𝐯𝐚́𝐥𝐢𝐝𝐚. 𝐄𝐣𝐞𝐦𝐩𝐥𝐨𝐬:\n.12vs12 3 pm mx\n.12vs12 16 co' })
+    return
+  }
 
   // Función para convertir y formatear horarios para mostrar
   function format12h(h) {
@@ -59,11 +66,7 @@ let handler = async (m, { conn, args }) => {
 
   let mexHora, colHora
 
-  if (horaInput === null) {
-    // Sin hora, dejar vacío
-    mexHora = '  '
-    colHora = '  '
-  } else if (zonaInput === 'mx') {
+  if (zonaInput === 'mx') {
     mexHora = horaInput
     colHora = (horaInput + 1) % 24
   } else { // zonaInput === 'co'
@@ -71,9 +74,8 @@ let handler = async (m, { conn, args }) => {
     mexHora = (horaInput + 23) % 24 // -1 mod 24
   }
 
-  // Formatear para mostrar
-  const mexText = (horaInput === null) ? '  ' : format12h(mexHora)
-  const colText = (horaInput === null) ? '  ' : format12h(colHora)
+  const mexText = format12h(mexHora)
+  const colText = format12h(colHora)
 
   const template = generarVersus([], [], [], [], mexText, colText)
   const sent = await conn.sendMessage(m.chat, { text: template, mentions: [] })
@@ -91,9 +93,11 @@ let handler = async (m, { conn, args }) => {
 handler.help = ['12vs12']
 handler.tags = ['freefire']
 handler.command = /^\.?(12vs12|vs12)$/i
-handler.group = true;
-handler.botAdmin = true;
+handler.group = true
+handler.botAdmin = true
 export default handler
+
+// Resto del código (generarVersus y listener) igual que antes
 
 // --------------------------
 // Función para generar mensaje con diseño nuevo y slots rellenados
