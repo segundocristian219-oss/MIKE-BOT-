@@ -139,7 +139,7 @@ ${formatEscuadra(esc2)}
 
 ${formatEscuadra(esc3)}
 
-ㅤ*ʚ 𝐒𝐔𝐏𝐋𝐄𝐍𝐓𝐄*:
+ㅤʚ *𝐒𝐔𝐏𝐋𝐄𝐍𝐓𝐄*:
 
 ${formatSuplentes(suplentes)}
 
