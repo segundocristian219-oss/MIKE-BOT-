@@ -1,4 +1,3 @@
-
 let versusData = {} // Guarda el estado por mensaje
 
 // --------------------------
@@ -197,4 +196,6 @@ versusData[sent.key.id] = data
 
 }
 })
+
+Agregalo acá
 
