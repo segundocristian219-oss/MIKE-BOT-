@@ -39,7 +39,7 @@ let handler = async (m, { conn, args }) => {
   }
 
   if (horaInput === null) {
-    await conn.sendMessage(m.chat, { text: '𝐇𝐨𝐫𝐚 𝐢𝐧𝐯𝐚́𝐥𝐢𝐝𝐚. Ej:\n.12vs12 3 pm mx\n.12vs12 16 co' })
+    await conn.sendMessage(m.chat, { text: '𝐇𝐨𝐫𝐚 𝐢𝐧𝐯𝐚́𝐥𝐢𝐝𝐚. Ej:\n.4vs4 3 pm mx\n.4vs4 16 co' })
     return
   }
 
@@ -83,7 +83,7 @@ export default handler
 function generarVersus(escuadra, suplentes, mexText = '  ', colText = '  ') {
   function formatEscuadra(arr) {
     let out = ''
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 4; i++) { // máximo 4 jugadores
       let icon = i === 0 ? '👑' : '🥷🏻'
       out += arr[i] ? `${icon} ┇ @${arr[i].split('@')[0]}\n` : `${icon} ┇ \n`
     }
@@ -98,7 +98,7 @@ function generarVersus(escuadra, suplentes, mexText = '  ', colText = '  ') {
     return out.trimEnd()
   }
 
-  return `4 𝐕𝐄𝐑𝐒𝐔𝐒 4
+  return `4 𝐕𝐒 4
 
 𝐇𝐎𝐑𝐀𝐑𝐈𝐎𝐒;
 🇲🇽 MEXICO : ${mexText}
@@ -144,9 +144,7 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
     } catch {}
 
     if (emoji === '❌' && isAdmin) {
-      const hasPlayers =
-        data.escuadra.length +
-        data.suplentes.length > 0
+      const hasPlayers = data.escuadra.length + data.suplentes.length > 0
       if (!hasPlayers) continue
       data.escuadra = []
       data.suplentes = []
@@ -158,12 +156,11 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
       continue
     }
 
-    // Quitar usuario de todas las listas para evitar duplicados
     data.escuadra = data.escuadra.filter(u => u !== user)
     data.suplentes = data.suplentes.filter(u => u !== user)
 
     if (emoji === '❤️') {
-      if (data.escuadra.length < 12) data.escuadra.push(user)
+      if (data.escuadra.length < 4) data.escuadra.push(user)
     } else if (emoji === '👍') {
       if (data.suplentes.length < 2) data.suplentes.push(user)
     } else if (emoji === '👎') {
