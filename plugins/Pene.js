@@ -116,7 +116,7 @@ function generarVersus(esc1, esc2, esc3, suplentes, mexText = '  ', colText = ' 
     return out.trimEnd()
   }
 
-  return `                  *12 𝐕𝐄𝐑𝐒𝐔𝐒 12*
+  return `*12 𝐕𝐄𝐑𝐒𝐔𝐒 12*
 
 
 *𝐇𝐎𝐑𝐀𝐑𝐈𝐎S*;  
