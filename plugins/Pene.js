@@ -116,11 +116,7 @@ function generarVersus(esc1, esc2, esc3, suplentes, mexText = '  ', colText = ' 
     return out.trimEnd()
   }
 
-  return ` 
-
-12 𝙑𝙀𝙍𝙎𝙐𝙎 12
-
-
+  return `
 𝐇𝐎𝐑𝐀𝐑𝐈𝐎S;  
 
 🇲🇽 𝐌𝐄𝐗 : ${mexText}  
