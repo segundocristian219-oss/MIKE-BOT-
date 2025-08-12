@@ -90,7 +90,7 @@ let handler = async (m, { conn, args }) => {
 }
 handler.help = ['12vs12']
 handler.tags = ['freefire']
-handler.command = /^(12vs12|vs12)$/i;
+handler.command = /^\.?(12vs12|vs12)$/i
 handler.group = true;
 handler.botAdmin = true;
 
