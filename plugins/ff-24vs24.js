@@ -78,9 +78,9 @@ let handler = async (m, { conn, args }) => {
     colText
   }
 }
-handler.help = ['12vs12']
+handler.help = ['24vs24']
 handler.tags = ['freefire']
-handler.command = /^\.?(12vs12|vs12)$/i
+handler.command = /^\.?(24vs24|vs24)$/i
 handler.group = true
 handler.botAdmin = true
 export default handler
@@ -103,7 +103,7 @@ function generarVersus(esc1, esc2, esc3, esc4, esc5, esc6, suplentes, mexText = 
     return out.trimEnd()
   }
 
-  return `*12 𝐕𝐄𝐑𝐒𝐔𝐒 12*
+  return `*24 𝐕𝐄𝐑𝐒𝐔𝐒 24*
 
 *𝐇𝐎𝐑𝐀𝐑𝐈𝐎𝐒*;  
 *🇲🇽 MEXICO* : ${mexText}  
