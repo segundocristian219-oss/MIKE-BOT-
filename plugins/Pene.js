@@ -121,8 +121,8 @@ function generarVersus(esc1, esc2, esc3, suplentes, mexText = '  ', colText = ' 
 
 *𝐇𝐎𝐑𝐀𝐑𝐈𝐎S*;  
 
-*🇲🇽 𝐌𝐄𝐗* : ${mexText}  
-*🇨🇴 𝐂𝐎𝐋* : ${colText}
+*🇲🇽 𝐌𝐄𝐗𝐈𝐂𝐎* : ${mexText}  
+*🇨🇴 𝐂𝐎𝐋𝐎𝐌𝐁𝐈𝐀* : ${colText}
 
 
 *𝐉𝐔𝐆𝐀𝐃𝐎𝐑𝐄𝐒 𝐏𝐑𝐄𝐒𝐄𝐍𝐓𝐄𝐒*;
