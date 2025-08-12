@@ -1,32 +1,21 @@
 let versusData = {} // Guarda el estado por mensaje
 
-// --------------------------
-// Comando .versus [hora] [zona]
-// Ejemplos: ".versus 4 pm mx", ".versus 16 co"
-// --------------------------
 let handler = async (m, { conn, args }) => {
-  // args = ["4", "pm", "mx"] o ["16", "co"] o []
   let horaInput = null
   let zonaInput = null
 
-  // Buscar hora y zona
   if (args.length > 0) {
-    // Intentamos parsear la zona (último arg si es 'mx' o 'co')
     const lastArg = args[args.length - 1].toLowerCase()
     if (lastArg === 'mx' || lastArg === 'co') {
       zonaInput = lastArg
       args.pop()
     }
 
-    // Lo que queda en args puede ser ["4", "pm"] o ["16"] o ["4", "am"]
-    const timeStr = args.join(' ').toUpperCase().trim() // ej "4 PM", "16", "4 AM"
-
-    // Regex para hora + optional am/pm
+    const timeStr = args.join(' ').toUpperCase().trim()
     const match = timeStr.match(/^(\d{1,2})(?:\s*(AM|PM))?$/i)
     if (match) {
       let hour = parseInt(match[1])
       const ampm = match[2] || null
-
       if (ampm) {
         if (ampm === 'PM' && hour < 12) hour += 12
         if (ampm === 'AM' && hour === 12) hour = 0
@@ -37,10 +26,8 @@ let handler = async (m, { conn, args }) => {
     }
   }
 
-  // Si no hay zona, asumimos mx por defecto
   if (!zonaInput) zonaInput = 'mx'
 
-  // Función para convertir y formatear horarios para mostrar
   function format12h(h) {
     let ampm = h >= 12 ? 'PM' : 'AM'
     let hour12 = h % 12
@@ -48,30 +35,27 @@ let handler = async (m, { conn, args }) => {
     return `${hour12} ${ampm}`
   }
 
-  // Convertir horas para ambas zonas
-  // México UTC-6, Colombia UTC-5 (Colombia +1 respecto a México)
-  // Dependiendo de zonaInput, interpretamos horaInput en esa zona y calculamos la otra zona
-
   let mexHora, colHora
-
   if (horaInput === null) {
-    // Sin hora, dejar vacío
     mexHora = '  '
     colHora = '  '
   } else if (zonaInput === 'mx') {
     mexHora = horaInput
     colHora = (horaInput + 1) % 24
-  } else { // zonaInput === 'co'
+  } else {
     colHora = horaInput
-    mexHora = (horaInput + 23) % 24 // -1 mod 24
+    mexHora = (horaInput + 23) % 24
   }
 
-  // Formatear para mostrar
   const mexText = (horaInput === null) ? '  ' : format12h(mexHora)
   const colText = (horaInput === null) ? '  ' : format12h(colHora)
 
   const template = generarVersus([], [], [], [], mexText, colText)
-  const sent = await conn.sendMessage(m.chat, { text: template, mentions: [] })
+  const sent = await conn.sendMessage(m.chat, { 
+    image: { url: 'https://files.catbox.moe/xbtkwq.jpg' },
+    caption: template,
+    mentions: []
+  })
 
   versusData[sent.key.id] = {
     chat: m.chat,
@@ -86,32 +70,19 @@ let handler = async (m, { conn, args }) => {
 handler.command = /^versus$/i
 export default handler
 
-// --------------------------
-// Función para generar mensaje con diseño nuevo y slots rellenados
-// --------------------------
 function generarVersus(esc1, esc2, esc3, suplentes, mexText = '  ', colText = '  ') {
   function formatEscuadra(arr) {
     let out = ''
     for (let i = 0; i < 4; i++) {
-      if (arr[i]) {
-        let icon = i === 0 ? '👑' : '🥷🏻'
-        out += `${icon} ┇ @${arr[i].split('@')[0]}\n`
-      } else {
-        let icon = i === 0 ? '👑' : '🥷🏻'
-        out += `${icon} ┇ \n`
-      }
+      let icon = i === 0 ? '👑' : '🥷🏻'
+      out += `${icon} ┇ ${arr[i] ? '@' + arr[i].split('@')[0] : ''}\n`
     }
     return out.trimEnd()
   }
-
   function formatSuplentes(arr) {
     let out = ''
     for (let i = 0; i < 2; i++) {
-      if (arr[i]) {
-        out += `🥷🏻 ┇ @${arr[i].split('@')[0]}\n`
-      } else {
-        out += `🥷🏻 ┇ \n`
-      }
+      out += `🥷🏻 ┇ ${arr[i] ? '@' + arr[i].split('@')[0] : ''}\n`
     }
     return out.trimEnd()
   }
@@ -138,15 +109,11 @@ ${formatSuplentes(suplentes)}
 
 
 *𝖲𝗈𝗅𝗈 𝗋𝖾𝖺𝖼𝖼𝗂𝗈𝗇𝖺 𝖼𝗈𝗇:*
-
 > 「 ❤️ 」𝖯𝖺𝗋𝗍𝗂𝖼𝗂𝗉𝖺𝗋
 > 「 👍 」𝖲𝗎𝗉𝗅𝖾𝗇𝗍𝖾
 > 「 👎 」𝖲𝖺𝗅𝗂𝗋 𝖽𝖾 𝗅𝖺 𝗅𝗂𝗌𝗍𝖺`
 }
 
-// --------------------------
-// Listener de reacciones (ds6/meta)
-// --------------------------
 conn.ev.on('messages.upsert', async ({ messages }) => {
   for (let msg of messages) {
     if (!msg.message || !msg.message.reactionMessage) continue
@@ -170,7 +137,6 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
     } else if (emoji === '👍') {
       if (data.suplentes.length < 2) data.suplentes.push(user)
     } else if (emoji === '👎') {
-      // Ya eliminado arriba
     } else continue
 
     let nuevoTexto = generarVersus(data.escuadra1, data.escuadra2, data.escuadra3, data.suplentes, data.mexText, data.colText)
@@ -181,7 +147,8 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
     } catch {}
 
     let sent = await conn.sendMessage(data.chat, {
-      text: nuevoTexto,
+      image: { url: 'https://files.catbox.moe/xbtkwq.jpg' },
+      caption: nuevoTexto,
       mentions
     })
 
