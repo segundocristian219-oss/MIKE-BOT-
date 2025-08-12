@@ -1,6 +1,5 @@
 let versusData = {} // Guarda el estado por mensaje
 
-// Lista de aliases para cada país, en minúsculas sin coma
 const aliasesMX = ['mx', 'méxico', 'mexico', 'méx', 'mex']
 const aliasesCO = ['co', 'colombia', 'col']
 
@@ -10,11 +9,9 @@ let handler = async (m, { conn, args }) => {
     return
   }
 
-  // Buscamos y limpiamos la coma si hay en el último argumento
   let lastArgRaw = args[args.length - 1]
-  let lastArg = lastArgRaw.toLowerCase().replace(/,$/, '') // quita coma al final
+  let lastArg = lastArgRaw.toLowerCase().replace(/,$/, '')
 
-  // Verificar si el último argumento es un alias válido de país
   let zonaInput = null
   if (aliasesMX.includes(lastArg)) {
     zonaInput = 'mx'
@@ -23,28 +20,25 @@ let handler = async (m, { conn, args }) => {
     zonaInput = 'co'
     args.pop()
   } else {
-    // No se especificó país válido
     await conn.sendMessage(m.chat, { text: '𝐓𝐢𝐞𝐧𝐞𝐬 𝐪𝐮𝐞 𝐞𝐬𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐫 𝐞𝐥 𝐩𝐚𝐢́𝐬 𝐯𝐚́𝐥𝐢𝐝𝐨 𝐞𝐧 𝐞𝐥 𝐜𝐨𝐦𝐚𝐧𝐝𝐨.\nEjemplo: 𝟑 𝐩𝐦 𝐦𝐱, 𝟏𝟔 𝐜𝐨, 𝟒 𝐩𝐦 𝐦é𝐱𝐢𝐜𝐨' })
     return
   }
 
-  // Lo que queda en args es la hora: ej ["3", "pm"] o ["16"] etc.
   const timeStr = args.join(' ').toUpperCase().trim()
 
-  // Regex para hora + optional am/pm  
-  const match = timeStr.match(/^(\d{1,2})(?:\s*(AM|PM))?$/i)  
+  const match = timeStr.match(/^(\d{1,2})(?:\s*(AM|PM))?$/i)
   let horaInput = null
-  if (match) {  
-    let hour = parseInt(match[1])  
-    const ampm = match[2] || null  
+  if (match) {
+    let hour = parseInt(match[1])
+    const ampm = match[2] || null
 
-    if (ampm) {  
-      if (ampm === 'PM' && hour < 12) hour += 12  
-      if (ampm === 'AM' && hour === 12) hour = 0  
-    }  
-    if (hour >= 0 && hour <= 23) {  
-      horaInput = hour  
-    }  
+    if (ampm) {
+      if (ampm === 'PM' && hour < 12) hour += 12
+      if (ampm === 'AM' && hour === 12) hour = 0
+    }
+    if (hour >= 0 && hour <= 23) {
+      horaInput = hour
+    }
   }
 
   if (horaInput === null) {
@@ -52,7 +46,6 @@ let handler = async (m, { conn, args }) => {
     return
   }
 
-  // Función para convertir y formatear horarios para mostrar
   function format12h(h) {
     let ampm = h >= 12 ? 'PM' : 'AM'
     let hour12 = h % 12
@@ -60,18 +53,14 @@ let handler = async (m, { conn, args }) => {
     return `${hour12} ${ampm}`
   }
 
-  // Convertir horas para ambas zonas
-  // México UTC-6, Colombia UTC-5 (Colombia +1 respecto a México)
-  // Dependiendo de zonaInput, interpretamos horaInput en esa zona y calculamos la otra zona
-
   let mexHora, colHora
 
   if (zonaInput === 'mx') {
     mexHora = horaInput
     colHora = (horaInput + 1) % 24
-  } else { // zonaInput === 'co'
+  } else {
     colHora = horaInput
-    mexHora = (horaInput + 23) % 24 // -1 mod 24
+    mexHora = (horaInput + 23) % 24
   }
 
   const mexText = format12h(mexHora)
@@ -97,9 +86,6 @@ handler.group = true
 handler.botAdmin = true
 export default handler
 
-// --------------------------
-// Función para generar mensaje con diseño nuevo y slots rellenados
-// --------------------------
 function generarVersus(esc1, esc2, esc3, suplentes, mexText = '  ', colText = '  ') {
   function formatEscuadra(arr) {
     let out = ''
@@ -159,31 +145,24 @@ ${formatSuplentes(suplentes)}
 > 「 ❤️ 」𝖯𝖺𝗋𝗍𝗂𝖼𝗂𝗉𝖺𝗋  
 > 「 👍 」𝖲𝗎𝗉𝗅𝖾𝗇𝗍𝖾  
 > 「 👎 」𝖲𝖺𝗅𝗂𝗋 𝖽𝖾 𝗅𝖺 𝗅𝗂𝗌𝗍𝖺  
-> 「 ❌ 」Reiniciar la lista  
+> 「 ❌ 」 (Admin) 𝗥𝗲𝗶𝗻𝗶𝗰𝗶𝗮𝗿 𝗹𝗮 𝗹𝗶𝘀𝘁𝗮  
 `
 }
 
-// --------------------------
-// Listener de reacciones (ds6/meta)
-// --------------------------
 conn.ev.on('messages.upsert', async ({ messages }) => {
   for (let msg of messages) {
     if (!msg.message || !msg.message.reactionMessage) continue
 
-    let msgID = msg.message.reactionMessage.key.id  
-    let data = versusData[msgID]  
-    if (!data) continue  
+    let msgID = msg.message.reactionMessage.key.id
+    let data = versusData[msgID]
+    if (!data) continue
 
-    let user = msg.key.participant || msg.key.remoteJid  
-    let emoji = msg.message.reactionMessage.text  
+    let user = msg.key.participant || msg.key.remoteJid
+    let emoji = msg.message.reactionMessage.text
 
-    // Si reaccionó alguien fuera de la lista y pone 👎, ignorar
     const isInAnyList = data.escuadra1.includes(user) || data.escuadra2.includes(user) || data.escuadra3.includes(user) || data.suplentes.includes(user)
-    if (emoji === '👎' && !isInAnyList) {
-      continue
-    }
+    if (emoji === '👎' && !isInAnyList) continue
 
-    // Obtener si el user es admin en el grupo
     let isAdmin = false
     try {
       let groupMetadata = await conn.groupMetadata(data.chat)
@@ -191,8 +170,11 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
       isAdmin = participant?.admin === 'admin' || participant?.admin === 'superadmin'
     } catch {}
 
-    // Si admin reacciona con ❌: reiniciar lista y mandar mensaje vacío
+    // ❌ solo admins y si hay jugadores anotados
     if (emoji === '❌' && isAdmin) {
+      const hasPlayers = data.escuadra1.length + data.escuadra2.length + data.escuadra3.length + data.suplentes.length > 0
+      if (!hasPlayers) continue
+
       data.escuadra1 = []
       data.escuadra2 = []
       data.escuadra3 = []
@@ -213,37 +195,36 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
       continue
     }
 
-    // Quitar usuario de todas las listas para manejar su nueva reacción (o eliminar)
     data.escuadra1 = data.escuadra1.filter(u => u !== user)
     data.escuadra2 = data.escuadra2.filter(u => u !== user)
     data.escuadra3 = data.escuadra3.filter(u => u !== user)
     data.suplentes = data.suplentes.filter(u => u !== user)
 
-    if (emoji === '❤️') {  
-      if (data.escuadra1.length < 4) data.escuadra1.push(user)  
-      else if (data.escuadra2.length < 4) data.escuadra2.push(user)  
-      else if (data.escuadra3.length < 4) data.escuadra3.push(user)  
-    } else if (emoji === '👍') {  
-      if (data.suplentes.length < 2) data.suplentes.push(user)  
-    } else if (emoji === '👎') {  
-      // Si el usuario estaba en lista, ya fue removido arriba, solo ignorar
+    if (emoji === '❤️') {
+      if (data.escuadra1.length < 4) data.escuadra1.push(user)
+      else if (data.escuadra2.length < 4) data.escuadra2.push(user)
+      else if (data.escuadra3.length < 4) data.escuadra3.push(user)
+    } else if (emoji === '👍') {
+      if (data.suplentes.length < 2) data.suplentes.push(user)
+    } else if (emoji === '👎') {
+      // Ya removido arriba, solo ignorar
     } else {
-      continue  
+      continue
     }
 
-    let nuevoTexto = generarVersus(data.escuadra1, data.escuadra2, data.escuadra3, data.suplentes, data.mexText, data.colText)  
-    let mentions = [...data.escuadra1, ...data.escuadra2, ...data.escuadra3, ...data.suplentes]  
+    let nuevoTexto = generarVersus(data.escuadra1, data.escuadra2, data.escuadra3, data.suplentes, data.mexText, data.colText)
+    let mentions = [...data.escuadra1, ...data.escuadra2, ...data.escuadra3, ...data.suplentes]
 
-    try {  
-      await conn.sendMessage(data.chat, { delete: msg.message.reactionMessage.key })  
-    } catch {}  
+    try {
+      await conn.sendMessage(data.chat, { delete: msg.message.reactionMessage.key })
+    } catch {}
 
-    let sent = await conn.sendMessage(data.chat, {  
-      text: nuevoTexto,  
-      mentions  
-    })  
+    let sent = await conn.sendMessage(data.chat, {
+      text: nuevoTexto,
+      mentions
+    })
 
-    delete versusData[msgID]  
+    delete versusData[msgID]
     versusData[sent.key.id] = data
   }
 })
