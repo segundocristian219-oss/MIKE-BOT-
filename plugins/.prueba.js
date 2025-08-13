@@ -4,6 +4,7 @@ let handler = async (m, { conn }) => {
 
     let menu = `
 ¡Hola! 👋🏻 @${m.sender.split("@")[0]}
+
 \`\`\`${week}, ${date}\`\`\`
 
 ╭──𝗠𝗘𝗡𝗨 𝗛𝗢𝗧──────
