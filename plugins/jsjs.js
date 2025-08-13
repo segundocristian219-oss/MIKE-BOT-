@@ -10,9 +10,9 @@ let handler = async (m, { conn }) => {
   }, { quoted: m });
 };
 
-handler.help = ['tiktokhot'];
+handler.help = ['tiktokhot', 'hottiktok'];
 handler.tags = ['random', 'nsfw'];
-handler.command = /^(tiktokhot)$/i;
+handler.command = /^(tiktokhot|hottiktok)$/i;
 export default handler;
 
 global.tiktokhot = [
