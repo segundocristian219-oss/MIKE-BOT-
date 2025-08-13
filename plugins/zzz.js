@@ -9,7 +9,7 @@ const handler = async (m, { conn }) => {
 
   // Verificar modohorny
   if (!db.data.chats[m.chat].modohorny && m.isGroup) {
-    throw '⚠ 𝙇𝙊𝙎 𝘾𝙊𝙈𝘼𝙉𝘿𝙊𝙎 +18 𝙀𝙎𝙏𝘼𝙉 𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊𝙎 𝙀𝙉 𝙀𝙎𝙏𝙀 𝙂𝙍𝙐𝙋𝙊';
+    throw '';
   }
 
   // API
