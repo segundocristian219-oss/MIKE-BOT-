@@ -10,13 +10,13 @@ let handler = async (m, { conn, text, usedPrefix, command}) => {
 
   const textRandom = [
     "𝗣𝗼𝗿𝗻𝗶𝘁𝗼 𝗥𝗶𝗰𝗼 😈",
-    "😈",
-    "😈"
+    "𝗣𝗼𝗿𝗻𝗶𝘁𝗼 𝗥𝗶𝗰𝗼 😈",
+    ""
   ];
 
   const imgRandom = [
-    "https://iili.io/FKVDVAN.jpg",
-    "https://iili.io/FKVbUrJ.jpg"
+    "https://cdn.russellxz.click/c3cf443a.jpeg",
+    "https://cdn.russellxz.click/c3cf443a.jpeg"
   ];
 
   const msjRandom = textRandom[Math.floor(Math.random() * textRandom.length)];
