@@ -1,174 +1,102 @@
 import axios from 'axios';
 import fetch from 'node-fetch';
-const handler = async (m, {command, conn}) => {
-  if (!db.data.chats[m.chat].modohorny && m.isGroup) throw '⚠ 𝙇𝙊𝙎 𝘾𝙊𝙈𝘼𝙉𝘿𝙊𝙎 +18 𝙀𝙎𝙏𝘼𝙉 𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊𝙎 𝙀𝙉 𝙀𝙎𝙏𝙀 𝙂𝙍𝙐𝙋𝙊, 𝙎𝙄 𝙀𝙎 𝘼𝘿𝙈𝙄𝙉 𝙔 𝘿𝙀𝙎𝙀𝘼 𝘼𝘾𝙏𝙄𝙑𝘼𝙍𝙇𝙊𝙎, 𝙐𝙎𝙀 𝙀𝙇 𝘾𝙊𝙈𝘼𝙉𝘿𝙊 .on modohorny \n𝙍𝙀𝘾𝙐𝙀𝙍𝘿𝙀 𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝙍 .off modohorny';
 
+const handler = async (m, { command, conn }) => {
+  // Validación segura de modohorny
+  const chatSettings = (db.data?.chats?.[m.chat]) || {};
+  if (!chatSettings.modohorny && m.isGroup) 
+    throw '⚠ 𝐋𝐎𝐒 𝐂𝐎𝐌𝐀𝐍𝐃𝐎𝐒 +18 𝐄𝐒𝐓𝐀𝐍 𝐃𝐄𝐒𝐀𝐂𝐓𝐈𝐕𝐀𝐃𝐎𝐒 𝐄𝐍 𝐄𝐒𝐓𝐄 𝐆𝐑𝐔𝐏𝐎.\nSi eres admin y deseas activarlos, usa .on modohorny';
 
-  if (command == 'nsfwloli') {
-    const res = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/nsfwloli.json`)).data;
-    const haha = await res[Math.floor(res.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: haha}, caption: `_${command}_`.trim()}, {quoted: m});
+  // Función genérica para enviar imágenes desde JSON
+  const sendRandomFromJSON = async (urlJSON, caption) => {
+    const res = (await axios.get(urlJSON)).data;
+    const url = res[Math.floor(Math.random() * res.length)];
+    await conn.sendMessage(m.chat, { image: { url }, caption: `_${caption}_`.trim() }, { quoted: m });
+  };
+
+  // Comandos simples que solo necesitan JSON
+  const simpleJSONCommands = {
+    nsfwloli: 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/nsfwloli.json',
+    nsfwfoot: 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/nsfwfoot.json',
+    nsfwass: 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/nsfwass.json',
+    nsfwbdsm: 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/nsfwbdsm.json',
+    nsfwcum: 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/nsfwcum.json',
+    nsfwero: 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/nsfwero.json',
+    nsfwfemdom: 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/nsfwfemdom.json',
+    nsfwglass: 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/nsfwglass.json',
+    hentai: 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/hentai.json',
+    nsfworgy: 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/nsfworgy.json',
+    ecchi: 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/ecchi.json',
+    furro: 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/furro.json',
+    yuri: 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/yuri.json',
+    panties: 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/panties.json',
+    porno: 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/porno.json',
+    pechos: 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/pechos.json'
+  };
+
+  if (simpleJSONCommands[command]) {
+    return sendRandomFromJSON(simpleJSONCommands[command], command);
   }
 
-  if (command == 'nsfwfoot') {
-    const res = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/nsfwfoot.json`)).data;
-    const haha = await res[Math.floor(res.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: haha}, caption: `_${command}_`.trim()}, {quoted: m});
+  // Comandos que usan API externa con fallback
+  if (command === 'tetas') {
+    const fallback = (await axios.get('https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/tetas.json')).data;
+    let res;
+    try {
+      res = await conn.getFile('https://api-fgmods.ddns.net/api/nsfw/boobs?apikey=fg-dylux');
+      res = res?.data || fallback[Math.floor(Math.random() * fallback.length)];
+    } catch {
+      res = fallback[Math.floor(Math.random() * fallback.length)];
+    }
+    return conn.sendMessage(m.chat, { image: { url: res }, caption: `_${command}_` }, { quoted: m });
   }
 
-  if (command == 'nsfwass') {
-    const res = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/nsfwass.json`)).data;
-    const haha = await res[Math.floor(res.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: haha}, caption: `_${command}_`.trim()}, {quoted: m});
+  if (command === 'booty') {
+    const fallback = (await axios.get('https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/booty.json')).data;
+    let res;
+    try {
+      res = await conn.getFile('https://api-fgmods.ddns.net/api/nsfw/ass?apikey=fg-dylux');
+      res = res?.data || fallback[Math.floor(Math.random() * fallback.length)];
+    } catch {
+      res = fallback[Math.floor(Math.random() * fallback.length)];
+    }
+    return conn.sendMessage(m.chat, { image: { url: res }, caption: `_${command}_` }, { quoted: m });
   }
 
-  if (command == 'nsfwbdsm') {
-    const res = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/nsfwbdsm.json`)).data;
-    const haha = await res[Math.floor(res.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: haha}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
+  // Comandos que usan fetch y APIs externas
+  const fetchCommands = {
+    trapito: 'https://api.waifu.pics/nsfw/trap',
+    yaoi: 'https://nekobot.xyz/api/image?type=yaoi',
+    yaoi2: 'https://purrbot.site/api/img/nsfw/yaoi/gif',
+    yuri2: 'https://purrbot.site/api/img/nsfw/yuri/gif'
+  };
 
-  if (command == 'nsfwcum') {
-    const res = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/nsfwcum.json`)).data;
-    const haha = await res[Math.floor(res.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: haha}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
-
-  if (command == 'nsfwero') {
-    const res = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/nsfwero.json`)).data;
-    const haha = await res[Math.floor(res.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: haha}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
-
-  if (command == 'nsfwfemdom') {
-    const res = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/nsfwfemdom.json`)).data;
-    const haha = await res[Math.floor(res.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: haha}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
-
-  if (command == 'nsfwglass') {
-    const res = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/nsfwglass.json`)).data;
-    const haha = await res[Math.floor(res.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: haha}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
-
-  if (command == 'hentai') {
-    const res = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/hentai.json`)).data;
-    const haha = await res[Math.floor(res.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: haha}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
-
-  if (command == 'nsfworgy') {
-    const res = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/nsfworgy.json`)).data;
-    const haha = await res[Math.floor(res.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: haha}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
-
-  if (command == 'tetas') {
-    const resError = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/tetas.json`)).data;
-    let res = await conn.getFile(`https://api-fgmods.ddns.net/api/nsfw/boobs?apikey=fg-dylux`).data;
-    if (res == '' || !res || res == null) res = await resError[Math.floor(resError.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: res}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
-
-  if (command == 'booty') {
-    const resError = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/booty.json`)).data;
-    let res = await conn.getFile(`https://api-fgmods.ddns.net/api/nsfw/ass?apikey=fg-dylux`).data;
-    if (res == '' || !res || res == null) res = await resError[Math.floor(resError.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: res}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
-
-  if (command == 'ecchi') {
-    const res = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/ecchi.json`)).data;
-    const url = await res[Math.floor(res.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: url}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
-
-  if (command == 'furro') {
-    const res = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/furro.json`)).data;
-    const url = await res[Math.floor(res.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: url}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
-
-  if (command == 'trapito') {
-    const res = await fetch(`https://api.waifu.pics/nsfw/trap`);
+  if (fetchCommands[command]) {
+    const res = await fetch(fetchCommands[command]);
     const json = await res.json();
-    const url = json.url;
-    conn.sendMessage(m.chat, {image: {url: url}, caption: `_${command}_`.trim()}, {quoted: m});
+    let url = json.url || json.link || json.message;
+    return conn.sendMessage(m.chat, { image: { url }, caption: `_${command}_` }, { quoted: m });
   }
 
-  if (command == 'imagenlesbians') {
-    const resError = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/imagenlesbians.json`)).data;
-    let res = await conn.getFile(`https://api-fgmods.ddns.net/api/nsfw/lesbian?apikey=fg-dylux`).data;
-    if (res == '' || !res || res == null) res = await resError[Math.floor(resError.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: res}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
-
-  if (command == 'panties') {
-    const res = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/panties.json`)).data;
-    const url = await res[Math.floor(res.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: url}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
-
-  if (command == 'pene') {
-    const resError = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/pene.json`)).data;
-    let res = await conn.getFile(`https://api-fgmods.ddns.net/api/nsfw/penis?apikey=fg-dylux`).data;
-    if (res == '' || !res || res == null) res = await resError[Math.floor(resError.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: res}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
-
-  if (command == 'porno') {
-    const res = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/porno.json`)).data;
-    const url = await res[Math.floor(res.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: url}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
-
-  if (command == 'randomxxx') {
-    const rawjsonn = ['https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/tetas.json', 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/booty.json', 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/imagenlesbians.json', 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/panties.json', 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/porno.json'];
-    const rawjson = await rawjsonn[Math.floor(rawjsonn.length * Math.random())];
-    const res = (await axios.get(rawjson)).data;
-    const url = await res[Math.floor(res.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: url}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
-
-  if (command == 'pechos') {
-    const res = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/pechos.json`)).data;
-    const url = await res[Math.floor(res.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: url}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
-
-  if (command == 'yaoi') {
-    const res = await fetch(`https://nekobot.xyz/api/image?type=yaoi`);
-    const json = await res.json();
-    const url = json.message;
-    conn.sendMessage(m.chat, {image: {url: url}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
-
-  if (command == 'yaoi2') {
-    const res = await fetch(`https://purrbot.site/api/img/nsfw/yaoi/gif`);
-    const json = await res.json();
-    const url = json.link;
-    conn.sendMessage(m.chat, {image: {url: url}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
-
-  if (command == 'yuri') {
-    const res = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/yuri.json`)).data;
-    const url = await res[Math.floor(res.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: url}, caption: `_${command}_`.trim()}, {quoted: m});
-  }
-
-  if (command == 'yuri2') {
-    const resError = (await axios.get(`https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/yuri.json`)).data;
-    const res = await fetch(`https://purrbot.site/api/img/nsfw/yuri/gif`);
-    const json = await res.json();
-    let url = json.link;
-    if (url == '' || !url || url == null) url = await resError[Math.floor(resError.length * Math.random())];
-    conn.sendMessage(m.chat, {image: {url: url}, caption: `_${command}_`.trim()}, {quoted: m});
+  // Comando randomxxx
+  if (command === 'randomxxx') {
+    const sources = [
+      'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/tetas.json',
+      'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/booty.json',
+      'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/imagenlesbians.json',
+      'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/panties.json',
+      'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/porno.json'
+    ];
+    const res = (await axios.get(sources[Math.floor(Math.random() * sources.length)])).data;
+    const url = res[Math.floor(Math.random() * res.length)];
+    return conn.sendMessage(m.chat, { image: { url }, caption: `_${command}_` }, { quoted: m });
   }
 };
-handler.help = ['nsfwloli', 'nsfwfoot', 'nsfwass', 'nsfwbdsm', 'nsfwcum', 'nsfwero', 'nsfwfemdom', 'nsfwfoot', 'nsfwglass', 'nsfworgy', 'yuri', 'yuri2', 'yaoi', 'yaoi2', 'panties', '', 'booty', 'ecchi', 'furro', 'hentai', 'trapito', 'imagenlesbians', 'pene', 'porno', 'randomxxx', ''];
-handler.command = ['nsfwloli', 'nsfwfoot', 'nsfwass', 'nsfwbdsm', 'nsfwcum', 'nsfwero', 'nsfwfemdom', 'nsfwfoot', 'nsfwglass', 'nsfworgy', 'yuri', 'yuri2', 'yaoi', 'yaoi2', 'panties', '', 'booty', 'ecchi', 'furro', 'hentai', 'trapito', 'imagenlesbians', 'pene', 'porno', 'randomxxx', ''];
+
+handler.help = Object.keys(handler.simpleJSONCommands || {}).concat(['tetas', 'booty', 'trapito', 'yaoi', 'yaoi2', 'yuri2', 'randomxxx']);
+handler.command = handler.help;
 handler.tags = ['nsfw'];
-handler.register = false
-handler.group = true
+handler.register = false;
+handler.group = true;
+
 export default handler;
