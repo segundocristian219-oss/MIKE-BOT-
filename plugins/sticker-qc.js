@@ -1,28 +1,30 @@
 import { sticker } from '../lib/sticker.js'
 import axios from 'axios'
 
-let handler = async (m, {
-    conn,
-    args,
-    usedPrefix,
-    command
-}) => {
+let handler = async (m, { conn, args, usedPrefix, command }) => {
+    let targetUser
     let text
 
-    if (args.length >= 1) {
-        text = args.join(" ")
-    } else if (m.quoted && m.quoted.text) {
-        text = m.quoted.text
+    // Detectar si hay menciones
+    if (m.mentionedJid && m.mentionedJid.length > 0) {
+        targetUser = m.mentionedJid[0]
+        text = args.slice(1).join(' ') // El texto después del @
+    } else if (m.quoted) {
+        targetUser = m.quoted.sender
+        text = args.join(' ')
     } else {
-        return conn.reply(m.chat, `☁️ 𝘼𝙂𝙍𝙀𝙂𝙐𝙀́ 𝙐𝙉 𝙏𝙀𝙓𝙏𝙊 𝙋𝘼𝙍𝘼 𝘾𝙍𝙀𝘼𝙍 𝙀𝙇 𝙎𝙏𝙄𝘾𝙆𝙀𝙍`, m)
+        // Si no hay mención ni reply, usar el autor del mensaje
+        targetUser = m.sender
+        text = args.join(' ')
     }
 
-    if (!text) return m.reply('⚠️ 𝙔 𝙀𝙇 𝙏𝙀𝙓𝙏𝙊?')
+    if (!text) return conn.reply(m.chat, `☁️ *Agrega un texto para crear el sticker*`, m)
 
     const wordCount = text.trim().split(/\s+/).length
-    if (wordCount > 30) return m.reply('⚠️ 𝙈𝘼́𝙓𝙄𝙈𝙊 30 𝙋𝘼𝙇𝘼𝘽𝙍𝘼𝙎')
+    if (wordCount > 30) return m.reply('⚠️ *Máximo 30 palabras*')
 
-    let pp = await conn.profilePictureUrl(m.sender, 'image').catch(_ => 'https://qu.ax/ZJKqt.jpg')
+    let name = await conn.getName(targetUser)
+    let pp = await conn.profilePictureUrl(targetUser, 'image').catch(_ => 'https://qu.ax/ZJKqt.jpg')
 
     const obj = {
         type: "quote",
@@ -36,7 +38,7 @@ let handler = async (m, {
             avatar: true,
             from: {
                 id: 1,
-                name: m.name,
+                name: name,
                 photo: {
                     url: pp
                 }
@@ -53,7 +55,7 @@ let handler = async (m, {
     })
 
     const buffer = Buffer.from(json.data.result.image, 'base64')
-    const stiker = await sticker(buffer, false, '', '') // sin texto debajo del sticker
+    const stiker = await sticker(buffer, false, '', '')
 
     if (stiker) return conn.sendFile(m.chat, stiker, 'Quotly.webp', '', m)
 }
