@@ -53,10 +53,11 @@ let handler = async (m, { conn }) => {
     const vi = ['https://telegra.ph/file/aa3e11b1cc4246ad72b9b.mp4']
 
     await conn.sendMessage(m.chat, {
-        video: { url: vi[0] },
-        caption: menu,
-        mentions: [m.sender]
-    }, { quoted: m })
+    video: { url: vi[0] },
+    caption: menu,
+    mentions: [m.sender],
+    gifPlayback: true
+}, { quoted: m })
 }
 
 handler.command = /^menuhot$/i
