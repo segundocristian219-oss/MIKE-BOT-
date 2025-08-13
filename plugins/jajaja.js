@@ -10,8 +10,8 @@ let handler = async (m, { conn, text, usedPrefix, command}) => {
 
   const textRandom = [
     "𝗣𝗼𝗿𝗻𝗶𝘁𝗼 𝗥𝗶𝗰𝗼 😈",
-    "",
-    ""
+    "😈",
+    "😈"
   ];
 
   const imgRandom = [
