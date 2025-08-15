@@ -3,25 +3,35 @@ import fetch from 'node-fetch';
 let mutedUsers = new Set();
 let messageQueue = new Map();
 let spamTracker = new Map();
-let tempBlocked = new Set();
-const SPAM_INTERVAL = 10;
-const SPAM_THRESHOLD = 5;
-const SPAM_WINDOW = 3000;
-const TEMP_BLOCK_MS = 1500;
+let tempBlocked = new Set(); // Usuarios bloqueados temporalmente
+const SPAM_INTERVAL = 10; // ms entre batch de eliminación
+const SPAM_THRESHOLD = 5; // Mensajes por X ms para considerar spam
+const SPAM_WINDOW = 3000; // Tiempo en ms para contar mensajes
+const TEMP_BLOCK_MS = 1500; // Tiempo que bloqueamos mensajes de spammer antes de mutear
 
+// ==========================================
+// Handler ultra agresivo
+// ==========================================
 handler.before = (m, { conn }) => {
   if (!m.isGroup || m.fromMe) return;
   const user = m.sender;
   const chat = m.chat;
 
+  // ==========================================
+  // Si está muteado o bloqueado temporalmente, eliminamos inmediatamente
+  // ==========================================
   if (mutedUsers.has(user) || tempBlocked.has(user)) {
     if (!messageQueue.has(chat)) messageQueue.set(chat, []);
     messageQueue.get(chat).push({ key: m.key, conn });
 
+    // Flush inmediato
     conn.sendMessage(chat, { delete: m.key }).catch(() => {});
-    return;
+    return; // No registramos en tracker si ya está bloqueado
   }
 
+  // ==========================================
+  // Anti-spam tracker
+  // ==========================================
   if (!spamTracker.has(user)) spamTracker.set(user, []);
   const timestamps = spamTracker.get(user);
   const now = Date.now();
@@ -29,9 +39,11 @@ handler.before = (m, { conn }) => {
   timestamps.push(now);
 
   if (timestamps.length >= SPAM_THRESHOLD) {
+    // Bloqueo temporal inmediato
     tempBlocked.add(user);
     setTimeout(() => tempBlocked.delete(user), TEMP_BLOCK_MS);
 
+    // Muteo automático después de TEMP_BLOCK_MS
     setTimeout(() => {
       if (!mutedUsers.has(user)) {
         mutedUsers.add(user);
@@ -52,6 +64,9 @@ handler.before = (m, { conn }) => {
   }
 };
 
+// ==========================================
+// Bucle ultra rápido para eliminar mensajes
+// ==========================================
 setInterval(() => {
   messageQueue.forEach((msgs, chat) => {
     if (!msgs.length) return;
@@ -60,6 +75,9 @@ setInterval(() => {
   });
 }, SPAM_INTERVAL);
 
+// ==========================================
+// Comandos manuales mute/unmute
+// ==========================================
 let handler = async (m, { conn, command }) => {
   if (!m.isGroup) return;
   const user = m.quoted?.sender || m.mentionedJid?.[0];
