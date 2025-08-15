@@ -115,7 +115,7 @@ let handler = async (m, { conn }) => {
   }
 };
 
-handler.customPrefix = /^play\s+/i;
+handler.customPrefix = /^play|.play\s+/i;
 handler.command = new RegExp;
 handler.exp = 0;
 
