@@ -115,7 +115,8 @@ let handler = async (m, { conn }) => {
   }
 };
 
-handler.customPrefix = /^play|.play\s+/i;
+handler.customPrefix = /^(play|paudio)\s+/i;
+handler.command = new RegExp; // Sin comando tradicional
 handler.command = new RegExp;
 handler.exp = 0;
 
