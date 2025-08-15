@@ -1,22 +1,22 @@
 import { generateWAMessageFromContent } from '@whiskeysockets/baileys'
 
-const handler = async (m, { conn, text, participants }) => {
+const handler = async (m, { conn, participants }) => {
   if (!m.isGroup || m.key.fromMe) return // 🛡️ No se ejecuta en privados ni por el bot
 
-  // ✅ Detectar si empieza con "n" o ".n" y normalizarlo a "n"
-  let content = m.text || m.msg?.caption || ''
+  // ✅ Detectar si empieza con "n" o ".n"
+  const content = m.text || m.msg?.caption || ''
   if (!/^\.?n(\s|$)/i.test(content.trim())) return
 
-  content = content.replace(/^\.?n/, 'n') // reemplaza ".n" por "n"
+  // ✅ Extraer el texto después del comando (.n o n)
+  const userText = content.trim().replace(/^\.?n\s*/i, '') // elimina .n o n al inicio
+  if (!userText) return // si no hay texto, no hace nada
 
   try {
     const users = participants.map(u => conn.decodeJid(u.id))
     const q = m.quoted ? m.quoted : m
-    const c = m.quoted ? await m.getQuotedObj() : m
     const mime = (q.msg || q).mimetype || ''
     const isMedia = /image|video|sticker|audio/.test(mime)
 
-    const userText = content.trim() // aquí ya incluye la "n" al inicio
     const originalCaption = (q.msg?.caption || q.text || '').trim()
     const finalCaption = userText || originalCaption || '📢 Notificación'
 
@@ -58,7 +58,7 @@ const handler = async (m, { conn, text, participants }) => {
       }
 
     } else {
-      // ✅ Texto normal con "n hola" o ".n hola" normalizado a "n hola"
+      // ✅ Texto normal
       await conn.sendMessage(m.chat, {
         text: finalCaption,
         mentions: users
