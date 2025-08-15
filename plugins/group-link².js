@@ -1,18 +1,28 @@
-var handler = async (m, { conn, args }) => {
+var handler = async (m, { conn }) => {
     try {
-        let group = m.chat;
-        let link = 'https://chat.whatsapp.com/' + await conn.groupInviteCode(group);
-        conn.reply(m.chat, '🔗 ' + link, m, { detectLink: true });
+        let code = await conn.groupInviteCode(m.chat)
+        let groupMeta = await conn.groupMetadata(m.chat)
+
+        await conn.sendMessage(m.chat, {
+            groupInviteMessage: {
+                groupJid: m.chat,
+                inviteCode: code,
+                inviteExpiration: Date.now() + 3_600_000, // 1 hora
+                groupName: groupMeta.subject,
+                caption: groupMeta.subject,
+                jpegThumbnail: await conn.getProfilePicture(m.chat).catch(() => null)
+            }
+        })
     } catch (error) {
-        conn.reply(m.chat, 'Error al obtener el enlace del grupo. Asegúrate de que soy administrador y estoy en un grupo.', m);
+        console.error(error)
+        conn.reply(m.chat, '⚠ No puedo obtener el enlace, verifica que soy administrador.', m)
     }
 }
 
-handler.help = ['link'];
-handler.tags = ['grupo'];
-handler.command = ['link', 'linkgroup'];
+handler.help = ['link']
+handler.tags = ['grupo']
+handler.command = /^link$/i
+handler.group = true
+handler.botAdmin = true
 
-handler.group = true;
-handler.botAdmin = true;
-
-export default handler;
+export default handler
