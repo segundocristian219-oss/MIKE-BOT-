@@ -62,8 +62,7 @@ let handler = async (m, { conn, args }) => {
   const mexText = format12h(mexHora)
   const colText = format12h(colHora)
 
-  // 🔹 Corrección: pasamos array vacío en suplentes antes de mexText y colText
-  const template = generarVersus([], [], [], [], [], [], mexText, colText)
+  const template = generarVersus([], [], [], [], [], mexText, colText)
   const sent = await conn.sendMessage(m.chat, { text: template, mentions: [] })
 
   versusData[sent.key.id] = {
@@ -72,7 +71,6 @@ let handler = async (m, { conn, args }) => {
     escuadra2: [],
     escuadra3: [],
     escuadra4: [],
-    escuadra5: [],
     suplentes: [],
     mexText,
     colText
@@ -85,27 +83,19 @@ handler.group = true
 handler.botAdmin = true
 export default handler
 
-function generarVersus(esc1, esc2, esc3, esc4, esc5, suplentes, mexText = '  ', colText = '  ') {
+function generarVersus(esc1, esc2, esc3, esc4, suplentes, mexText = '  ', colText = '  ') {
   function formatEscuadra(arr) {
     let out = ''
     for (let i = 0; i < 4; i++) {
       let icon = i === 0 ? '👑' : '🥷🏻'
-      if (arr[i] && arr[i].includes('@')) {
-        out += `${icon} ┇ @${arr[i].split('@')[0]}\n`
-      } else {
-        out += `${icon} ┇ \n`
-      }
+      out += arr[i] ? `${icon} ┇ @${arr[i].split('@')[0]}\n` : `${icon} ┇ \n`
     }
     return out.trimEnd()
   }
   function formatSuplentes(arr) {
     let out = ''
     for (let i = 0; i < 2; i++) {
-      if (arr[i] && arr[i].includes('@')) {
-        out += `🥷🏻 ┇ @${arr[i].split('@')[0]}\n`
-      } else {
-        out += `🥷🏻 ┇ \n`
-      }
+      out += arr[i] ? `🥷🏻 ┇ @${arr[i].split('@')[0]}\n` : `🥷🏻 ┇ \n`
     }
     return out.trimEnd()
   }
@@ -130,18 +120,16 @@ ${formatEscuadra(esc3)}
 *𝗘𝗦𝗖𝗨𝗔𝗗𝗥𝗔 4*
 ${formatEscuadra(esc4)}
 
-*𝗘𝗦𝗖𝗨𝗔𝗗𝗥𝗔 5*
-${formatEscuadra(esc5)}
-
 ㅤʚ *𝐒𝐔𝐏𝐋𝐄𝐍𝐓𝐄𝐒*:
 ${formatSuplentes(suplentes)}
+
 
 *𝖲𝗈𝗅𝗈 𝗋𝖾𝖺𝖼𝖼𝗂𝗈𝗇𝖺 𝖼𝗈𝗇:*
 
 > 「 ❤️ 」𝐏𝐚𝐫𝐭𝐢𝐜𝐢𝐩𝐚𝐫  
 > 「 👍 」𝐒𝐮𝐩𝐥𝐞𝐧𝐭𝐞  
 > 「 👎 」𝐒𝐚𝐥𝐢𝐫 𝐃𝐞 𝐋𝐚 𝐋𝐢𝐬𝐭𝐚  
-> 「 ❌ 」𝐑𝐞𝐢𝐧𝐢𝐜𝐢𝐚𝐫 𝐋𝐢𝐬𝐭𝐚              
+> 「 ❌ 」𝐑𝐞𝐢𝐧𝐢𝐜𝐢𝐚𝐫 𝐋𝐢𝐬𝐭𝐚      
 `
 }
 
@@ -159,7 +147,6 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
       data.escuadra2.includes(user) ||
       data.escuadra3.includes(user) ||
       data.escuadra4.includes(user) ||
-      data.escuadra5.includes(user) ||
       data.suplentes.includes(user)
 
     if (emoji === '👎' && !isInAnyList) continue
@@ -173,15 +160,14 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
 
     if (emoji === '❌' && isAdmin) {
       const hasPlayers =
-        data.escuadra1.length + data.escuadra2.length + data.escuadra3.length + data.escuadra4.length + data.escuadra5.length + data.suplentes.length > 0
+        data.escuadra1.length + data.escuadra2.length + data.escuadra3.length + data.escuadra4.length + data.suplentes.length > 0
       if (!hasPlayers) continue
       data.escuadra1 = []
       data.escuadra2 = []
       data.escuadra3 = []
       data.escuadra4 = []
-      data.escuadra5 = []
       data.suplentes = []
-      let nuevoTexto = generarVersus(data.escuadra1, data.escuadra2, data.escuadra3, data.escuadra4, data.escuadra5, data.suplentes, data.mexText, data.colText)
+      let nuevoTexto = generarVersus(data.escuadra1, data.escuadra2, data.escuadra3, data.escuadra4, data.suplentes, data.mexText, data.colText)
       try { await conn.sendMessage(data.chat, { delete: msg.message.reactionMessage.key }) } catch {}
       let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions: [] })
       delete versusData[msgID]
@@ -193,7 +179,6 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
     data.escuadra2 = data.escuadra2.filter(u => u !== user)
     data.escuadra3 = data.escuadra3.filter(u => u !== user)
     data.escuadra4 = data.escuadra4.filter(u => u !== user)
-    data.escuadra5 = data.escuadra5.filter(u => u !== user)
     data.suplentes = data.suplentes.filter(u => u !== user)
 
     if (emoji === '❤️') {
@@ -201,18 +186,14 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
       else if (data.escuadra2.length < 4) data.escuadra2.push(user)
       else if (data.escuadra3.length < 4) data.escuadra3.push(user)
       else if (data.escuadra4.length < 4) data.escuadra4.push(user)
-      else if (data.escuadra5.length < 4) data.escuadra5.push(user)
     } else if (emoji === '👍') {
-      // 🔹 Validamos que sea un JID real antes de agregar
-      if (data.suplentes.length < 2 && user.includes('@s.whatsapp.net')) {
-        data.suplentes.push(user)
-      }
+      if (data.suplentes.length < 2) data.suplentes.push(user)
     } else if (emoji === '👎') {
       // Ya fue eliminado arriba
     } else continue
 
-    let nuevoTexto = generarVersus(data.escuadra1, data.escuadra2, data.escuadra3, data.escuadra4, data.escuadra5, data.suplentes, data.mexText, data.colText)
-    let mentions = [...data.escuadra1, ...data.escuadra2, ...data.escuadra3, ...data.escuadra4, ...data.escuadra5, ...data.suplentes]
+    let nuevoTexto = generarVersus(data.escuadra1, data.escuadra2, data.escuadra3, data.escuadra4, data.suplentes, data.mexText, data.colText)
+    let mentions = [...data.escuadra1, ...data.escuadra2, ...data.escuadra3, ...data.escuadra4, ...data.suplentes]
     try { await conn.sendMessage(data.chat, { delete: msg.message.reactionMessage.key }) } catch {}
     let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions })
     delete versusData[msgID]
