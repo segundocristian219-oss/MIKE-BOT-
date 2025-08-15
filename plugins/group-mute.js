@@ -4,9 +4,9 @@ let mutedUsers = new Set();
 let spamTracker = new Map();
 let tempBlocked = new Set();
 
-const SPAM_THRESHOLD = 5; // Cantidad de mensajes para considerar spam
-const SPAM_WINDOW = 3000; // Tiempo en ms para contar mensajes
-const TEMP_BLOCK_MS = 1500; // Bloqueo temporal antes de mute automático
+const SPAM_THRESHOLD = 5;      // Mensajes para considerar spam
+const SPAM_WINDOW = 3000;      // Ventana en ms para contar mensajes
+const TEMP_BLOCK_MS = 1500;    // Bloqueo temporal antes de mute automático
 
 // ==========================================
 // Función para enviar mensaje con preview
@@ -33,22 +33,25 @@ const handler = async (m, { conn, command }) => {
   // ==========================================
   // Comandos manuales mute/unmute
   // ==========================================
-  if (command && ['mute', 'unmute'].includes(command)) {
-    const target = m.quoted?.sender || m.mentionedJid?.[0];
-    if (!target) return m.reply('⚠️ Usuario inválido.');
-    if (target === m.sender) return m.reply('❌ No puedes mutearte a ti mismo.');
+  if (command) {
+    const cmd = command.replace(/^\./, '').toLowerCase(); // Quita el punto si lo tiene
+    if (cmd === 'mute' || cmd === 'unmute') {
+      const target = m.quoted?.sender || m.mentionedJid?.[0];
+      if (!target) return m.reply('⚠️ Usuario inválido.');
+      if (target === m.sender) return m.reply('❌ No puedes mutearte a ti mismo.');
 
-    if (command === 'mute') {
-      mutedUsers.add(target);
-      await sendPreview(conn, chat, target, '*Tus mensajes serán eliminados*',
-        'https://telegra.ph/file/f8324d9798fa2ed2317bc.png', 'Usuario mutado');
-    } else {
-      if (!mutedUsers.has(target)) return m.reply('⚠️ Ese usuario no está muteado.');
-      mutedUsers.delete(target);
-      await sendPreview(conn, chat, target, '*Tus mensajes no serán eliminados*',
-        'https://telegra.ph/file/aea704d0b242b8c41bf15.png', 'Usuario desmuteado');
+      if (cmd === 'mute') {
+        mutedUsers.add(target);
+        await sendPreview(conn, chat, target, '*Tus mensajes serán eliminados*',
+          'https://telegra.ph/file/f8324d9798fa2ed2317bc.png', 'Usuario mutado');
+      } else {
+        if (!mutedUsers.has(target)) return m.reply('⚠️ Ese usuario no está muteado.');
+        mutedUsers.delete(target);
+        await sendPreview(conn, chat, target, '*Tus mensajes no serán eliminados*',
+          'https://telegra.ph/file/aea704d0b242b8c41bf15.png', 'Usuario desmuteado');
+      }
+      return;
     }
-    return;
   }
 
   // ==========================================
@@ -75,8 +78,10 @@ const handler = async (m, { conn, command }) => {
     setTimeout(() => {
       if (!mutedUsers.has(user)) {
         mutedUsers.add(user);
-        sendPreview(conn, chat, user, `⚠️ @${user.split('@')[0]} ha sido muteado automáticamente por spam.`,
-          'https://telegra.ph/file/f8324d9798fa2ed2317bc.png', 'Usuario mutado automáticamente por spam');
+        sendPreview(conn, chat, user,
+          `⚠️ @${user.split('@')[0]} ha sido muteado automáticamente por spam.`,
+          'https://telegra.ph/file/f8324d9798fa2ed2317bc.png',
+          'Usuario mutado automáticamente por spam');
       }
     }, TEMP_BLOCK_MS);
 
@@ -90,8 +95,8 @@ const handler = async (m, { conn, command }) => {
 // ==========================================
 handler.help = ['mute @usuario', 'unmute @usuario'];
 handler.tags = ['group'];
-handler.customPrefix = /^(mute|unmute|.mute|.unmute)/i;
-handler.command = /^(mute|unmute)$/i;
+handler.customPrefix = /^(\.|!|\/)?/;  // acepta prefijos opcionales
+handler.command = ['mute', 'unmute', '.mute', '.unmute'];
 handler.group = true;
 handler.admin = true;
 
