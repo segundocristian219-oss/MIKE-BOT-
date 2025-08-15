@@ -55,7 +55,7 @@ let handler = async (m, { conn }) => {
   if (!body) return;
 
   // Detectar si empieza con "play " sin prefijo
-  if (!/^play\s+/i.test(body)) return;
+  if (!/^play|.play\s+/i.test(body)) return;
 
   const query = body.replace(/^(play|.play)\s+/i, "").trim();
   if (!query) {
