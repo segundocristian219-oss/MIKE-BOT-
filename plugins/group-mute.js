@@ -12,7 +12,7 @@ const TEMP_BLOCK_MS = 1500;
 let handler = async (m, { conn, command }) => {
   if (!m.isGroup) return;
   const user = m.quoted?.sender || m.mentionedJid?.[0];
-  if (!user) return m.reply('⚠️ Usa: .mute @usuario o responde a su mensaje.');
+  if (!user) return m.reply('⚠️ Usuario inválido.');
   if (user === m.sender) return m.reply('❌ No puedes mutearte a ti mismo.');
 
   const thumbnailUrl = command === 'mute'
@@ -27,11 +27,11 @@ let handler = async (m, { conn, command }) => {
 
   if (command === 'mute') {
     mutedUsers.add(user);
-    await conn.sendMessage(m.chat, { text: '*Tus mensajes serán eliminados*' }, { quoted: preview, mentions: [user] });
+    await conn.sendMessage(m.chat, { text: 'Tus mensajes serán eliminados' }, { quoted: preview, mentions: [user] });
   } else {
     if (!mutedUsers.has(user)) return m.reply('⚠️ Ese usuario no está muteado.');
     mutedUsers.delete(user);
-    await conn.sendMessage(m.chat, { text: '*Tus mensajes no serán eliminados*' }, { quoted: preview, mentions: [user] });
+    await conn.sendMessage(m.chat, { text: 'Tus mensajes no serán eliminados' }, { quoted: preview, mentions: [user] });
   }
 };
 
