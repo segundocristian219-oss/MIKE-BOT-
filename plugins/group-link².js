@@ -2,15 +2,12 @@ import fetch from 'node-fetch'
 
 var handler = async (m, { conn }) => {
     try {
-        // Obtener link y foto
         let link = '🔗 https://chat.whatsapp.com/' + await conn.groupInviteCode(m.chat)
         let ppUrl = await conn.profilePictureUrl(m.chat, 'image').catch(() => null)
 
-        // Mandar la foto del grupo
         if (ppUrl) {
             await conn.sendMessage(m.chat, { image: { url: ppUrl }, caption: link }, { quoted: m })
         } else {
-            // Si no hay foto, mandar solo el link con vista previa
             await conn.sendMessage(m.chat, { text: link }, { quoted: m })
         }
 
@@ -20,9 +17,10 @@ var handler = async (m, { conn }) => {
     }
 }
 
-handler.customPrefix = /^(link|.link)/i;
-handler.command = new RegExp;
-handler.group = true;
-handler.admin = true;
+// Solo activará si el mensaje es exactamente ".link" o "link"
+handler.customPrefix = /^(\.link|link)$/i
+handler.command = new RegExp
+handler.group = true
+handler.admin = true
 
 export default handler
