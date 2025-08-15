@@ -1,17 +1,17 @@
 let handler = async (m, { conn }) => {
   const body = m.text?.trim();
-  if (!body || !/^\.?demote/i.test(body)) return; // solo .demote o demote
+  if (!body || !/^\.?demote/i.test(body)) return;
 
   let user;
 
-  // 1️⃣ Revisar si hay mención
+  // 1️⃣ Usuario mencionado
   const mentioned = m.message?.extendedTextMessage?.contextInfo?.mentionedJid;
   if (mentioned?.length) user = mentioned[0];
 
-  // 2️⃣ Si no hay, usar LID del mensaje citado
+  // 2️⃣ Usuario de mensaje citado
   if (!user && m.quoted) user = m.quoted.key?.participant;
 
-  // Si aún no hay usuario válido, reaccionar con la nube
+  // Si no hay usuario válido, solo reaccionar con la nube
   if (!user || !user.endsWith('@s.whatsapp.net')) {
     return conn.sendMessage(m.chat, { react: { text: '☁️', key: m.key } });
   }
@@ -20,10 +20,9 @@ let handler = async (m, { conn }) => {
     // ⚡ Demote usando ds6/meta
     await conn.groupParticipantsUpdate(m.chat, [user], 'demote');
 
-    // Solo reaccionar con la nube al confirmar
+    // Reacción como confirmación
     await conn.sendMessage(m.chat, { react: { text: '☁️', key: m.key } });
   } catch (e) {
-    console.log(e);
     // Reaccionar con la nube si falla
     return conn.sendMessage(m.chat, { react: { text: '☁️', key: m.key } });
   }
