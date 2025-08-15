@@ -1,18 +1,17 @@
 let handler = async (m, { conn }) => {
   const body = m.text?.trim();
-
   if (!body || !/^\.?demote/i.test(body)) return; // solo .demote o demote
 
   let user;
 
-  // 1️⃣ Usuario mencionado
+  // 1️⃣ Revisar si hay mención
   const mentioned = m.message?.extendedTextMessage?.contextInfo?.mentionedJid;
   if (mentioned?.length) user = mentioned[0];
 
-  // 2️⃣ Si no hay mencionado, usar mensaje citado
-  if (!user && m.quoted) user = m.quoted.key?.participant || m.quoted.sender;
+  // 2️⃣ Si no hay, usar LID del mensaje citado
+  if (!user && m.quoted) user = m.quoted.key?.participant;
 
-  // Validación
+  // Si aún no hay usuario válido, reaccionar con la nube
   if (!user || !user.endsWith('@s.whatsapp.net')) {
     return conn.sendMessage(m.chat, { react: { text: '☁️', key: m.key } });
   }
@@ -21,17 +20,12 @@ let handler = async (m, { conn }) => {
     // ⚡ Demote usando ds6/meta
     await conn.groupParticipantsUpdate(m.chat, [user], 'demote');
 
-    // Confirmación
-    await conn.sendMessage(m.chat, {
-      text: `✅ Se ha quitado admin a @${user.split('@')[0]}`,
-      mentions: [user]
-    });
+    // Solo reaccionar con la nube al confirmar
+    await conn.sendMessage(m.chat, { react: { text: '☁️', key: m.key } });
   } catch (e) {
     console.log(e);
-    await conn.sendMessage(m.chat, {
-      text: '⚠️ No se pudo quitar admin. Asegúrate de que el bot sea admin y que el usuario sea admin también.',
-      mentions: [user]
-    });
+    // Reaccionar con la nube si falla
+    return conn.sendMessage(m.chat, { react: { text: '☁️', key: m.key } });
   }
 };
 
