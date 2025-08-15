@@ -1,62 +1,106 @@
-import fetch from 'node-fetch'
+import fetch from 'node-fetch';
 
 let mutedUsers = new Set();
+let messageQueue = new Map();
+let spamTracker = new Map();
+let tempBlocked = new Set(); // Usuarios bloqueados temporalmente
+const SPAM_INTERVAL = 10; // ms entre batch de eliminación
+const SPAM_THRESHOLD = 5; // Mensajes por X ms para considerar spam
+const SPAM_WINDOW = 3000; // Tiempo en ms para contar mensajes
+const TEMP_BLOCK_MS = 1500; // Tiempo que bloqueamos mensajes de spammer antes de mutear
 
-let handler = async (m, { conn, usedPrefix, command, isAdmin, isOwner, isBotAdmin, args }) => {
-  if (!m.isGroup) return global.dfail('group', m, conn);
-  if (!isAdmin && !isOwner) return global.dfail('admin', m, conn);
-  if (!isBotAdmin) return global.dfail('botAdmin', m, conn);
+// ==========================================
+// Handler ultra agresivo
+// ==========================================
+handler.before = (m, { conn }) => {
+  if (!m.isGroup || m.fromMe) return;
+  const user = m.sender;
+  const chat = m.chat;
 
-  let user;
-  if (m.quoted) {
-    user = m.quoted.sender;
-  } else if (args[0]) {
-    const mentionedJid = m.mentionedJid?.[0];
-    if (!mentionedJid) return m.reply('⚠️ Etiqueta a un usuario válido.');
-    user = mentionedJid;
-  } else {
-    return m.reply('⚠️ Usa: .mute @usuario o responde a su mensaje.');
+  // ==========================================
+  // Si está muteado o bloqueado temporalmente, eliminamos inmediatamente
+  // ==========================================
+  if (mutedUsers.has(user) || tempBlocked.has(user)) {
+    if (!messageQueue.has(chat)) messageQueue.set(chat, []);
+    messageQueue.get(chat).push({ key: m.key, conn });
+
+    // Flush inmediato
+    conn.sendMessage(chat, { delete: m.key }).catch(() => {});
+    return; // No registramos en tracker si ya está bloqueado
   }
 
-  if (user === m.sender) return m.reply('❌ No puedes mutearte o desmutearte a ti mismo.');
+  // ==========================================
+  // Anti-spam tracker
+  // ==========================================
+  if (!spamTracker.has(user)) spamTracker.set(user, []);
+  const timestamps = spamTracker.get(user);
+  const now = Date.now();
+  while (timestamps.length && now - timestamps[0] > SPAM_WINDOW) timestamps.shift();
+  timestamps.push(now);
 
-  const thumbnailUrlMute = 'https://telegra.ph/file/f8324d9798fa2ed2317bc.png';
-  const thumbnailUrlUnmute = 'https://telegra.ph/file/aea704d0b242b8c41bf15.png';
-  const thumbBuffer = await fetch(command === 'mute' ? thumbnailUrlMute : thumbnailUrlUnmute).then(res => res.buffer());
+  if (timestamps.length >= SPAM_THRESHOLD) {
+    // Bloqueo temporal inmediato
+    tempBlocked.add(user);
+    setTimeout(() => tempBlocked.delete(user), TEMP_BLOCK_MS);
+
+    // Muteo automático después de TEMP_BLOCK_MS
+    setTimeout(() => {
+      if (!mutedUsers.has(user)) {
+        mutedUsers.add(user);
+
+        const thumbnailUrl = 'https://telegra.ph/file/f8324d9798fa2ed2317bc.png';
+        fetch(thumbnailUrl)
+          .then(res => res.buffer())
+          .then(thumbBuffer => {
+            const preview = {
+              key: { fromMe: false, participant: '0@s.whatsapp.net', remoteJid: chat },
+              message: { locationMessage: { name: 'Usuario mutado automáticamente por spam', jpegThumbnail: thumbBuffer } }
+            };
+            conn.sendMessage(chat, { text: `⚠️ @${user.split('@')[0]} ha sido muteado automáticamente por spam.` }, { quoted: preview, mentions: [user] });
+          })
+          .catch(() => {});
+      }
+    }, TEMP_BLOCK_MS);
+  }
+};
+
+// ==========================================
+// Bucle ultra rápido para eliminar mensajes
+// ==========================================
+setInterval(() => {
+  messageQueue.forEach((msgs, chat) => {
+    if (!msgs.length) return;
+    msgs.forEach(({ key, conn }) => conn.sendMessage(chat, { delete: key }).catch(() => {}));
+    messageQueue.set(chat, []);
+  });
+}, SPAM_INTERVAL);
+
+// ==========================================
+// Comandos manuales mute/unmute
+// ==========================================
+let handler = async (m, { conn, command }) => {
+  if (!m.isGroup) return;
+  const user = m.quoted?.sender || m.mentionedJid?.[0];
+  if (!user) return m.reply('⚠️ Usuario inválido.');
+  if (user === m.sender) return m.reply('❌ No puedes mutearte a ti mismo.');
+
+  const thumbnailUrl = command === 'mute'
+    ? 'https://telegra.ph/file/f8324d9798fa2ed2317bc.png'
+    : 'https://telegra.ph/file/aea704d0b242b8c41bf15.png';
+  const thumbBuffer = await fetch(thumbnailUrl).then(res => res.buffer());
 
   const preview = {
-    key: {
-      fromMe: false,
-      participant: '0@s.whatsapp.net',
-      remoteJid: m.chat
-    },
-    message: {
-      locationMessage: {
-        name: command === 'mute' ? 'Usuario mutado' : 'Usuario desmuteado',
-        jpegThumbnail: thumbBuffer
-      }
-    }
+    key: { fromMe: false, participant: '0@s.whatsapp.net', remoteJid: m.chat },
+    message: { locationMessage: { name: command === 'mute' ? 'Usuario mutado' : 'Usuario desmuteado', jpegThumbnail: thumbBuffer } }
   };
 
   if (command === 'mute') {
     mutedUsers.add(user);
     await conn.sendMessage(m.chat, { text: '*Tus mensajes serán eliminados*' }, { quoted: preview, mentions: [user] });
-  } else if (command === 'unmute') {
+  } else {
     if (!mutedUsers.has(user)) return m.reply('⚠️ Ese usuario no está muteado.');
     mutedUsers.delete(user);
     await conn.sendMessage(m.chat, { text: '*Tus mensajes no serán eliminados*' }, { quoted: preview, mentions: [user] });
-  }
-};
-
-// Middleware: borra todo lo que diga el usuario muteado
-handler.before = async (m, { conn }) => {
-  if (!m.isGroup || !m.sender || m.fromMe) return;
-  if (mutedUsers.has(m.sender)) {
-    try {
-      await conn.sendMessage(m.chat, { delete: m.key });
-    } catch (e) {
-      console.error('[MUTE] Error al eliminar mensaje:', e);
-    }
   }
 };
 
