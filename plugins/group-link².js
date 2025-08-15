@@ -1,27 +1,10 @@
-const handler = async (m, { conn, isAdmin }) => {
-  if (!isAdmin) return;
-
-  const code = await conn.groupInviteCode(m.chat);
-  const link = 'https://chat.whatsapp.com/' + code;
-
-  // Obtiene info del grupo
-  const group = await conn.groupMetadata(m.chat);
-  
-  // Enviar como invitación con vista previa
-  await conn.sendMessage(m.chat, {
-    groupInviteMessage: {
-      groupJid: m.chat,
-      inviteCode: code,
-      groupName: group.subject,
-      caption: link,
-      jpegThumbnail: group.picture ? await conn.getProfilePicture(m.chat, 'image') : null
-    }
-  });
-};
-
-handler.customPrefix = /^(link|\.link)$/i;
-handler.command = new RegExp;
-handler.group = true;
-handler.admin = true;
-
-export default handler;
+let handler = async (m, { conn, args }) => {
+let group = m.chat
+let link = 'https://chat.whatsapp.com/' + await conn.groupInviteCode(group)
+conn.reply(m.chat, link, m, {detectLink: true})
+//conn.sendMessage(m.chat, { text: link }, { quoted: m, detectLink: true })
+}
+handler.command = /^link|enlace(gro?up)?$/i
+handler.group = true
+handler.botAdmin = true
+export default handler
