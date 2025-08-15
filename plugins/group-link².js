@@ -1,9 +1,13 @@
 var handler = async (m, { conn }) => {
     try {
         let link = 'https://chat.whatsapp.com/' + await conn.groupInviteCode(m.chat)
-        await conn.sendMessage(m.chat, { text: link }) // solo el link, sin nada más
+
+        await conn.sendMessage(m.chat, {
+            text: link
+        }, { quoted: m }) // contesta al mensaje original
+
     } catch (error) {
-        conn.reply(m.chat, 'Error al obtener el enlace del grupo.', m)
+        conn.reply(m.chat, '⚠ Error al obtener el enlace del grupo. Asegúrate de que soy admin.', m)
     }
 }
 
