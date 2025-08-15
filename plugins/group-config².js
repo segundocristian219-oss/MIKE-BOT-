@@ -22,7 +22,6 @@ let handler = async (m, { conn }) => {
 
   await conn.groupSettingUpdate(m.chat, isClose);
 
-  // Reacciona con ✅ cuando se complete la acción
   await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
 };
 
