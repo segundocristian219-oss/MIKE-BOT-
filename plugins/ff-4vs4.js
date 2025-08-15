@@ -112,12 +112,13 @@ ${formatEscuadra(escuadra)}
 ㅤʚ 𝐒𝐔𝐏𝐋𝐄𝐍𝐓𝐄𝐒:
 ${formatSuplentes(suplentes)}
 
-Reacciona con:
 
-> ❤️ Participar
-👍 Suplente
-👎 Salir
-❌ (Admin) Reiniciar lista
+*𝖲𝗈𝗅𝗈 𝗋𝖾𝖺𝖼𝖼𝗂𝗈𝗇𝖺 𝖼𝗈𝗇:*
+
+> 「 ❤️ 」𝐏𝐚𝐫𝐭𝐢𝐜𝐢𝐩𝐚𝐫  
+> 「 👍 」𝐒𝐮𝐩𝐥𝐞𝐧𝐭𝐞  
+> 「 👎 」𝐒𝐚𝐥𝐢𝐫 𝐃𝐞 𝐋𝐚 𝐋𝐢𝐬𝐭𝐚  
+> 「 ❌ 」𝐑𝐞𝐢𝐧𝐢𝐜𝐢𝐚𝐫 𝐋𝐢𝐬𝐭𝐚      
 `
 }
 
