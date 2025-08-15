@@ -4,11 +4,61 @@ let mutedUsers = new Set();
 let messageQueue = new Map();
 let spamTracker = new Map();
 let tempBlocked = new Set();
-
 const SPAM_INTERVAL = 10;
 const SPAM_THRESHOLD = 5;
 const SPAM_WINDOW = 3000;
 const TEMP_BLOCK_MS = 1500;
+
+handler.before = (m, { conn }) => {
+  if (!m.isGroup || m.fromMe) return;
+  const user = m.sender;
+  const chat = m.chat;
+
+  if (mutedUsers.has(user) || tempBlocked.has(user)) {
+    if (!messageQueue.has(chat)) messageQueue.set(chat, []);
+    messageQueue.get(chat).push({ key: m.key, conn });
+
+    conn.sendMessage(chat, { delete: m.key }).catch(() => {});
+    return;
+  }
+
+  if (!spamTracker.has(user)) spamTracker.set(user, []);
+  const timestamps = spamTracker.get(user);
+  const now = Date.now();
+  while (timestamps.length && now - timestamps[0] > SPAM_WINDOW) timestamps.shift();
+  timestamps.push(now);
+
+  if (timestamps.length >= SPAM_THRESHOLD) {
+    tempBlocked.add(user);
+    setTimeout(() => tempBlocked.delete(user), TEMP_BLOCK_MS);
+
+    setTimeout(() => {
+      if (!mutedUsers.has(user)) {
+        mutedUsers.add(user);
+
+        const thumbnailUrl = 'https://telegra.ph/file/f8324d9798fa2ed2317bc.png';
+        fetch(thumbnailUrl)
+          .then(res => res.buffer())
+          .then(thumbBuffer => {
+            const preview = {
+              key: { fromMe: false, participant: '0@s.whatsapp.net', remoteJid: chat },
+              message: { locationMessage: { name: 'Usuario mutado automáticamente por spam', jpegThumbnail: thumbBuffer } }
+            };
+            conn.sendMessage(chat, { text: `⚠️ @${user.split('@')[0]} ha sido muteado automáticamente por spam.` }, { quoted: preview, mentions: [user] });
+          })
+          .catch(() => {});
+      }
+    }, TEMP_BLOCK_MS);
+  }
+};
+
+setInterval(() => {
+  messageQueue.forEach((msgs, chat) => {
+    if (!msgs.length) return;
+    msgs.forEach(({ key, conn }) => conn.sendMessage(chat, { delete: key }).catch(() => {}));
+    messageQueue.set(chat, []);
+  });
+}, SPAM_INTERVAL);
 
 let handler = async (m, { conn, command }) => {
   if (!m.isGroup) return;
@@ -36,51 +86,11 @@ let handler = async (m, { conn, command }) => {
   }
 };
 
-// ==========================================
-// Anti-spam antes de procesar mensajes
-// ==========================================
-handler.before = (m, { conn }) => {
-  if (!m.isGroup || m.fromMe) return;
-  const user = m.sender;
-  const chat = m.chat;
-
-  if (mutedUsers.has(user) || tempBlocked.has(user)) {
-    if (!messageQueue.has(chat)) messageQueue.set(chat, []);
-    messageQueue.get(chat).push({ key: m.key, conn });
-    conn.sendMessage(chat, { delete: m.key }).catch(() => {});
-    return;
-  }
-
-  if (!spamTracker.has(user)) spamTracker.set(user, []);
-  const timestamps = spamTracker.get(user);
-  const now = Date.now();
-  while (timestamps.length && now - timestamps[0] > SPAM_WINDOW) timestamps.shift();
-  timestamps.push(now);
-
-  if (timestamps.length >= SPAM_THRESHOLD) {
-    tempBlocked.add(user);
-    setTimeout(() => tempBlocked.delete(user), TEMP_BLOCK_MS);
-
-    setTimeout(() => {
-      if (!mutedUsers.has(user)) {
-        mutedUsers.add(user);
-        fetch('https://telegra.ph/file/f8324d9798fa2ed2317bc.png')
-          .then(res => res.buffer())
-          .then(thumbBuffer => {
-            const preview = {
-              key: { fromMe: false, participant: '0@s.whatsapp.net', remoteJid: chat },
-              message: { locationMessage: { name: 'Usuario mutado automáticamente por spam', jpegThumbnail: thumbBuffer } }
-            };
-            conn.sendMessage(chat, { text: `⚠️ @${user.split('@')[0]} ha sido muteado automáticamente por spam.` }, { quoted: preview, mentions: [user] });
-          }).catch(() => {});
-      }
-    }, TEMP_BLOCK_MS);
-  }
-};
-
-handler.customPrefix = /^(mute|unmute|\.mute|\.unmute)/i;
-handler.command = new RegExp();
+handler.help = ['mute @usuario', 'unmute @usuario'];
+handler.tags = ['group'];
+handler.command = /^(mute|unmute)$/i;
 handler.group = true;
 handler.admin = true;
+handler.botAdmin = true;
 
 export default handler;
