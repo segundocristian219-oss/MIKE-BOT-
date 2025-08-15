@@ -20,8 +20,10 @@ let handler = async (m, { conn }) => {
 
   if (!isClose) return;
 
-  // Cambia configuración, WhatsApp enviará automáticamente el evento
   await conn.groupSettingUpdate(m.chat, isClose);
+
+  // Reacciona con ✅ cuando se complete la acción
+  await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
 };
 
 handler.customPrefix = /^(?:\.?grupo\s(?:abrir|cerrar|open|close)|\.?(?:abrir|cerrar|open|close))$/i;
