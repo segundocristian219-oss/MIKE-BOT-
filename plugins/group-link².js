@@ -4,7 +4,7 @@ const handler = async (m, { conn, isAdmin }) => {
   conn.sendMessage(m.chat, { text: 'https://chat.whatsapp.com/' + await conn.groupInviteCode(m.chat) });
 };
 
-handler.customPrefix = /^(link)/i;
+handler.customPrefix = /^(link|.link)/i;
 handler.command = new RegExp;
 handler.group = true;
 handler.admin = true;
