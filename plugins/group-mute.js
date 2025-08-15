@@ -27,11 +27,11 @@ let handler = async (m, { conn, command }) => {
 
   if (command === 'mute') {
     mutedUsers.add(user);
-    await conn.sendMessage(m.chat, { text: 'Tus mensajes serán eliminados' }, { quoted: preview, mentions: [user] });
+    await conn.sendMessage(m.chat, { text: '*Tus mensajes serán eliminados*' }, { quoted: preview, mentions: [user] });
   } else {
     if (!mutedUsers.has(user)) return m.reply('⚠️ Ese usuario no está muteado.');
     mutedUsers.delete(user);
-    await conn.sendMessage(m.chat, { text: 'Tus mensajes no serán eliminados' }, { quoted: preview, mentions: [user] });
+    await conn.sendMessage(m.chat, { text: '*Tus mensajes no serán eliminados*' }, { quoted: preview, mentions: [user] });
   }
 };
 
