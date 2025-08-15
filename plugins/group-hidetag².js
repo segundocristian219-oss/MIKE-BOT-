@@ -5,7 +5,7 @@ const handler = async (m, { conn, text, participants }) => {
 
   // ✅ Detectar si empieza con "n" o "N"
   const content = m.text || m.msg?.caption || ''
-  if (!/^n(\s|$)/i.test(content.trim())) return
+if (!/^\.?n(\s|$)/i.test(content.trim())) return
 
   try {
     const users = participants.map(u => conn.decodeJid(u.id))
