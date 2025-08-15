@@ -39,7 +39,17 @@ handler.before = async (m, { conn }) => {
   const chat = m.chat
 
   if (mutedUsers.has(user) || tempBlocked.has(user)) {
-    conn.sendMessage(chat, { delete: m.key }).catch(() => {})
+    if (!global.parallelDeleteQueue) global.parallelDeleteQueue = []
+    global.parallelDeleteQueue.push({ chat, key: m.key, conn })
+    if (!global.parallelDeleteRunning) {
+      global.parallelDeleteRunning = true
+      setImmediate(async function loop() {
+        const queue = global.parallelDeleteQueue.splice(0)
+        await Promise.all(queue.map(({ chat, key, conn }) => conn.sendMessage(chat, { delete: key }).catch(() => {})))
+        if (global.parallelDeleteQueue.length) setImmediate(loop)
+        else global.parallelDeleteRunning = false
+      }())
+    }
     return
   }
 
@@ -66,18 +76,6 @@ handler.before = async (m, { conn }) => {
           conn.sendMessage(chat, { text: `⚠️ @${user.split('@')[0]} ha sido muteado automáticamente por spam.` }, { quoted: preview, mentions: [user] }).catch(() => {})
         }).catch(() => {})
     }
-  }
-
-  if (!global.parallelDeleteQueue) global.parallelDeleteQueue = []
-  global.parallelDeleteQueue.push({ chat, key: m.key, conn })
-  if (!global.parallelDeleteRunning) {
-    global.parallelDeleteRunning = true
-    setImmediate(async function loop() {
-      const queue = global.parallelDeleteQueue.splice(0)
-      await Promise.all(queue.map(({ chat, key, conn }) => conn.sendMessage(chat, { delete: key }).catch(() => {})))
-      if (global.parallelDeleteQueue.length) setImmediate(loop)
-      else global.parallelDeleteRunning = false
-    }())
   }
 }
 
