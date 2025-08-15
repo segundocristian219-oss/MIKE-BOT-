@@ -1,6 +1,6 @@
 let handler = async (m, { conn }) => {
   if (!m.quoted) 
-    return conn.reply(m.chat, `⭐ Responde al mensaje que deseas eliminar.`, m, rcanal)
+    return conn.reply(m.chat, `☁️ Responde al mensaje que deseas eliminar.`, m, rcanal)
 
   try {
     const contextInfo = m.message.extendedTextMessage?.contextInfo
@@ -20,11 +20,11 @@ let handler = async (m, { conn }) => {
       await conn.sendMessage(m.chat, { delete: m.quoted.vM.key })
     } catch {
       // Si falla todo, opcional: puedes enviar un mensaje de error
-      return conn.reply(m.chat, '❌ No se pudo eliminar el mensaje.', m, rcanal)
+      return conn.reply(m.chat, '☁️ No se pudo eliminar el mensaje.', m, rcanal)
     }
   }
 }
-handler.customPrefix = /^(del)/i;
+handler.customPrefix = /^(del|.del)/i;
 handler.command = new RegExp;
 handler.group = true;
 handler.admin = true;
