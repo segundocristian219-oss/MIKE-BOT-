@@ -3,7 +3,7 @@ import fetch from 'node-fetch'
 var handler = async (m, { conn }) => {
     try {
         // Obtener link y foto
-        let link = 'https://chat.whatsapp.com/' + await conn.groupInviteCode(m.chat)
+        let link = '🔗 https://chat.whatsapp.com/' + await conn.groupInviteCode(m.chat)
         let ppUrl = await conn.profilePictureUrl(m.chat, 'image').catch(() => null)
 
         // Mandar la foto del grupo
