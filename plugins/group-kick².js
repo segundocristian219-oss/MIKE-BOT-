@@ -9,7 +9,7 @@ const handler = async (m, { conn }) => {
     await conn.groupParticipantsUpdate(m.chat, [target], 'remove');
     return m.reply('☠️ Intruso eliminado.');
   } catch {
-    return global.dfail('admin', m, conn);
+    return global.dfail('botAdmin', m, conn);
   }
 };
 
