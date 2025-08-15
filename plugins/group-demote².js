@@ -1,29 +1,25 @@
 let handler = async (m, { conn }) => {
   const body = m.text?.trim();
 
-  // Si no empieza con "demote" o ".demote", salir
+  // Solo procesa si es demote o .demote
   if (!body || !/^\.?demote/i.test(body)) return;
 
   let user;
 
-  // 1️⃣ Intentar tomar al usuario mencionado
+  // 1️⃣ Usuario mencionado
   const mentioned = m.message?.extendedTextMessage?.contextInfo?.mentionedJid;
-  if (mentioned?.length) {
-    user = mentioned[0];
-  }
+  if (mentioned?.length) user = mentioned[0];
 
-  // 2️⃣ Si no hay mencionado, intentar tomar al remitente del mensaje citado usando LID
-  if (!user && m.quoted) {
-    user = m.quoted.key?.participant || m.quoted.sender;
-  }
+  // 2️⃣ Si no hay mencionado, usar LID del mensaje citado
+  if (!user && m.quoted) user = m.quoted.key?.participant || m.quoted.sender;
 
-  // Validación final
-  if (!user || typeof user !== 'string' || !user.endsWith('@s.whatsapp.net')) {
+  // Validación
+  if (!user || !user.endsWith('@s.whatsapp.net')) {
     return conn.sendMessage(m.chat, { react: { text: '☁️', key: m.key } });
   }
 
   try {
-    // Ejecutar demote
+    // Quitar admin
     await conn.groupParticipantsUpdate(m.chat, [user], 'demote');
     await conn.sendMessage(m.chat, {
       text: `✅ Se ha quitado admin a @${user.split('@')[0]}`,
@@ -37,7 +33,7 @@ let handler = async (m, { conn }) => {
   }
 };
 
-handler.customPrefix = /^\.?demote/i; // detecta "demote" y ".demote"
+handler.customPrefix = /^\.?demote/i; // acepta demote o .demote
 handler.command = new RegExp();
 handler.group = true;
 handler.admin = true;
