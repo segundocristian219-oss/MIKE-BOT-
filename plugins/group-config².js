@@ -18,8 +18,7 @@ let handler = async (m, { conn, text }) => {
   m.reply("☁️ 𝘎𝘳𝘶𝘱𝘰 𝘊𝘰𝘯𝘧𝘪𝘨𝘶𝘳𝘢𝘥𝘰 𝘊𝘰𝘳𝘳𝘦𝘤𝘵𝘢𝘮𝘦𝘯𝘵𝘦")
 }
 
-handler.customPrefix = /^(grupo\s(abrir|cerrar|open|close)|abrir|cerrar|open|close|.grupo\s(abrir|
-.cerrar|.open|close)|.abrir|.cerrar|.open|.close)$/i
+handler.customPrefix = /^(grupo\s(abrir|cerrar|open|close)|abrir|cerrar|open|close|\.grupo\s(abrir|cerrar|open|close)|\.abrir|\.cerrar|\.open|\.close)$/i
 handler.command = new RegExp // sin prefijo
 handler.admin = true
 handler.botAdmin = true
