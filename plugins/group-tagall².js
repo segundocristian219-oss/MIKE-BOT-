@@ -8,7 +8,7 @@ const handler = async (m, { conn, participants, isAdmin, isOwner, command }) => 
 
   for (const user of participants) {
     const numero = user.id.split('@')[0];
-    texto += `🥃 @${numero}\n`;
+    texto += `🗣️ @${numero}\n`;
   }
 
   await conn.sendMessage(m.chat, {
@@ -17,7 +17,7 @@ const handler = async (m, { conn, participants, isAdmin, isOwner, command }) => 
   });
 };
 
-handler.customPrefix = /^(tagall|invocar|invocacion|invocación|todos|talibanes)/i;
+handler.customPrefix = /^(tagall|invocar|invocacion|invocación|todos|.todos)/i;
 handler.command = new RegExp;
 handler.group = true;
 handler.admin = true;
