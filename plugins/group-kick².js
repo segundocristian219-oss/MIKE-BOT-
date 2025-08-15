@@ -1,24 +1,19 @@
 const handler = async (m, { conn }) => {
-  // Mensajes configurables del handler
-  const msgNoTarget = '_Menciona o responde al usuario que deseas eliminar._';
-  const msgSuccess = '☠️ Intruso eliminado.';
-  const msgError = '_No pude expulsar al usuario. Asegúrate de que soy admin y de que el objetivo no sea admin/owner._';
-
   const target = (m.mentionedJid && m.mentionedJid.length)
     ? m.mentionedJid[0]
     : m.quoted?.sender;
 
-  if (!target) return m.reply(msgNoTarget);
+  if (!target) return m.reply('_Menciona o responde al usuario que deseas eliminar._');
 
   try {
     await conn.groupParticipantsUpdate(m.chat, [target], 'remove');
-    return m.reply(msgSuccess);
+    return m.reply('☠️ Intruso eliminado.');
   } catch {
-    return m.reply(msgError);
+    // Usar el diálogo de error del handler
+    return global.dfail('admin', m, conn);
   }
 };
 
-// Acepta "kick", ".kick", y variantes con texto/mención después
 handler.customPrefix = /^(?:\.?kick)(?:\s+|$)/i;
 handler.command = new RegExp();
 handler.group = true;
