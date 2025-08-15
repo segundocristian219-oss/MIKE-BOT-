@@ -98,18 +98,18 @@ function generarVersus(escuadra, suplentes, mexText = '  ', colText = '  ') {
     return out.trimEnd()
   }
 
-  return `4 𝐕𝐒 4
+  return `*4 𝐕𝐄𝐑𝐒𝐔𝐒 4*
 
-𝐇𝐎𝐑𝐀𝐑𝐈𝐎𝐒;
-🇲🇽 MEXICO : ${mexText}
-🇨🇴 COLOMBIA : ${colText}
+*𝐇𝐎𝐑𝐀𝐑𝐈𝐎𝐒*;
+*🇲🇽 MEXICO* : ${mexText}
+*🇨🇴 COLOMBIA* : ${colText}
 
-𝐉𝐔𝐆𝐀𝐃𝐎𝐑𝐄𝐒 𝐏𝐑𝐄𝐒𝐄𝐍𝐓𝐄𝐒;
+*𝐉𝐔𝐆𝐀𝐃𝐎𝐑𝐄𝐒 𝐏𝐑𝐄𝐒𝐄𝐍𝐓𝐄𝐒*;
 
-𝗘𝗦𝗖𝗨𝗔𝗗𝗥𝗔 Ú𝗡𝗜𝗖𝗔
+*𝗘𝗦𝗖𝗨𝗔𝗗𝗥𝗔 Ú𝗡𝗜𝗖𝗔*
 ${formatEscuadra(escuadra)}
 
-ㅤʚ 𝐒𝐔𝐏𝐋𝐄𝐍𝐓𝐄𝐒:
+ㅤʚ *𝐒𝐔𝐏𝐋𝐄𝐍𝐓𝐄𝐒*:
 ${formatSuplentes(suplentes)}
 
 
