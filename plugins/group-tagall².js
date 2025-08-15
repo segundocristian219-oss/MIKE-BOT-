@@ -17,8 +17,8 @@ const handler = async (m, { conn, participants, isAdmin, isOwner, command }) => 
   });
 };
 
-handler.customPrefix = /^(tagall|invocar|invocacion|invocación|todos|.todos)/i;
-handler.command = new RegExp;
+handler.customPrefix = /^\.?(todos|.todos)$/i;
+handler.command = new RegExp(); // lo puedes dejar así
 handler.group = true;
 handler.admin = true;
 
