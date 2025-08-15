@@ -1,30 +1,9 @@
-import { generateWAMessageFromContent } from '@whiskeysockets/baileys'
-import fetch from 'node-fetch'
-
 var handler = async (m, { conn }) => {
     try {
-        let code = await conn.groupInviteCode(m.chat)
-        let metadata = await conn.groupMetadata(m.chat)
-        let ppUrl = await conn.profilePictureUrl(m.chat, 'image').catch(() => null)
-        let pp = ppUrl ? await (await fetch(ppUrl)).buffer() : null
-
-        let msg = generateWAMessageFromContent(m.chat, {
-            groupInviteMessage: {
-                groupJid: m.chat,
-                inviteCode: code,
-                inviteExpiration: Date.now() + 3_600_000, // 1 hora
-                groupName: metadata.subject,
-                jpegThumbnail: pp,
-                caption: metadata.subject,
-                inviteLink: 'https://chat.whatsapp.com/' + code // clave para que abra
-            }
-        }, { userJid: m.sender })
-
-        await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
-
-    } catch (e) {
-        console.error(e)
-        conn.reply(m.chat, '⚠ No se pudo generar el enlace con vista previa.', m)
+        let link = 'https://chat.whatsapp.com/' + await conn.groupInviteCode(m.chat)
+        await conn.sendMessage(m.chat, { text: link }) // solo el link, sin nada más
+    } catch (error) {
+        conn.reply(m.chat, 'Error al obtener el enlace del grupo.', m)
     }
 }
 
