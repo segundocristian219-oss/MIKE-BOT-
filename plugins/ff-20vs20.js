@@ -62,7 +62,8 @@ let handler = async (m, { conn, args }) => {
   const mexText = format12h(mexHora)
   const colText = format12h(colHora)
 
-  const template = generarVersus([], [], [], [], [], mexText, colText)
+  // 🔹 Corrección: pasamos array vacío en suplentes antes de mexText y colText
+  const template = generarVersus([], [], [], [], [], [], mexText, colText)
   const sent = await conn.sendMessage(m.chat, { text: template, mentions: [] })
 
   versusData[sent.key.id] = {
@@ -89,14 +90,22 @@ function generarVersus(esc1, esc2, esc3, esc4, esc5, suplentes, mexText = '  ', 
     let out = ''
     for (let i = 0; i < 4; i++) {
       let icon = i === 0 ? '👑' : '🥷🏻'
-      out += arr[i] ? `${icon} ┇ @${arr[i].split('@')[0]}\n` : `${icon} ┇ \n`
+      if (arr[i] && arr[i].includes('@')) {
+        out += `${icon} ┇ @${arr[i].split('@')[0]}\n`
+      } else {
+        out += `${icon} ┇ \n`
+      }
     }
     return out.trimEnd()
   }
   function formatSuplentes(arr) {
     let out = ''
     for (let i = 0; i < 2; i++) {
-      out += arr[i] ? `🥷🏻 ┇ @${arr[i].split('@')[0]}\n` : `🥷🏻 ┇ \n`
+      if (arr[i] && arr[i].includes('@')) {
+        out += `🥷🏻 ┇ @${arr[i].split('@')[0]}\n`
+      } else {
+        out += `🥷🏻 ┇ \n`
+      }
     }
     return out.trimEnd()
   }
@@ -194,7 +203,10 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
       else if (data.escuadra4.length < 4) data.escuadra4.push(user)
       else if (data.escuadra5.length < 4) data.escuadra5.push(user)
     } else if (emoji === '👍') {
-      if (data.suplentes.length < 2) data.suplentes.push(user)
+      // 🔹 Validamos que sea un JID real antes de agregar
+      if (data.suplentes.length < 2 && user.includes('@s.whatsapp.net')) {
+        data.suplentes.push(user)
+      }
     } else if (emoji === '👎') {
       // Ya fue eliminado arriba
     } else continue
