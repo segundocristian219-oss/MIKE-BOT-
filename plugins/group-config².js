@@ -1,9 +1,7 @@
 let handler = async (m, { conn }) => {
-  // Normalizar texto: quitar punto inicial si existe y pasar a minúsculas
-  const cmd = m.text.replace(/^\./, "").toLowerCase()
+  const lower = m.text.toLowerCase();
 
-  // Comandos válidos
-  const commandsMap = {
+  let isClose = {
     abrir: "not_announcement",
     cerrar: "announcement",
     "grupo abrir": "not_announcement",
@@ -12,23 +10,26 @@ let handler = async (m, { conn }) => {
     close: "announcement",
     "grupo open": "not_announcement",
     "grupo close": "announcement",
-  }
+    ".abrir": "not_announcement",
+    ".cerrar": "announcement",
+    ".grupo abrir": "not_announcement",
+    ".grupo cerrar": "announcement",
+    ".open": "not_announcement",
+    ".close": "announcement",
+    ".grupo open": "not_announcement",
+    ".grupo close": "announcement"
+  }[lower];
 
-  const isClose = commandsMap[cmd]
-  if (!isClose) return
+  if (!isClose) return;
 
-  await conn.groupSettingUpdate(m.chat, isClose)
-  m.reply("☁️ 𝘎𝘳𝘶𝘱𝘰 𝘊𝘰𝘯𝘧𝘪𝘨𝘶𝘳𝘢𝘥𝘰 𝘊𝘰𝘳𝘳𝘦𝘤𝘵𝘢𝘮𝘦𝘯𝘵𝘦")
-}
+  await conn.groupSettingUpdate(m.chat, isClose);
+  m.reply("☁️ 𝘎𝘳𝘶𝘱𝘰 𝘊𝘰𝘯𝘧𝘪𝘨𝘶𝘳𝘢𝘥𝘰 𝘊𝘰𝘳𝘳𝘦𝘤𝘵𝘢𝘮𝘦𝘯𝘵𝘦");
+};
 
-// Prefijo personalizado: se usa solo para detectar sin punto ni prefijo especial
-handler.customPrefix = /^(grupo\s(abrir|cerrar|open|close)|abrir|cerrar|open|close)$/i
+handler.customPrefix = /^(?:\.?grupo\s(?:abrir|cerrar|open|close)|\.?(?:abrir|cerrar|open|close))$/i;
+handler.command = new RegExp; // sin prefijo
+handler.admin = true;
+handler.botAdmin = true;
+handler.group = true;
 
-// Permitir comando sin prefijo
-handler.command = new RegExp
-
-handler.admin = true     // Solo admins
-handler.botAdmin = true  // El bot debe ser admin
-handler.group = true     // Solo en grupos
-
-export default handler
+export default handler;
