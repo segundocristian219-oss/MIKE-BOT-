@@ -9,7 +9,6 @@ const handler = async (m, { conn }) => {
     await conn.groupParticipantsUpdate(m.chat, [target], 'remove');
     return m.reply('☠️ Intruso eliminado.');
   } catch {
-    // Usar el diálogo de error del handler
     return global.dfail('admin', m, conn);
   }
 };
