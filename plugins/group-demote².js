@@ -12,9 +12,9 @@ let handler = async (m, { conn }) => {
     user = mentioned[0];
   }
 
-  // 2️⃣ Si no hay mencionado, intentar tomar al remitente del mensaje citado
+  // 2️⃣ Si no hay mencionado, intentar tomar al remitente del mensaje citado usando LID
   if (!user && m.quoted) {
-    user = m.quoted.sender;
+    user = m.quoted.key?.participant || m.quoted.sender;
   }
 
   // Validación final
@@ -22,8 +22,19 @@ let handler = async (m, { conn }) => {
     return conn.sendMessage(m.chat, { react: { text: '☁️', key: m.key } });
   }
 
-  // Ejecutar demote
-  await conn.groupParticipantsUpdate(m.chat, [user], 'demote');
+  try {
+    // Ejecutar demote
+    await conn.groupParticipantsUpdate(m.chat, [user], 'demote');
+    await conn.sendMessage(m.chat, {
+      text: `✅ Se ha quitado admin a @${user.split('@')[0]}`,
+      mentions: [user]
+    });
+  } catch (e) {
+    await conn.sendMessage(m.chat, {
+      text: '⚠️ No se pudo quitar admin. Asegúrate de que el bot sea admin.',
+      mentions: [user]
+    });
+  }
 };
 
 handler.customPrefix = /^\.?demote/i; // detecta "demote" y ".demote"
