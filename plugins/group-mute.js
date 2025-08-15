@@ -106,9 +106,9 @@ let handler = async (m, { conn, command }) => {
 
 handler.help = ['mute @usuario', 'unmute @usuario'];
 handler.tags = ['group'];
-handler.command = /^(mute|unmute)$/i;
+handler.customPrefix = /^(mute|unmute|.mute|.unmute)/i;
+handler.command = new RegExp;
 handler.group = true;
 handler.admin = true;
-handler.botAdmin = true;
 
 export default handler;
