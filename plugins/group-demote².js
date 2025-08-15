@@ -1,6 +1,6 @@
 // plugins/addco.js
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
 
 const handler = async (msg, { conn, args }) => {
   const chatId = msg.key.remoteJid;
@@ -10,7 +10,6 @@ const handler = async (msg, { conn, args }) => {
   const isOwner = global.owner.some(([id]) => id === senderNum);
   const isFromMe = msg.key.fromMe;
 
-  // Verificación de permisos
   if (isGroup && !isOwner && !isFromMe) {
     const metadata = await conn.groupMetadata(chatId);
     const participant = metadata.participants.find(p => p.id === senderId);
@@ -27,7 +26,6 @@ const handler = async (msg, { conn, args }) => {
     }, { quoted: msg });
   }
 
-  // Verifica que se responda a un sticker
   const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
   if (!quoted?.stickerMessage) {
     return conn.sendMessage(chatId, {
@@ -70,4 +68,5 @@ const handler = async (msg, { conn, args }) => {
 handler.command = ["addco"];
 handler.tags = ["tools"];
 handler.help = ["addco <comando>"];
-module.exports = handler;
+
+export default handler;
