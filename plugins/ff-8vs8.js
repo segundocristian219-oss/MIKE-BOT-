@@ -99,29 +99,30 @@ function generarVersus(esc1, esc2, suplentes, suplentes2, mexText = '  ', colTex
     return out.trimEnd()
   }
 
-  return `4 𝐕𝐒 4
+  return `*8 𝐕𝐄𝐑𝐒𝐔𝐒 8*
 
-𝐇𝐎𝐑𝐀𝐑𝐈𝐎𝐒;
-🇲🇽 MEXICO : ${mexText}
-🇨🇴 COLOMBIA : ${colText}
+*𝐇𝐎𝐑𝐀𝐑𝐈𝐎𝐒*;
+*🇲🇽 MEXICO* : ${mexText}
+*🇨🇴 COLOMBIA* : ${colText}
 
-𝐉𝐔𝐆𝐀𝐃𝐎𝐑𝐄𝐒 𝐏𝐑𝐄𝐒𝐄𝐍𝐓𝐄𝐒;
+*𝐉𝐔𝐆𝐀𝐃𝐎𝐑𝐄𝐒 𝐏𝐑𝐄𝐒𝐄𝐍𝐓𝐄𝐒*;
 
-𝗘𝗦𝗖𝗨𝗔𝗗𝗥𝗔 1
+*𝗘𝗦𝗖𝗨𝗔𝗗𝗥𝗔* 1
 ${formatEscuadra(esc1)}
 
-𝗘𝗦𝗖𝗨𝗔𝗗𝗥𝗔 2
+*𝗘𝗦𝗖𝗨𝗔𝗗𝗥𝗔* 2
 ${formatEscuadra(esc2)}
 
-ㅤʚ 𝐒𝐔𝐏𝐋𝐄𝐍𝐓𝐄𝐒:
+ㅤʚ *𝐒𝐔𝐏𝐋𝐄𝐍𝐓𝐄𝐒*:
 ${formatSuplentes(suplentes)}
 
-Reacciona con:
 
-> ❤️ Participar
-👍 Suplente
-👎 Salir
-❌ (Admin) Reiniciar lista
+*𝖲𝗈𝗅𝗈 𝗋𝖾𝖺𝖼𝖼𝗂𝗈𝗇𝖺 𝖼𝗈𝗇:*
+
+> 「 ❤️ 」𝐏𝐚𝐫𝐭𝐢𝐜𝐢𝐩𝐚𝐫  
+> 「 👍 」𝐒𝐮𝐩𝐥𝐞𝐧𝐭𝐞  
+> 「 👎 」𝐒𝐚𝐥𝐢𝐫 𝐃𝐞 𝐋𝐚 𝐋𝐢𝐬𝐭𝐚  
+> 「 ❌ 」𝐑𝐞𝐢𝐧𝐢𝐜𝐢𝐚𝐫 𝐋𝐢𝐬𝐭𝐚      
 `
 }
 
