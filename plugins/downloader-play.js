@@ -57,7 +57,7 @@ let handler = async (m, { conn }) => {
   // Detectar si empieza con "play " sin prefijo
   if (!/^play\s+/i.test(body)) return;
 
-  const query = body.replace(/^play\s+/i, "").trim();
+  const query = body.replace(/^(play|.play)\s+/i, "").trim();
   if (!query) {
     throw `⭐ Escribe el nombre de la canción\n\nEjemplo: play Bad Bunny - Monaco`;
   }
