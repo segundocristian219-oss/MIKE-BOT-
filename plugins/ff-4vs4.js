@@ -87,7 +87,7 @@ function generarVersus(escuadra, suplentes, mexText = '  ', colText = '  ') {
       let icon = i === 0 ? '👑' : '🥷🏻'
       out += arr[i] ? `${icon} ┇ @${arr[i].split('@')[0]}\n` : `${icon} ┇ \n`
     }
-    return out.trimEnd()
+    return out.trimEnd() || '─ ┇ Sin jugadores'
   }
 
   function formatSuplentes(arr) {
@@ -95,7 +95,7 @@ function generarVersus(escuadra, suplentes, mexText = '  ', colText = '  ') {
     for (let i = 0; i < 2; i++) {
       out += arr[i] ? `🥷🏻 ┇ @${arr[i].split('@')[0]}\n` : `🥷🏻 ┇ \n`
     }
-    return out.trimEnd()
+    return out.trimEnd() || '─ ┇ Sin suplentes'
   }
 
   return `*4 𝐕𝐄𝐑𝐒𝐔𝐒 4*
@@ -145,12 +145,16 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
     } catch {}
 
     if (emoji === '❌' && isAdmin) {
-      const hasPlayers = data.escuadra.length + data.suplentes.length > 0
-      if (!hasPlayers) continue
       data.escuadra = []
       data.suplentes = []
+
+      // Texto de lista vacía visible
       let nuevoTexto = generarVersus(data.escuadra, data.suplentes, data.mexText, data.colText)
+
+      // Borrar mensaje original
       try { await conn.sendMessage(data.chat, { delete: msg.message.reactionMessage.key }) } catch {}
+
+      // Enviar nuevo mensaje vacío
       let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions: [] })
       delete versusData[msgID]
       versusData[sent.key.id] = data
