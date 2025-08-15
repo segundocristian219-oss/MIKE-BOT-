@@ -16,15 +16,13 @@ let handler = async (m, { conn }) => {
     })
   } catch {
     try {
-      // fallback: eliminar mensaje citado por la clave del mensaje citado
       await conn.sendMessage(m.chat, { delete: m.quoted.vM.key })
     } catch {
-      // Si falla todo, opcional: puedes enviar un mensaje de error
       return conn.reply(m.chat, '☁️ No se pudo eliminar el mensaje.', m, rcanal)
     }
   }
 }
-handler.customPrefix = /^(del|.del)/i;
+handler.customPrefix = /^(?:\.del|del)$/i
 handler.command = new RegExp;
 handler.group = true;
 handler.admin = true;
