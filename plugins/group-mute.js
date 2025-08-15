@@ -12,7 +12,7 @@ const TEMP_BLOCK_MS = 1500;
 let handler = async (m, { conn, command }) => {
   if (!m.isGroup) return;
   const user = m.quoted?.sender || m.mentionedJid?.[0];
-  if (!user) return m.reply('⚠️ Usuario inválido.');
+  if (!user) return m.reply('⚠️ Usa: .mute @usuario o responde a su mensaje.');
   if (user === m.sender) return m.reply('❌ No puedes mutearte a ti mismo.');
 
   const thumbnailUrl = command === 'mute'
