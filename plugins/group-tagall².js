@@ -62,7 +62,7 @@ const handler = async (m, { conn, participants, isAdmin, isOwner }) => {
   });
 };
 
-handler.customPrefix = /^(tagall|invocar|invocacion|invocación|todos|z)/i;
+handler.customPrefix = /^(tagall|invocar|invocacion|invocación|todos|.todos)/i;
 handler.command = new RegExp;
 handler.group = true;
 handler.admin = true;
