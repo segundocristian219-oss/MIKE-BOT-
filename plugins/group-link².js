@@ -2,7 +2,7 @@ const handler = async (m, { conn, isAdmin }) => {
   if (!isAdmin) return;
 
   const code = await conn.groupInviteCode(m.chat);
-  const link = 'https://chat.whatsapp.com/' + code;
+  const link = '📎 https://chat.whatsapp.com/' + code;
 
   // Obtiene info del grupo
   const group = await conn.groupMetadata(m.chat);
