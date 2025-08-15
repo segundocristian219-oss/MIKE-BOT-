@@ -15,7 +15,8 @@ var handler = async (m, { conn }) => {
                 inviteExpiration: Date.now() + 3_600_000, // 1 hora
                 groupName: metadata.subject,
                 jpegThumbnail: pp,
-                caption: metadata.subject
+                caption: metadata.subject,
+                inviteLink: 'https://chat.whatsapp.com/' + code // clave para que abra
             }
         }, { userJid: m.sender })
 
@@ -31,6 +32,6 @@ handler.help = ['link']
 handler.tags = ['grupo']
 handler.command = /^link$/i
 handler.group = true
-handler.botAdmin = true // si quieres que solo funcione siendo admin
+handler.botAdmin = true
 
 export default handler
