@@ -44,8 +44,8 @@ END:VCARD`.trim()
       contextInfo: {
         mentionedJid: [m.sender],
         externalAdReply: {
-          title: '𝗥𝗲𝘆𝗲𝘀 𝗕𝗼𝘁',
-          body: '𝗥𝗲𝘆𝗲𝘀 𝗕𝗼𝘁',
+          title: '𝐁𝐮𝐮 𝐛𝐨𝐭 🔮',
+          body: '𝐁𝐮𝐮 𝐛𝐨𝐭 🔮',
           thumbnailUrl: imageUrl,
           sourceUrl: instagramUrl,
           mediaType: 1,
