@@ -1,40 +1,47 @@
-let handler = async (m, { isPrems, conn }) => {
-let time = global.db.data.users[m.sender].lastcofre + 0 // 36000000 10 Horas //86400000 24 Horas
-if (new Date - global.db.data.users[m.sender].lastcofre < 0) throw `[❗𝐈𝐍𝐅𝐎❗] 𝚈𝙰 𝚁𝙴𝙲𝙻𝙰𝙼𝙰𝚂𝚃𝙴 𝚃𝚄 𝙲𝙾𝙵𝚁𝙴\𝚗𝚅𝚄𝙴𝙻𝚅𝙴 𝙴𝙽 *${msToTime(time - new Date())}* 𝙿𝙰𝚁𝙰 𝚅𝙾𝙻𝚅𝙴𝚁 𝙰 𝚁𝙴𝙲𝙻𝙰𝙼𝙰𝚁`
+import axios from 'axios';
 
-let img = 'https://telegra.ph/file/daf0bc0fc3c1e4c471c5c.jpg' 
-let texto = `📕 ¡LA #AGENDASEMANAL ESTÁ AQUÍ! 📕
+const API_KEY = 'TU_API_KEY_DE_NENCER';
 
-📢 Abran paso al REY 👑 Pelea por la corona con una nueva barba para tomar el trono del emote Máquina del Tesoro Imperial. 
-
-🔨 También adueñarte del Whac-A-Mole y no olvides comer frutas y verduras con el regreso de una MP5 peligrosa. 🐰🥕
-
-¿Listo para reinar Bermuda? 
-#CelebraciónDePascua
-
-
-
-
-
-`
-
-const fkontak = {
-        "key": {
-    "participants":"0@s.whatsapp.net",
-                "remoteJid": "status@broadcast",
-                "fromMe": false,
-                "id": "Halo"
-        },
-        "message": {
-                "contactMessage": {
-                        "vcard": `BEGIN:VCARD\nVERSION:3.0\nN:Sy;Bot;;;\nFN:y\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
-                }
-        },
-        "participant": "0@s.whatsapp.net"
+async function fetchWeeklyEvents() {
+  const res = await axios.get('https://api.nencer.vn/ff/events', {
+    params: { api_key: API_KEY }
+  });
+  if (!res.data || !res.data.data) throw 'No se pudo obtener la agenda semanal';
+  return res.data.data.events; // ajusta según la estructura real
 }
-await conn.sendFile(m.chat, img, 'img.jpg', texto, fkontak)
-global.db.data.users[m.sender].lastcofre = new Date * 1
-}
-handler.command = ['agendasemanal'] 
-handler.register = false 
-export default handler
+
+let handler = async (m, { conn }) => {
+  try {
+    // Bloqueo de tiempo (opcional)
+    let user = global.db.data.users[m.sender];
+    let time = user.lastcofre + 0;
+    if (new Date - user.lastcofre < 0) {
+      throw `[❗INFO❗] Ya reclamaste tu cofre.\nVuelve en *${msToTime(time - new Date())}* para reclamar de nuevo.`;
+    }
+
+    // Obtener eventos desde API
+    let events = await fetchWeeklyEvents();
+
+    let texto = `📕 *AGENDA SEMANAL DE FREE FIRE* 📕\n\n`;
+    events.forEach(evt => {
+      texto += `📅 *${evt.title}*\n🗓️ ${evt.start} → ${evt.end}\n${evt.description}\n\n`;
+    });
+
+    // Imagen genérica o la que devuelva la API
+    let img = events[0]?.image || 'https://telegra.ph/file/daf0bc0fc3c1e4c471c5c.jpg';
+
+    // Enviar mensaje
+    await conn.sendFile(m.chat, img, 'agenda.jpg', texto, m);
+
+    // Guardar última ejecución
+    user.lastcofre = new Date * 1;
+
+  } catch (err) {
+    console.error(err);
+    conn.reply(m.chat, '❌ Error al obtener la agenda semanal', m);
+  }
+};
+
+handler.command = ['agendasemanal'];
+handler.register = false;
+export default handler;
