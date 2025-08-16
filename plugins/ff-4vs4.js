@@ -122,15 +122,15 @@ ${formatSuplentes(suplentes)}
 `
 }
 
-conn.ev.on('messages.upsert', async ({ messages }) => {
-  for (let msg of messages) {
-    if (!msg.message?.reactionMessage) continue
-    let msgID = msg.message.reactionMessage.key.id
+// 🚀 Aquí ya escucha reacciones bien
+conn.ev.on('messages.reaction', async (reactions) => {
+  for (let r of reactions) {
+    let msgID = r.key.id
     let data = versusData[msgID]
     if (!data) continue
 
-    let user = msg.key.participant || msg.key.remoteJid
-    let emoji = msg.message.reactionMessage.text
+    let user = r.key.participant || r.key.remoteJid
+    let emoji = r.text
     const isInAnyList =
       data.escuadra.includes(user) ||
       data.suplentes.includes(user)
@@ -148,19 +148,15 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
       data.escuadra = []
       data.suplentes = []
 
-      // Texto de lista vacía visible
       let nuevoTexto = generarVersus(data.escuadra, data.suplentes, data.mexText, data.colText)
-
-      // Borrar mensaje original
-      try { await conn.sendMessage(data.chat, { delete: msg.message.reactionMessage.key }) } catch {}
-
-      // Enviar nuevo mensaje vacío
+      try { await conn.sendMessage(data.chat, { delete: r.key }) } catch {}
       let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions: [] })
       delete versusData[msgID]
       versusData[sent.key.id] = data
       continue
     }
 
+    // limpiar al usuario si ya estaba en alguna lista
     data.escuadra = data.escuadra.filter(u => u !== user)
     data.suplentes = data.suplentes.filter(u => u !== user)
 
@@ -169,12 +165,12 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
     } else if (emoji === '👍') {
       if (data.suplentes.length < 2) data.suplentes.push(user)
     } else if (emoji === '👎') {
-      // Ya fue eliminado arriba
+      // ya se eliminó arriba
     } else continue
 
     let nuevoTexto = generarVersus(data.escuadra, data.suplentes, data.mexText, data.colText)
     let mentions = [...data.escuadra, ...data.suplentes]
-    try { await conn.sendMessage(data.chat, { delete: msg.message.reactionMessage.key }) } catch {}
+    try { await conn.sendMessage(data.chat, { delete: r.key }) } catch {}
     let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions })
     delete versusData[msgID]
     versusData[sent.key.id] = data
