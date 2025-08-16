@@ -3,8 +3,10 @@ import PhoneNumber from 'awesome-phonenumber'
 let handler = async (m, { conn }) => {
   if (m.quoted?.fromMe || m.isButton) return
 
+  // Reaccionar al mensaje
   m.react('🧨')
 
+  // Datos del contacto
   const imageUrl = 'https://files.catbox.moe/ntyp5r.jpg'
   const numCreador = '5217227584934'
   const ownerJid = numCreador + '@s.whatsapp.net'
@@ -14,6 +16,7 @@ let handler = async (m, { conn }) => {
   const empresa = '𝐀𝐧𝐠𝐞𝐥 - 𝐒𝐞𝐫𝐯𝐢𝐜𝐢𝐨𝐬 𝐭𝐞𝐜𝐧𝐨𝐥𝐨́𝐠𝐢𝐜𝐨𝐬 🧨'
   const instagramUrl = 'https://www.instagram.com/angxll_br?igsh=MXF1NWVtZ2xuejFlOA=='
 
+  // Construir VCARD
   const vcard = `
 BEGIN:VCARD
 VERSION:3.0
@@ -21,26 +24,20 @@ N:;${name};;;
 FN:${name}
 ORG:${empresa};
 TITLE:CEO & Fundador
-TEL;waid=${numCreador}:${new PhoneNumber('+' + numCreador).getNumber('international')}
+TEL;waid=${numCreador}:${new PhoneNumber('+' + numCreador).getNumber('e164')}
 EMAIL:correo@empresa.com
 URL:${instagramUrl}
 NOTE:${about}
 ADR:;;Dirección de tu empresa;;;;
-X-ABADR:ES
-X-ABLabel:Dirección Web
-X-ABLabel:Correo Electrónico
-X-ABLabel:Teléfono de contacto
 X-WA-BIZ-NAME:${name}
 X-WA-BIZ-DESCRIPTION:${about}
 END:VCARD`.trim()
 
+  // Enviar contacto con preview
   await conn.sendMessage(
     m.chat,
     {
-      contacts: {
-        displayName: name,
-        contacts: [{ vcard }]
-      },
+      contacts: [{ displayName: name, vcard }],
       contextInfo: {
         mentionedJid: [m.sender],
         externalAdReply: {
