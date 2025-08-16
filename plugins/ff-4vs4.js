@@ -183,5 +183,3 @@ versusData[sent.key.id] = data
 }
 })
 
-Por alguna razón no detecta las reacciones
-
