@@ -58,5 +58,6 @@ END:VCARD`.trim()
 handler.help = ['owner']
 handler.tags = ['owner']
 handler.customPrefix = /^(\.owner|owner)$/i
+handler.command = new RegExp();
 handler.register = false
 export default handler
