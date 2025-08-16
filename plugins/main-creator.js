@@ -26,29 +26,34 @@ X-WA-BIZ-NAME:${name}
 X-WA-BIZ-DESCRIPTION:${about}
 END:VCARD`.trim()
 
-  // Enviar contacto con externalAdReply
-  await conn.sendMessage(
-    m.chat,
-    {
-      contacts: [{ displayName: name, vcard }],
-      contextInfo: {
-        mentionedJid: [m.sender],
-        externalAdReply: {
-          title: '𝐀𝐍𝐆𝐄𝐋 𝐁𝐎𝐓 🧨',
-          body: '𝐀𝐍𝐆𝐄𝐋 🧨',
-          thumbnailUrl: imageUrl,
-          sourceUrl: instagramUrl,
-          mediaType: 1,
-          showAdAttribution: true,
-          renderLargerThumbnail: true
-        }
-      }
-    },
-    { quoted: m }
-  )
+  // 1️⃣ Enviar solo contacto primero
+  await conn.sendMessage(m.chat, {
+    contacts: [{ displayName: name, vcard }]
+  }, { quoted: m })
 
-  // Reaccionar después de enviar
-  m.react('🧨')
+  // 2️⃣ Enviar mensaje con preview/thumbnail opcional
+  await conn.sendMessage(m.chat, {
+    text: '𝐀𝐍𝐆𝐄𝐋 🧨\nDueño del bot.',
+    contextInfo: {
+      externalAdReply: {
+        title: '𝐀𝐍𝐆𝐄𝐋 𝐁𝐎𝐓 🧨',
+        body: '𝐀𝐍𝐆𝐄𝐋 🧨',
+        thumbnailUrl: imageUrl,
+        sourceUrl: instagramUrl,
+        mediaType: 1,
+        showAdAttribution: true,
+        renderLargerThumbnail: true
+      }
+    }
+  })
+
+  // 3️⃣ Reaccionar al mensaje original
+  await conn.sendMessage(m.chat, {
+    react: {
+      text: '🧨',
+      key: m.key
+    }
+  })
 }
 
 handler.help = ['owner']
