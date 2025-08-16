@@ -3,7 +3,7 @@ import PhoneNumber from 'awesome-phonenumber'
 let handler = async (m, { conn }) => {
   if (m.quoted?.fromMe || m.isButton) return
 
-  m.react('🌴')
+  m.react('🔮')
 
   const imageUrl = 'https://files.catbox.moe/6fo871.jpg'
   const numCreador = '5215565238431'
