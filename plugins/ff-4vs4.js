@@ -122,57 +122,77 @@ ${formatSuplentes(suplentes)}
 `
 }
 
-// 🚀 Aquí ya escucha reacciones bien
-conn.ev.on('messages.reaction', async (reactions) => {
-  for (let r of reactions) {
-    let msgID = r.key.id
-    let data = versusData[msgID]
-    if (!data) continue
+// 🟢 Manejo de reacciones
+async function handleReaction(conn, r) {
+  let msgID = r.key.id
+  let data = versusData[msgID]
+  if (!data) return
 
-    let user = r.key.participant || r.key.remoteJid
-    let emoji = r.text
-    const isInAnyList =
-      data.escuadra.includes(user) ||
-      data.suplentes.includes(user)
+  let user = r.key.participant || r.key.remoteJid
+  let emoji = r.text
+  const isInAnyList =
+    data.escuadra.includes(user) ||
+    data.suplentes.includes(user)
 
-    if (emoji === '👎' && !isInAnyList) continue
+  if (emoji === '👎' && !isInAnyList) return
 
-    let isAdmin = false
-    try {
-      let groupMetadata = await conn.groupMetadata(data.chat)
-      let participant = groupMetadata.participants.find(p => p.id === user)
-      isAdmin = participant?.admin === 'admin' || participant?.admin === 'superadmin'
-    } catch {}
+  let isAdmin = false
+  try {
+    let groupMetadata = await conn.groupMetadata(data.chat)
+    let participant = groupMetadata.participants.find(p => p.id === user)
+    isAdmin = participant?.admin === 'admin' || participant?.admin === 'superadmin'
+  } catch {}
 
-    if (emoji === '❌' && isAdmin) {
-      data.escuadra = []
-      data.suplentes = []
-
-      let nuevoTexto = generarVersus(data.escuadra, data.suplentes, data.mexText, data.colText)
-      try { await conn.sendMessage(data.chat, { delete: r.key }) } catch {}
-      let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions: [] })
-      delete versusData[msgID]
-      versusData[sent.key.id] = data
-      continue
-    }
-
-    // limpiar al usuario si ya estaba en alguna lista
-    data.escuadra = data.escuadra.filter(u => u !== user)
-    data.suplentes = data.suplentes.filter(u => u !== user)
-
-    if (emoji === '❤️') {
-      if (data.escuadra.length < 4) data.escuadra.push(user)
-    } else if (emoji === '👍') {
-      if (data.suplentes.length < 2) data.suplentes.push(user)
-    } else if (emoji === '👎') {
-      // ya se eliminó arriba
-    } else continue
-
+  if (emoji === '❌' && isAdmin) {
+    data.escuadra = []
+    data.suplentes = []
     let nuevoTexto = generarVersus(data.escuadra, data.suplentes, data.mexText, data.colText)
-    let mentions = [...data.escuadra, ...data.suplentes]
     try { await conn.sendMessage(data.chat, { delete: r.key }) } catch {}
-    let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions })
+    let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions: [] })
     delete versusData[msgID]
     versusData[sent.key.id] = data
+    return
+  }
+
+  // limpiar al usuario si ya estaba en alguna lista
+  data.escuadra = data.escuadra.filter(u => u !== user)
+  data.suplentes = data.suplentes.filter(u => u !== user)
+
+  if (emoji === '❤️') {
+    if (data.escuadra.length < 4) data.escuadra.push(user)
+  } else if (emoji === '👍') {
+    if (data.suplentes.length < 2) data.suplentes.push(user)
+  } else if (emoji === '👎') {
+    // ya se eliminó arriba
+  } else return
+
+  let nuevoTexto = generarVersus(data.escuadra, data.suplentes, data.mexText, data.colText)
+  let mentions = [...data.escuadra, ...data.suplentes]
+  try { await conn.sendMessage(data.chat, { delete: r.key }) } catch {}
+  let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions })
+  delete versusData[msgID]
+  versusData[sent.key.id] = data
+}
+
+// 🚀 Evento principal (DS6 Meta soporta este)
+conn.ev.on('messages.reaction', async reactions => {
+  console.log('Reacciones detectadas:', reactions)
+  for (let r of reactions) {
+    await handleReaction(conn, r)
+  }
+})
+
+// 🔄 Fallback por si tu DS6 no dispara "messages.reaction"
+conn.ev.on('messages.upsert', async ({ messages, type }) => {
+  if (type !== 'notify') return
+  for (let m of messages) {
+    if (m.message?.reactionMessage) {
+      let r = {
+        key: m.message.reactionMessage.key,
+        text: m.message.reactionMessage.text
+      }
+      console.log('Reacción detectada (fallback upsert):', r)
+      await handleReaction(conn, r)
+    }
   }
 })
