@@ -124,6 +124,3 @@ default:
 
 }
 }
-
-Por alguna razón algunas veces no manda los eventos
-
