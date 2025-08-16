@@ -1,12 +1,12 @@
-let versusData = {} // Guarda el estado por mensaje
+// 📌 Guardado global
+let versusData = {} 
 
 const aliasesMX = ['mx', 'méxico', 'mexico', 'méx', 'mex']
 const aliasesCO = ['co', 'colombia', 'col']
 
 let handler = async (m, { conn, args }) => {
   if (args.length === 0) {
-    await conn.sendMessage(m.chat, { text: '𝐓𝐢𝐞𝐧𝐞𝐬 𝐪𝐮𝐞 𝐞𝐬𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐫 𝐥𝐚 𝐡𝐨𝐫𝐚 𝐲 𝐞𝐥 𝐩𝐚𝐢́𝐬 ❇️' })
-    return
+    return conn.sendMessage(m.chat, { text: '𝐓𝐢𝐞𝐧𝐞𝐬 𝐪𝐮𝐞 𝐞𝐬𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐫 𝐥𝐚 𝐡𝐨𝐫𝐚 𝐲 𝐞𝐥 𝐩𝐚𝐢́𝐬 ❇️' })
   }
 
   let lastArgRaw = args[args.length - 1]
@@ -20,8 +20,7 @@ let handler = async (m, { conn, args }) => {
     zonaInput = 'co'
     args.pop()
   } else {
-    await conn.sendMessage(m.chat, { text: '𝐄𝐬𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚 𝐮𝐧 𝐩𝐚𝐢́𝐬 𝐯𝐚́𝐥𝐢𝐝𝐨.\nEj: 𝟑 𝐩𝐦 𝐦𝐱, 𝟏𝟔 𝐜𝐨, 𝟒 𝐩𝐦 𝐦é𝐱𝐢𝐜𝐨' })
-    return
+    return conn.sendMessage(m.chat, { text: '𝐄𝐬𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚 𝐮𝐧 𝐩𝐚𝐢́𝐬 𝐯𝐚́𝐥𝐢𝐝𝐨.\nEj: 3 pm mx, 16 co, 4 pm méxico' })
   }
 
   const timeStr = args.join(' ').toUpperCase().trim()
@@ -39,8 +38,7 @@ let handler = async (m, { conn, args }) => {
   }
 
   if (horaInput === null) {
-    await conn.sendMessage(m.chat, { text: '𝐇𝐨𝐫𝐚 𝐢𝐧𝐯𝐚́𝐥𝐢𝐝𝐚. Ej:\n.4vs4 3 pm mx\n.4vs4 16 co' })
-    return
+    return conn.sendMessage(m.chat, { text: '𝐇𝐨𝐫𝐚 𝐢𝐧𝐯𝐚́𝐥𝐢𝐝𝐚. Ej:\n.4vs4 3 pm mx\n.4vs4 16 co' })
   }
 
   function format12h(h) {
@@ -78,10 +76,9 @@ handler.help = ['4vs4']
 handler.tags = ['freefire']
 handler.command = /^.?(4vs4|vs4)$/i
 handler.group = true
-handler.botAdmin = true
 export default handler
 
-function generarVersus(escuadra, suplentes, mexText = '  ', colText = '  ') {
+function generarVersus(escuadra, suplentes, mexText = ' ', colText = ' ') {
   function formatEscuadra(arr) {
     let out = ''
     for (let i = 0; i < 4; i++) { 
@@ -122,80 +119,70 @@ ${formatSuplentes(suplentes)}
 `
 }
 
-// 🔥 DETECTOR DE REACCIONES 🔥
-conn.ev.on('messages.upsert', async ({ messages }) => {
-  for (let msg of messages) {
-    if (!msg.message?.reactionMessage) continue
+// 🔥 Detector de reacciones (DS6 Meta)
+conn.ev.on('messages.reaction', async (reaction) => {
+  let msgID = reaction.key?.stanzaId
+  let data = versusData[msgID]
+  if (!data) return
 
-    // ID real del mensaje al que reaccionaron
-    let msgID = msg.message.reactionMessage.key?.stanzaId || msg.message.reactionMessage.key?.id
-    let data = versusData[msgID]
-    if (!data) continue
+  let user = reaction.key.participant || reaction.participant
+  let emoji = reaction.text || null
+  let isRemoved = emoji === '' 
 
-    let user = msg.key.participant || msg.participant || msg.key.remoteJid
-    let emoji = msg.message.reactionMessage.text || null
-    let isRemoved = emoji === '' // Cuando quitan la reacción
-
-    // Si quitó reacción, lo borramos de todas las listas
-    if (isRemoved) {
-      data.escuadra = data.escuadra.filter(u => u !== user)
-      data.suplentes = data.suplentes.filter(u => u !== user)
-    }
-
-    // Verificar admin
-    let isAdmin = false
-    try {
-      let groupMetadata = await conn.groupMetadata(data.chat)
-      let participant = groupMetadata.participants.find(p => p.id === user)
-      isAdmin = !!participant?.admin
-    } catch {}
-
-    // Reiniciar lista (solo admin)
-    if (emoji === '❌' && isAdmin) {
-      data.escuadra = []
-      data.suplentes = []
-
-      let nuevoTexto = generarVersus(data.escuadra, data.suplentes, data.mexText, data.colText)
-
-      try { 
-        await conn.sendMessage(data.chat, { delete: { remoteJid: data.chat, id: msgID, fromMe: false } }) 
-      } catch {}
-
-      let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions: [] })
-      delete versusData[msgID]
-      versusData[sent.key.id] = data
-      continue
-    }
-
-    // Manejo normal de reacciones
+  // Si quitó reacción, limpiar usuario
+  if (isRemoved) {
     data.escuadra = data.escuadra.filter(u => u !== user)
     data.suplentes = data.suplentes.filter(u => u !== user)
+  }
 
-    if (emoji === '❤️') {
-      if (data.escuadra.length < 4 && !data.escuadra.includes(user)) {
-        data.escuadra.push(user)
-      }
-    } else if (emoji === '👍') {
-      if (data.suplentes.length < 2 && !data.suplentes.includes(user)) {
-        data.suplentes.push(user)
-      }
-    } else if (emoji === '👎') {
-      // se eliminó arriba
-    } else {
-      continue
-    }
+  // Verificar admin
+  let isAdmin = false
+  try {
+    let groupMetadata = await conn.groupMetadata(data.chat)
+    let participant = groupMetadata.participants.find(p => p.id === user)
+    isAdmin = !!participant?.admin
+  } catch {}
 
-    // Actualizar mensaje
+  // Reiniciar lista (admin + ❌)
+  if (emoji === '❌' && isAdmin) {
+    data.escuadra = []
+    data.suplentes = []
+
     let nuevoTexto = generarVersus(data.escuadra, data.suplentes, data.mexText, data.colText)
-    let mentions = [...data.escuadra, ...data.suplentes]
 
     try { 
-      await conn.sendMessage(data.chat, { delete: { remoteJid: data.chat, id: msgID, fromMe: false } }) 
+      await conn.sendMessage(data.chat, { delete: { remoteJid: data.chat, id: msgID, fromMe: true } }) 
     } catch {}
 
-    let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions })
-
+    let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions: [] })
     delete versusData[msgID]
     versusData[sent.key.id] = data
+    return
   }
+
+  // Manejo normal
+  data.escuadra = data.escuadra.filter(u => u !== user)
+  data.suplentes = data.suplentes.filter(u => u !== user)
+
+  if (emoji === '❤️') {
+    if (data.escuadra.length < 4) data.escuadra.push(user)
+  } else if (emoji === '👍') {
+    if (data.suplentes.length < 2) data.suplentes.push(user)
+  } else if (emoji === '👎') {
+    // ya fue eliminado arriba
+  } else {
+    return
+  }
+
+  // Actualizar mensaje
+  let nuevoTexto = generarVersus(data.escuadra, data.suplentes, data.mexText, data.colText)
+  let mentions = [...data.escuadra, ...data.suplentes]
+
+  try { 
+    await conn.sendMessage(data.chat, { delete: { remoteJid: data.chat, id: msgID, fromMe: true } }) 
+  } catch {}
+
+  let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions })
+  delete versusData[msgID]
+  versusData[sent.key.id] = data
 })
