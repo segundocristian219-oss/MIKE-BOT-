@@ -9,9 +9,10 @@ let handler = async (m, { conn }) => {
   const numCreador = '5215565238431'
   const ownerJid = numCreador + '@s.whatsapp.net'
 
-  const name = '𝗥𝗲𝘆𝗲𝘀 🌴'
-  const about = '𝐒𝐨𝐲 𝗥𝗲𝘆𝗲𝘀, 𝐃𝐮𝐞𝐧̃𝐨 𝐝𝐞𝐥 𝐁𝐨𝐭: 𝗥𝗲𝘆𝗲𝘀 𝐛𝐨𝐭 🌴'
-  const empresa = '𝗥𝗲𝘆𝗲𝘀 - 𝐒𝐞𝐫𝐯𝐢𝐜𝐢𝐨𝐬 𝐭𝐞𝐜𝐧𝐨𝐥𝐨́𝐠𝐢𝐜𝐨𝐬 🌴'
+  const name = '𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧'
+  const about = '𝐒𝐨𝐲 𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧, 𝐃𝐮𝐞𝐧̃𝐨 𝐃𝐞𝐥 𝐁𝐨𝐭:
+𝐁𝐮𝐮 𝐛𝐨𝐭 🔮'
+  const empresa = '𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧 - 𝐒𝐞𝐫𝐯𝐢𝐜𝐢𝐨𝐬 𝐭𝐞𝐜𝐧𝐨𝐥𝐨́𝐠𝐢𝐜𝐨𝐬 🌴'
   const instagramUrl = ''
 
   const vcard = `
@@ -44,8 +45,8 @@ END:VCARD`.trim()
       contextInfo: {
         mentionedJid: [m.sender],
         externalAdReply: {
-          title: '𝗥𝗲𝘆𝗲𝘀 𝗕𝗼𝘁',
-          body: '𝗥𝗲𝘆𝗲𝘀 𝗕𝗼𝘁',
+          title: '𝐁𝐮𝐮 𝐛𝐨𝐭 🔮',
+          body: '',
           thumbnailUrl: imageUrl,
           sourceUrl: instagramUrl,
           mediaType: 1,
