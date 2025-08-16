@@ -161,7 +161,7 @@ async function serbot() {
 
 handler.help = ["serbot"]
 handler.tags = ["serbot"]
-handler.command = ['qrbotsisked', 'jadibotsisked', 'qrsisked']
+handler.command = ['qr']
 
 export default handler
 
