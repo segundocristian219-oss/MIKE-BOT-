@@ -26,7 +26,7 @@ let handler = async (m, { isPrems, conn }) => {
     global.db.data.users[m.sender].lastcofre = new Date().getTime(); // Cambié a getTime para mayor claridad
 };
 
-handler.command = ['nexterra']; 
+handler.command = ['nexterxxra']; 
 handler.register = false;
 handler.admin = true;
 export default handler;
