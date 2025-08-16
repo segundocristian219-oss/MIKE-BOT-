@@ -46,7 +46,7 @@ END:VCARD`.trim()
         mentionedJid: [m.sender],
         externalAdReply: {
           title: '𝐁𝐮𝐮 𝐛𝐨𝐭 🔮',
-          body: '',
+          body: 'x',
           thumbnailUrl: imageUrl,
           sourceUrl: instagramUrl,
           mediaType: 1,
