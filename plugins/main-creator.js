@@ -10,7 +10,7 @@ let handler = async (m, { conn }) => {
   const ownerJid = numCreador + '@s.whatsapp.net'
 
   const name = '𝗥𝗲𝘆𝗲𝘀 🌴'
-  const about = '𝐒𝐨𝐲 𝗥𝗲𝘆𝗲𝘀, 𝐃𝐮𝐞𝐧̃𝐨 𝐝𝐞𝐥 𝐁𝐨𝐭: 𝗥𝗲𝘆𝗲𝘀 𝐛𝐨𝐭 🌴'
+  const about = '𝐒𝐨𝐲 𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧, 𝐃𝐮𝐞𝐧̃𝐨 𝐃𝐞𝐥 𝐁𝐨𝐭: 𝐁𝐮𝐮 𝐛𝐨t🔮'
   const empresa = '𝗥𝗲𝘆𝗲𝘀 - 𝐒𝐞𝐫𝐯𝐢𝐜𝐢𝐨𝐬 𝐭𝐞𝐜𝐧𝐨𝐥𝐨́𝐠𝐢𝐜𝐨𝐬 🌴'
   const instagramUrl = ''
 
