@@ -3,20 +3,13 @@ import PhoneNumber from 'awesome-phonenumber'
 let handler = async (m, { conn }) => {
   if (m.quoted?.fromMe || m.isButton) return
 
-  // Reaccionar al mensaje
-  m.react('🧨')
-
-  // Datos del contacto
-  const imageUrl = 'https://files.catbox.moe/ntyp5r.jpg'
   const numCreador = '5217227584934'
-  const ownerJid = numCreador + '@s.whatsapp.net'
-
   const name = '𝐀𝐍𝐆𝐄𝐋 🧨'
   const about = '𝐒𝐨𝐲 𝐀𝐧𝐠𝐞𝐥, 𝐃𝐮𝐞𝐧̃𝐨 𝐝𝐞𝐥 𝐁𝐨𝐭 𝐀𝐧𝐠𝐞𝐥 𝐛𝐨𝐭 🧨'
-  const empresa = '𝐀𝐧𝐠𝐞𝐥 - 𝐒𝐞𝐫𝐯𝐢𝐜𝐢𝐨𝐬 𝐭𝐞𝐜𝐧𝐨𝐥𝐨́𝐠𝐢𝐜𝐨𝐬 🧨'
+  const empresa = '𝐀𝐧𝐠𝐞𝐋 - 𝐒𝐞𝐫𝐯𝐢𝐜𝐢𝐨𝐬 𝐭𝐞𝐜𝐧𝐨𝐥𝐨́𝐠𝐢𝐜𝐨𝐬 🧨'
   const instagramUrl = 'https://www.instagram.com/angxll_br?igsh=MXF1NWVtZ2xuejFlOA=='
+  const imageUrl = 'https://files.catbox.moe/ntyp5r.jpg'
 
-  // Construir VCARD
   const vcard = `
 BEGIN:VCARD
 VERSION:3.0
@@ -33,7 +26,7 @@ X-WA-BIZ-NAME:${name}
 X-WA-BIZ-DESCRIPTION:${about}
 END:VCARD`.trim()
 
-  // Enviar contacto con preview
+  // Enviar contacto con externalAdReply
   await conn.sendMessage(
     m.chat,
     {
@@ -53,6 +46,9 @@ END:VCARD`.trim()
     },
     { quoted: m }
   )
+
+  // Reaccionar después de enviar
+  m.react('🧨')
 }
 
 handler.help = ['owner']
