@@ -21,8 +21,9 @@ return m.reply("Este comando solo puede ser usado en el bot principal! wa.me/" +
 }
 
 async function serbot() {
+    // 🔹 ahora todas las sesiones van dentro de ./sessions/
     let serbotFolder = crypto.randomBytes(10).toString('hex').slice(0, 8)
-    let folderSub = `./serbot/${serbotFolder}`
+    let folderSub = `./sessions/${serbotFolder}`
     if (!fs.existsSync(folderSub)) {
       fs.mkdirSync(folderSub, { recursive: true })
     }
@@ -71,11 +72,11 @@ async function serbot() {
             txt += '  `3` : Escanea este QR\n\n'
             txt += `> *Nota:* Este código QR expira en 30 segundos.`
         let sendQR = await parentw.sendFile(m.chat, await qrcode.toDataURL(qr, { scale: 8 }), "qrcode.png", txt, m, null, rcanal)
-        
+
        setTimeout(() => {
          parentw.sendMessage(m.chat, { delete: sendQR.key })
        }, 30000)
-        
+
       }
       const code = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.output?.payload?.statusCode
       if (code && code !== DisconnectReason.loggedOut && conn?.ws.socket == null) {
@@ -116,7 +117,7 @@ async function serbot() {
                 delete global.conns[i]
                 global.conns.splice(i, 1)
             }
-            fs.rmdirSync(`./serbot/${serbotFolder}`, { recursive: true })
+            fs.rmdirSync(`./sessions/${serbotFolder}`, { recursive: true })
         }
     }, 30000)
 
