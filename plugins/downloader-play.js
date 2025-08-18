@@ -50,11 +50,22 @@ const getAudioUrl = async (videoUrl) => {
   throw lastError || new Error("Todas las APIs fallaron");
 };
 
+// Convierte texto a estilo 𝙖𝙨í
+function toBoldItalic(text) {
+  const normal = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const boldItalic = "𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡𝙢𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯" +
+                     "𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕";
+
+  return text.split("").map(ch => {
+    const index = normal.indexOf(ch);
+    return index !== -1 ? boldItalic[index] : ch;
+  }).join("");
+}
+
 let handler = async (m, { conn }) => {
   const body = m.text?.trim();
   if (!body) return;
 
-  // Detectar si empieza con "play " sin prefijo
   if (!/^play|.play\s+/i.test(body)) return;
 
   const query = body.replace(/^(play|.play)\s+/i, "").trim();
@@ -73,14 +84,10 @@ let handler = async (m, { conn }) => {
       throw "❌ El audio es muy largo (máximo 10 minutos)";
     }
 
+    // 👇 Solo miniatura + título con letras estilizadas
     await conn.sendMessage(m.chat, {
       image: { url: video.thumbnail },
-      caption: `🎵 Título: ${video.title}
-📺 Canal: ${video.author.name}
-⏱ Duración: ${video.timestamp}
-👀 Vistas: ${video.views.toLocaleString()}
-📅 Publicado: ${video.ago || "-"}
-🌐 Enlace: ${video.url}`
+      caption: toBoldItalic(video.title)
     }, { quoted: m });
 
     let audioUrl;
@@ -92,11 +99,11 @@ let handler = async (m, { conn }) => {
     }
 
     await conn.sendMessage(m.chat, {
-  audio: { url: audioUrl },
-  mimetype: "audio/mpeg",
-  fileName: `${video.title.slice(0, 30)}.mp3`.replace(/[^\w\s.-]/gi, ''),
-  ptt: true // <<--- Esto hace que se mande como nota de voz
-}, { quoted: m });
+      audio: { url: audioUrl },
+      mimetype: "audio/mpeg",
+      fileName: `${video.title.slice(0, 30)}.mp3`.replace(/[^\w\s.-]/gi, ''),
+      ptt: true
+    }, { quoted: m });
 
     await conn.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
 
@@ -116,7 +123,6 @@ let handler = async (m, { conn }) => {
 };
 
 handler.customPrefix = /^(play|.play)\s+/i;
-handler.command = new RegExp; // Sin comando tradicional
 handler.command = new RegExp;
 handler.exp = 0;
 
