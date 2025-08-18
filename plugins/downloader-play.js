@@ -53,8 +53,8 @@ const getAudioUrl = async (videoUrl) => {
 // Convierte texto a estilo 𝙖𝙨í
 function toBoldItalic(text) {
   const normal = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  const boldItalic = "𝙦𝙬𝙚𝙧𝙩𝙮𝙪𝙞𝙤𝙥𝙖𝙨𝙙𝙛𝙜𝙝𝙟𝙠𝙡𝙣̃𝙯𝙭𝙘𝙫𝙗𝙣𝙢" +
-                     "𝙌𝙒𝙀𝙍𝙏𝙔𝙐𝙄𝙊𝙋𝘼𝙎𝘿𝙁𝙂𝙃𝙅𝙆𝙇𝙉̃𝙕𝙓𝘾𝙑𝘽𝙉𝙈";
+  const boldItalic = "𝐪𝐰𝐞𝐫𝐭𝐲𝐮𝐢𝐨𝐩𝐚𝐬𝐝𝐟𝐠𝐡𝐣𝐤𝐥𝐧̃𝐳𝐱𝐜𝐯𝐛𝐧𝐦" +
+                     "𝐐𝐖𝐄𝐑𝐓𝐘𝐔𝐈𝐎𝐏𝐀𝐒𝐃𝐅𝐆𝐇𝐉𝐊𝐋𝐍̃𝐙𝐗𝐂𝐕𝐁𝐍𝐌";
 
   return text.split("").map(ch => {
     const index = normal.indexOf(ch);
