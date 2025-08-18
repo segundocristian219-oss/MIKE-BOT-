@@ -1,13 +1,12 @@
-var handler = async (m, { conn, command, text }) => {
+var handler = async (m, { conn, text }) => {
   let user1, user2
   let mentioned = m.mentionedJid || []
 
   if (mentioned.length >= 2) {
-    // 📌 Si hay 2 menciones
-    user1 = await conn.getName(mentioned[0]) || '@' + mentioned[0].split('@')[0]
-    user2 = await conn.getName(mentioned[1]) || '@' + mentioned[1].split('@')[0]
+    // ✅ Obtenemos los nombres bonitos
+    user1 = await conn.getName(mentioned[0])
+    user2 = await conn.getName(mentioned[1])
   } else if (text) {
-    // 📌 Si no hay menciones, usar texto normal
     let [first, ...rest] = text.split(' ')
     user1 = first
     user2 = rest.join(' ')
@@ -27,7 +26,7 @@ var handler = async (m, { conn, command, text }) => {
 
   await conn.sendMessage(m.chat, {
     text: love,
-    mentions: mentioned // ✅ aún los menciona, pero muestra su nombre
+    mentions: mentioned // 🔵 menciona en azul, aunque en texto salga el nombre
   }, { quoted: m })
 }
 
