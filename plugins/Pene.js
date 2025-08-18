@@ -1,27 +1,33 @@
 var handler = async (m, { conn, command, text }) => {
-  if (!text) {
-    throw `🍭 𝙀𝙎𝘾𝙍𝙄𝘽𝙀 𝙀𝙇 𝙉𝙊𝙈𝘽𝙍𝙀 𝘿𝙀 𝘿𝙊𝙎 𝙋𝙀𝙍𝙎𝙊𝙉𝘼𝙎 𝙊 𝙀𝙏𝙄𝙌𝙐𝙀𝙏𝘼𝙇𝙊𝙎 𝙋𝘼𝙍𝘼 𝘾𝘼𝙇𝘾𝙐𝙇𝘼𝙍 𝙎𝙐 𝘼𝙈𝙊𝙍.`
+  let user1, user2
+  let mentioned = m.mentionedJid || []
+
+  if (mentioned.length >= 2) {
+    // 📌 Si hay 2 menciones
+    user1 = await conn.getName(mentioned[0])
+    user2 = await conn.getName(mentioned[1])
+  } else if (text) {
+    // 📌 Si no hay menciones, usar texto
+    let [first, ...rest] = text.split(' ')
+    user1 = first
+    user2 = rest.join(' ')
   }
 
-  // Tomamos el primer nombre y el resto como segundo
-  let [text1, ...rest] = text.split(' ')
-  let text2 = rest.join(' ')
-
-  if (!text2) {
-    throw `🍭 𝙀𝙎𝘾𝙍𝙄𝘽𝙀 𝙊 𝙀𝙏𝙄𝙌𝙐𝙀𝙏𝘼 𝙀𝙇 𝙉𝙊𝙈𝘽𝙍𝙀 𝘿𝙀 𝙇𝘼 𝙎𝙀𝙂𝙐𝙉𝘿𝘼 𝙋𝙀𝙍𝙎𝙊𝙉𝘼.`
+  if (!user1 || !user2) {
+    throw `🍭 𝙀𝙎𝘾𝙍𝙄𝘽𝙀 𝙀𝙇 𝙉𝙊𝙈𝘽𝙍𝙀 𝘿𝙀 𝘿𝙊𝙎 𝙋𝙀𝙍𝙎𝙊𝙉𝘼𝙎 𝙊 𝙀𝙏𝙄𝙌𝙐𝙀𝙏𝘼𝙇𝙊𝙎 𝙋𝘼𝙍𝘼 𝘾𝘼𝙇𝘾𝙐𝙇𝘼𝙍 𝙎𝙐 𝘼𝙈𝙊𝙍.`
   }
 
   let porcentaje = Math.floor(Math.random() * 100)
 
   let love = `
 ━━━━━━━━━━━━━━━
-❤️ *${text1}* 𝙏𝙐 𝙊𝙋𝙊𝙍𝙏𝙐𝙉𝙄𝘿𝘼𝘿 𝘿𝙀 𝙀𝙉𝘼𝙈𝙊𝙍𝘼𝙍𝙏𝙀 𝘿𝙀 *${text2}* 𝙀𝙎 𝘿𝙀 *${porcentaje}%* 👩🏻‍❤️‍👨🏻 
+❤️ *${user1}* 𝙏𝙐 𝙊𝙋𝙊𝙍𝙏𝙐𝙉𝙄𝘿𝘼𝘿 𝘿𝙀 𝙀𝙉𝘼𝙈𝙊𝙍𝘼𝙍𝙏𝙀 𝘿𝙀 *${user2}* 𝙀𝙎 𝘿𝙀 *${porcentaje}%* 👩🏻‍❤️‍👨🏻
 ━━━━━━━━━━━━━━━
 `.trim()
 
-  await conn.sendMessage(m.chat, { 
-    text: love, 
-    mentions: conn.parseMention(love) 
+  await conn.sendMessage(m.chat, {
+    text: love,
+    mentions: mentioned // ✅ mantiene las menciones reales
   }, { quoted: m })
 }
 
