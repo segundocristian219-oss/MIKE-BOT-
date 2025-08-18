@@ -4,10 +4,10 @@ var handler = async (m, { conn, command, text }) => {
 
   if (mentioned.length >= 2) {
     // 📌 Si hay 2 menciones
-    user1 = await conn.getName(mentioned[0])
-    user2 = await conn.getName(mentioned[1])
+    user1 = await conn.getName(mentioned[0]) || '@' + mentioned[0].split('@')[0]
+    user2 = await conn.getName(mentioned[1]) || '@' + mentioned[1].split('@')[0]
   } else if (text) {
-    // 📌 Si no hay menciones, usar texto
+    // 📌 Si no hay menciones, usar texto normal
     let [first, ...rest] = text.split(' ')
     user1 = first
     user2 = rest.join(' ')
@@ -27,7 +27,7 @@ var handler = async (m, { conn, command, text }) => {
 
   await conn.sendMessage(m.chat, {
     text: love,
-    mentions: mentioned // ✅ mantiene las menciones reales
+    mentions: mentioned // ✅ aún los menciona, pero muestra su nombre
   }, { quoted: m })
 }
 
