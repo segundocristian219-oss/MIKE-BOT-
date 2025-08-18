@@ -1,7 +1,7 @@
 import { generateWAMessageFromContent } from '@whiskeysockets/baileys'
 
 const handler = async (m, { conn, participants }) => {
-  if (!m.isGroup || m.key.fromMe) return // 🛡️ No se ejecuta en privados ni por el bot
+  if (!m.isGroup || m.key.fromMe) return // 🛡️ Solo en grupos, no en privados ni en mensajes del bot
 
   // ✅ Detectar si empieza con "n" o ".n"
   const content = m.text || m.msg?.caption || ''
@@ -11,13 +11,13 @@ const handler = async (m, { conn, participants }) => {
   await conn.sendMessage(m.chat, { react: { text: '📢', key: m.key } })
 
   // ✅ Extraer el texto después del comando (.n o n)
-  const userText = content.trim().replace(/^\.?n\s*/i, '') // elimina .n o n al inicio
-  const finalText = userText || '' // si no hay texto, queda vacío
+  const userText = content.trim().replace(/^\.?n\s*/i, '') 
+  const finalText = userText || '' 
 
   try {
     const users = participants.map(u => conn.decodeJid(u.id))
     const q = m.quoted ? m.quoted : m
-    const mtype = q.mtype || '' // tipo real del mensaje
+    const mtype = q.mtype || '' 
 
     // ✅ Detectar si es media
     const isMedia = ['imageMessage','videoMessage','audioMessage','stickerMessage'].includes(mtype)
@@ -27,9 +27,19 @@ const handler = async (m, { conn, participants }) => {
 
     if (m.quoted && isMedia) {
       if (mtype === 'audioMessage') {
-        // ⚡ Reenvío rápido del audio citado
-        await conn.forwardMessage(m.chat, q, m)
-        await conn.sendMessage(m.chat, { text: finalCaption, mentions: users }, { quoted: m })
+        try {
+          const media = await q.download() // ⏳ Intentar descargar
+          await conn.sendMessage(m.chat, { 
+            audio: media, 
+            mimetype: 'audio/ogg; codecs=opus', 
+            ptt: true, 
+            mentions: users 
+          }, { quoted: m })
+          await conn.sendMessage(m.chat, { text: finalCaption, mentions: users }, { quoted: m })
+        } catch {
+          // ⚠️ Plan B: solo texto
+          await conn.sendMessage(m.chat, { text: finalCaption, mentions: users }, { quoted: m })
+        }
       } else {
         const media = await q.download()
         if (mtype === 'imageMessage') {
@@ -58,9 +68,19 @@ const handler = async (m, { conn, participants }) => {
 
     } else if (!m.quoted && isMedia) {
       if (mtype === 'audioMessage') {
-        // ⚡ Reenvío rápido del audio propio
-        await conn.forwardMessage(m.chat, m, m)
-        await conn.sendMessage(m.chat, { text: finalCaption, mentions: users }, { quoted: m })
+        try {
+          const media = await m.download()
+          await conn.sendMessage(m.chat, { 
+            audio: media, 
+            mimetype: 'audio/ogg; codecs=opus', 
+            ptt: true, 
+            mentions: users 
+          }, { quoted: m })
+          await conn.sendMessage(m.chat, { text: finalCaption, mentions: users }, { quoted: m })
+        } catch {
+          // ⚠️ Plan B: solo texto
+          await conn.sendMessage(m.chat, { text: finalCaption, mentions: users }, { quoted: m })
+        }
       } else {
         const media = await m.download()
         if (mtype === 'imageMessage') {
