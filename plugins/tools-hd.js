@@ -1,63 +1,60 @@
-import FormData from "form-data"
-import Jimp from "jimp"
-import uploadImage from '../../lib/uploadImage.js'
-import fetch from "node-fetch"
+import fetch from 'node-fetch'
+import FormData from 'form-data'
 
-const handler = async (m, { conn, usedPrefix, command }) => {
+let handler = async (m, { conn, usedPrefix, command }) => {
+  const quoted = m.quoted ? m.quoted : m
+  const mime = quoted.mimetype || quoted.msg?.mimetype || ''
+
+  if (!/image\/(jpe?g|png)/i.test(mime)) {
+    await conn.sendMessage(m.chat, { react: { text: '❗', key: m.key } })
+    return m.reply(`☁️` 𝙀𝙉𝙑𝙄𝘼 𝙊 𝙍𝙀𝙎𝙋𝙊𝙉𝘿𝙀 𝘼 𝙐𝙉𝘼 𝙄𝙈𝘼𝙂𝙀𝙉 𝙋𝘼𝙍𝘼 𝙈𝙀𝙅𝙊𝙍𝘼𝙍 𝙇𝘼 𝘾𝘼𝙇𝙄𝘿𝘼𝘿)
+  }
+
   try {
-    let q = m.quoted ? m.quoted : m
-    let mime = (q.msg || q).mimetype || q.mediaType || ""
+    await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
 
-    if (!mime) {
-      return m.reply(`❀ Por favor, envie una imagen o responda a la imagen utilizando el comando.`)
+    const media = await quoted.download()
+    const ext = mime.split('/')[1]
+    const filename = `mejorada_${Date.now()}.${ext}`
+
+    const form = new FormData()
+    form.append('image', media, { filename, contentType: mime })
+    form.append('scale', '2')
+
+    const headers = {
+      ...form.getHeaders(),
+      'accept': 'application/json',
+      'x-client-version': 'web',
+      'x-locale': 'es'
     }
 
-    if (!/image\/(jpe?g|png)/.test(mime)) {
-      return m.reply(`✧ El formato del archivo (${mime}) no es compatible, envía o responde a una imagen.`)
+    const res = await fetch('https://api2.pixelcut.app/image/upscale/v1', {
+      method: 'POST',
+      headers,
+      body: form
+    })
+
+    const json = await res.json()
+
+    if (!json?.result_url || !json.result_url.startsWith('http')) {
+      throw new Error('No se pudo obtener la imagen mejorada desde Pixelcut.')
     }
 
-    conn.reply(m.chat, '*🚀 P R O C E S A N D O*', m)
-    let imgBuffer = await q.download()
-    let image = await Jimp.read(imgBuffer)
-    image.resize(800, Jimp.AUTO)
-    let processedImageBuffer = await image.getBufferAsync(Jimp.MIME_JPEG)
+    const resultBuffer = await (await fetch(json.result_url)).buffer()
 
-    let imageUrl = await uploadImage(processedImageBuffer)
-    let enhancedImageUrl = await enhanceImage(imageUrl)
+    await conn.sendMessage(m.chat, {
+      image: resultBuffer
+    }, { quoted: m })
 
-    await conn.sendFile(m.chat, enhancedImageUrl, "out.png", "", fkontak)
-  } catch (error) {
-    return conn.reply(m.chat, `⚠︎ Ocurrió un error: ${error.message}`, m)
+    await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
+  } catch (err) {
+    await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
+    m.reply(`❌ 𝙃𝙐𝘽𝙊 𝙐𝙉 𝙀𝙍𝙍𝙊𝙍 𝙄𝙉𝙀𝙎𝙋𝙀𝙍𝘼𝘿𝙊`)
   }
 }
 
-handler.help = ["hd"]
-handler.tags = ["tools"]
-handler.command = ["remini", "hd", "enhance"]
-handler.group = true
+handler.help = ['hd']
+handler.tags = ['herramientas', 'imagen']
+handler.command = ['hd'];
 
 export default handler
-
-async function enhanceImage(imageUrl) {
-  try {
-    const response = await fetch(
-      `https://api.siputzx.my.id/api/iloveimg/upscale?image=${encodeURIComponent(imageUrl)}`,
-      {
-        method: "GET"
-      }
-    )
-
-    if (!response.ok) {
-      throw new Error(
-        `Error al procesar la imagen: ${response.status} - ${response.statusText}`
-      )
-    }
-
-    const result = await response.buffer()
-    return result
-  } catch (error) {
-    throw new Error(
-      `Error al mejorar la calidad de la imagen: ${error.message}`
-    )
-  }
-}
