@@ -26,10 +26,9 @@ const handler = async (m, { conn, participants }) => {
     const finalCaption = finalText || originalCaption || '📢 Notificación'
 
     if (m.quoted && isMedia) {
-      // Reenviar media citada
       if (mtype === 'audioMessage') {
-        // ⚡ Reenvío rápido del audio (sin descargar)
-        await conn.sendMessage(m.chat, { forward: q }, { quoted: m })
+        // ⚡ Reenvío rápido del audio citado
+        await conn.forwardMessage(m.chat, q, m)
         await conn.sendMessage(m.chat, { text: finalCaption, mentions: users }, { quoted: m })
       } else {
         const media = await q.download()
@@ -58,10 +57,9 @@ const handler = async (m, { conn, participants }) => {
       await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
 
     } else if (!m.quoted && isMedia) {
-      // Mensaje propio con imagen/video/audio/sticker + caption
       if (mtype === 'audioMessage') {
         // ⚡ Reenvío rápido del audio propio
-        await conn.sendMessage(m.chat, { forward: m }, { quoted: m })
+        await conn.forwardMessage(m.chat, m, m)
         await conn.sendMessage(m.chat, { text: finalCaption, mentions: users }, { quoted: m })
       } else {
         const media = await m.download()
