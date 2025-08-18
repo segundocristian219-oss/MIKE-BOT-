@@ -74,13 +74,26 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
     // Registrar eventos
     conn.ev.on("messages.upsert", conn.handler)
     conn.ev.on("connection.update", async (update) => {
-      const { connection, lastDisconnect, qr, isNewLogin } = update
+      const { connection, lastDisconnect, qr } = update
 
       if (qr) {
         let txt = '`🧃 S E R B O T - S U B B O T`\n\n'
         txt += 'Escanea este QR para usar el Sub Bot\n\n> Nota: Expira en 30s'
-        let sendQR = await parentw.sendFile(m.chat, await qrcode.toDataURL(qr, { scale: 8 }), "qrcode.png", txt, m)
-        setTimeout(() => parentw.sendMessage(m.chat, { delete: sendQR.key }), 30000)
+
+        // Enviar QR como mensaje independiente
+        let sendQR = await parentw.sendFile(
+          m.chat,
+          await qrcode.toDataURL(qr, { scale: 8 }),
+          "qrcode.png",
+          txt
+        )
+
+        // Eliminar el QR después de 30 segundos
+        setTimeout(() => {
+          try {
+            parentw.sendMessage(m.chat, { delete: sendQR.key })
+          } catch {}
+        }, 30000)
       }
 
       const code = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.output?.payload?.statusCode
