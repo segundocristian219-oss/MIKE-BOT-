@@ -1,11 +1,6 @@
 import fetch from 'node-fetch'
 
 let mutedUsers = new Set()
-let spamTracker = new Map()
-let tempBlocked = new Set()
-const SPAM_THRESHOLD = 5
-const SPAM_WINDOW = 3000
-const TEMP_BLOCK_MS = 1500
 
 let handler = async (m, { conn, command }) => {
   if (!m.isGroup) return
@@ -38,7 +33,7 @@ handler.before = async (m, { conn }) => {
   const user = m.sender
   const chat = m.chat
 
-  if (mutedUsers.has(user) || tempBlocked.has(user)) {
+  if (mutedUsers.has(user)) {
     if (!global.parallelDeleteQueue) global.parallelDeleteQueue = []
     global.parallelDeleteQueue.push({ chat, key: m.key, conn })
     if (!global.parallelDeleteRunning) {
@@ -51,31 +46,6 @@ handler.before = async (m, { conn }) => {
       }())
     }
     return
-  }
-
-  if (!spamTracker.has(user)) spamTracker.set(user, [])
-  const timestamps = spamTracker.get(user)
-  const now = Date.now()
-  while (timestamps.length && now - timestamps[0] > SPAM_WINDOW) timestamps.shift()
-  timestamps.push(now)
-
-  if (timestamps.length >= SPAM_THRESHOLD) {
-    tempBlocked.add(user)
-    setTimeout(() => tempBlocked.delete(user), TEMP_BLOCK_MS)
-
-    if (!mutedUsers.has(user)) {
-      mutedUsers.add(user)
-      const thumbnailUrl = 'https://telegra.ph/file/f8324d9798fa2ed2317bc.png'
-      fetch(thumbnailUrl)
-        .then(res => res.buffer())
-        .then(thumbBuffer => {
-          const preview = {
-            key: { fromMe: false, participant: '0@s.whatsapp.net', remoteJid: chat },
-            message: { locationMessage: { name: 'Usuario mutado automáticamente por spam', jpegThumbnail: thumbBuffer } }
-          }
-          conn.sendMessage(chat, { text: `⚠️ @${user.split('@')[0]} ha sido muteado automáticamente por spam.` }, { quoted: preview, mentions: [user] }).catch(() => {})
-        }).catch(() => {})
-    }
   }
 }
 
