@@ -9,16 +9,15 @@ import { makeWASocket } from '../lib/simple.js'
 if (!global.conns) global.conns = []
 
 let handler = async (m, { conn, args, usedPrefix, command }) => {
-  // Solo el bot principal puede iniciar un sub-bot
   let parentw = args[0] && args[0] === "plz" ? conn : await global.conn
   if (!(args[0] === 'plz' || (await global.conn).user.jid === conn.user.jid)) {
     return m.reply("Este comando solo puede ser usado en el bot principal! wa.me/" + global.conn.user.jid.split`@`[0] + "?text=" + usedPrefix + "serbot")
   }
 
   async function serbot() {
-    // Crear carpeta temporal del sub-bot
-    let serbotFolder = crypto.randomBytes(10).toString('hex').slice(0, 8)
-    let folderSub = `./serbot/${serbotFolder}`
+    // ===== Carpeta de sesiones =====
+    let subbotId = crypto.randomBytes(10).toString('hex').slice(0, 8)
+    let folderSub = `./sessions/${subbotId}`
     if (!fs.existsSync(folderSub)) fs.mkdirSync(folderSub, { recursive: true })
 
     if (args[0]) fs.writeFileSync(`${folderSub}/creds.json`, Buffer.from(args[0], 'base64').toString('utf-8'))
@@ -111,9 +110,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         const botId = subConn.user.jid
         const botIsAdmin = groupRoles[botId]?.isAdmin || false
 
-        console.log({
-          isAdmin, isOwner, botIsAdmin
-        })
+        console.log({ isAdmin, isOwner, botIsAdmin })
 
         if (!args[0]) {
           await parentw.reply(subConn.user.jid, "La siguiente vez que se conecte envía el siguiente mensaje para iniciar sesión sin escanear otro código QR", m, rcanal)
@@ -129,7 +126,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         subConn.ev.removeAllListeners()
         let i = global.conns.indexOf(subConn)
         if (i >= 0) global.conns.splice(i, 1)
-        fs.rmdirSync(`./serbot/${serbotFolder}`, { recursive: true })
+        fs.rmdirSync(folderSub, { recursive: true })
       }
     }, 30000)
 
