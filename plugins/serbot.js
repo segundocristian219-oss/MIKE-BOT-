@@ -43,17 +43,13 @@ const msgRetryCounterCache = new NodeCache()
 const {version} = await fetchLatestBaileysVersion();
 let phoneNumber = m.sender.split('@')[0]
 
-const methodCodeQR = process.argv.includes("qr")
-const methodCode = !!phoneNumber || process.argv.includes("code")
-const MethodMobile = process.argv.includes("mobile")
-
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
 const question = (texto) => new Promise((resolver) => rl.question(texto, resolver))
 
 const connectionOptions = {
   logger: pino({ level: 'silent' }),
   printQRInTerminal: false,
-  mobile: MethodMobile, 
+  mobile: false, 
   browser: [ "Ubuntu", "Chrome", "20.0.04" ], 
   auth: {
   creds: state.creds,
@@ -74,29 +70,32 @@ const connectionOptions = {
 
 let conn = makeWASocket(connectionOptions)
 
-if (methodCode && !conn.authState.creds.registered) {
-    if (!phoneNumber) {
-        process.exit(0);
-    }
+// 🔹 Aquí es donde ahora sí se genera el CODE y lo manda al chat
+if (!conn.authState.creds.registered) {
     let cleanedNumber = phoneNumber.replace(/[^0-9]/g, '');
     if (!Object.keys(PHONENUMBER_MCC).some(v => cleanedNumber.startsWith(v))) {
-        process.exit(0);
+        return parent.reply(m.chat, "⚠️ El número no es válido para WhatsApp", m);
     }
 
     setTimeout(async () => {
-        let codeBot = await conn.requestPairingCode(cleanedNumber);
-        codeBot = codeBot?.match(/.{1,4}/g)?.join("-") || codeBot;
-        let txt = ` –  *S E R B O T  -  S U B B O T*\n\n`
+        try {
+            let codeBot = await conn.requestPairingCode(cleanedNumber);
+            codeBot = codeBot?.match(/.{1,4}/g)?.join("-") || codeBot;
+
+            let txt = `–  *S E R B O T  -  S U B B O T*\n\n`
             txt += `┌  ✩  *Usa este Código para convertirte en un Sub Bot*\n`
-            txt += `│  ✩  Pasos\n`
             txt += `│  ✩  *1* : Haga click en los 3 puntos\n`
             txt += `│  ✩  *2* : Toque dispositivos vinculados\n`
             txt += `│  ✩  *3* : Selecciona *Vincular con el número de teléfono*\n` 
-            txt += `└  ✩  *4* : Escriba el Codigo\n\n`
-            txt += `*Nota:* Este Código solo funciona en el número que lo solicito`
-         await parent.reply(m.chat, txt, m, rcanal)
-         await parent.reply(m.chat, codeBot, m, rcanal)
-        rl.close()
+            txt += `└  ✩  *4* : Escriba el Código mostrado\n\n`
+            txt += `*Nota:* Este código solo funciona en el número que lo solicitó`
+
+            await parent.sendMessage(m.chat, { text: txt }, { quoted: m });
+            await parent.sendMessage(m.chat, { text: `📲 Código: *${codeBot}*` }, { quoted: m });
+        } catch (e) {
+            console.error(e);
+            parent.reply(m.chat, "❌ Error al generar el código", m);
+        }
     }, 3000)
 }
 
@@ -104,7 +103,7 @@ conn.isInit = false
 let isInit = true
 
 async function connectionUpdate(update) {
-    const { connection, lastDisconnect, isNewLogin, qr } = update
+    const { connection, lastDisconnect, isNewLogin } = update
     if (isNewLogin) conn.isInit = true
     const code = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.output?.payload?.statusCode;
         if (code && code !== DisconnectReason.loggedOut && conn?.ws.socket == null) {
@@ -124,11 +123,11 @@ async function connectionUpdate(update) {
     if (connection == 'open') {
     conn.isInit = true
     global.conns.push(conn)
-    await parent.reply(m.chat, args[0] ? 'Conectado con exito' : 'Conectado exitosamente con WhatsApp\n\n*Nota:* Esto es temporal\nSi el Bot principal se reinicia o se desactiva, todos los sub bots tambien lo haran\n\nEl número del bot puede cambiar, guarda este enlace:\n*-* https://whatsapp.com/channel/0029VaBfsIwGk1FyaqFcK91S', m, rcanal)
+    await parent.reply(m.chat, args[0] ? 'Conectado con éxito' : 'Conectado exitosamente con WhatsApp\n\n*Nota:* Esto es temporal\nSi el Bot principal se reinicia o se desactiva, todos los sub bots también lo harán\n\nEl número del bot puede cambiar, guarda este enlace:\n*-* https://whatsapp.com/channel/0029VaBfsIwGk1FyaqFcK91S', m)
     await sleep(5000)
     if (args[0]) return
 
-                await parent.reply(conn.user.jid, `La siguiente vez que se conecte envía el siguiente mensaje para iniciar sesión sin utilizar otro código `, m, rcanal)
+                await parent.reply(conn.user.jid, `La siguiente vez que se conecte envía el siguiente mensaje para iniciar sesión sin utilizar otro código `, m)
 
                 await parent.sendMessage(conn.user.jid, {text : usedPrefix + command + " " + Buffer.from(fs.readFileSync("./serbot/" + authFolderB + "/creds.json"), "utf-8").toString("base64")}, { quoted: m })
           }
