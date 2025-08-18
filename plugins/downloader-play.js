@@ -72,9 +72,10 @@ let handler = async (m, { conn }) => {
       throw "❌ El audio es muy largo (máximo 10 minutos)";
     }
 
+    // Enviar miniatura con título en negrita/cursiva y texto adicional
     await conn.sendMessage(m.chat, {
       image: { url: video.thumbnail },
-      caption: video.title // 🎯 Título normal
+      caption: `*_${video.title}_*\n> 𝙱𝚄𝚄 𝙱𝙾𝚃 𝙳𝙴𝚂𝙲𝙰𝚁𝙶𝙰𝚂 💻`
     }, { quoted: m });
 
     let audioUrl;
