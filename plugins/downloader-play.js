@@ -50,18 +50,6 @@ const getAudioUrl = async (videoUrl) => {
   throw lastError || new Error("Todas las APIs fallaron");
 };
 
-// Convierte texto a estilo 𝙖𝙨í
-function toBoldItalic(text) {
-  const normal = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  const boldItalic = "𝐪𝐰𝐞𝐫𝐭𝐲𝐮𝐢𝐨𝐩𝐚𝐬𝐝𝐟𝐠𝐡𝐣𝐤𝐥𝐧̃𝐳𝐱𝐜𝐯𝐛𝐧𝐦" +
-                     "𝐐𝐖𝐄𝐑𝐓𝐘𝐔𝐈𝐎𝐏𝐀𝐒𝐃𝐅𝐆𝐇𝐉𝐊𝐋𝐍̃𝐙𝐗𝐂𝐕𝐁𝐍𝐌";
-
-  return text.split("").map(ch => {
-    const index = normal.indexOf(ch);
-    return index !== -1 ? boldItalic[index] : ch;
-  }).join("");
-}
-
 let handler = async (m, { conn }) => {
   const body = m.text?.trim();
   if (!body) return;
@@ -84,10 +72,9 @@ let handler = async (m, { conn }) => {
       throw "❌ El audio es muy largo (máximo 10 minutos)";
     }
 
-    // 👇 Solo miniatura + título con letras estilizadas
     await conn.sendMessage(m.chat, {
       image: { url: video.thumbnail },
-      caption: toBoldItalic(video.title)
+      caption: video.title // 🎯 Título normal
     }, { quoted: m });
 
     let audioUrl;
