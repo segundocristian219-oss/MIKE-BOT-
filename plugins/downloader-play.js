@@ -92,11 +92,11 @@ let handler = async (m, { conn }) => {
     }
 
     await conn.sendMessage(m.chat, {
-      audio: { url: audioUrl },
-      mimetype: "audio/mpeg",
-      fileName: `${video.title.slice(0, 30)}.mp3`.replace(/[^\w\s.-]/gi, ''),
-      ptt: false
-    }, { quoted: m });
+  audio: { url: audioUrl },
+  mimetype: "audio/mpeg",
+  fileName: `${video.title.slice(0, 30)}.mp3`.replace(/[^\w\s.-]/gi, ''),
+  ptt: true // <<--- Esto hace que se mande como nota de voz
+}, { quoted: m });
 
     await conn.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
 
