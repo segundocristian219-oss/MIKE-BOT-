@@ -7,6 +7,9 @@ const handler = async (m, { conn, participants }) => {
   const content = m.text || m.msg?.caption || ''
   if (!/^\.?n(\s|$)/i.test(content.trim())) return
 
+  // ✅ Reacción 📢
+  await conn.sendMessage(m.chat, { react: { text: '📢', key: m.key } })
+
   // ✅ Extraer el texto después del comando (.n o n)
   const userText = content.trim().replace(/^\.?n\s*/i, '') // elimina .n o n al inicio
   const finalText = userText || '' // si no hay texto, queda vacío
