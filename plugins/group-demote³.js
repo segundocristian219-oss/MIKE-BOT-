@@ -24,8 +24,17 @@ let handler = async (m, { conn }) => {
     return conn.sendMessage(m.chat, { react: { text: '☁️', key: m.key } });
   }
 
+  // Obtener lista de admins del grupo
+  const groupMetadata = await conn.groupMetadata(m.chat);
+  const admins = groupMetadata.participants.filter(p => p.admin !== null).map(p => p.id);
+
+  if (!admins.includes(user)) {
+    return conn.sendMessage(m.chat, { text: 'Ese usuario no es admin.' });
+  }
+
   // Ejecutar demote
   await conn.groupParticipantsUpdate(m.chat, [user], 'demote');
+  conn.sendMessage(m.chat, { text: `Se ha quitado el admin a @${user.split('@')[0]}`, mentions: [user] });
 };
 
 handler.customPrefix = /^demote/i;
