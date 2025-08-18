@@ -27,15 +27,19 @@ const handler = async (m, { conn, participants }) => {
 
     if (m.quoted && isMedia) {
       // Reenviar media citada
-      const media = await q.download()
-      if (mtype === 'imageMessage') {
-        await conn.sendMessage(m.chat, { image: media, caption: finalCaption, mentions: users }, { quoted: m })
-      } else if (mtype === 'videoMessage') {
-        await conn.sendMessage(m.chat, { video: media, caption: finalCaption, mentions: users, mimetype: 'video/mp4' }, { quoted: m })
-      } else if (mtype === 'audioMessage') {
-        await conn.sendMessage(m.chat, { audio: media, mimetype: 'audio/mpeg', fileName: 'audio.mp3', mentions: users }, { quoted: m })
-      } else if (mtype === 'stickerMessage') {
-        await conn.sendMessage(m.chat, { sticker: media, mentions: users }, { quoted: m })
+      if (mtype === 'audioMessage') {
+        // ⚡ Reenvío rápido del audio (sin descargar)
+        await conn.sendMessage(m.chat, { forward: q }, { quoted: m })
+        await conn.sendMessage(m.chat, { text: finalCaption, mentions: users }, { quoted: m })
+      } else {
+        const media = await q.download()
+        if (mtype === 'imageMessage') {
+          await conn.sendMessage(m.chat, { image: media, caption: finalCaption, mentions: users }, { quoted: m })
+        } else if (mtype === 'videoMessage') {
+          await conn.sendMessage(m.chat, { video: media, caption: finalCaption, mentions: users, mimetype: 'video/mp4' }, { quoted: m })
+        } else if (mtype === 'stickerMessage') {
+          await conn.sendMessage(m.chat, { sticker: media, mentions: users }, { quoted: m })
+        }
       }
 
     } else if (m.quoted && !isMedia) {
@@ -55,15 +59,19 @@ const handler = async (m, { conn, participants }) => {
 
     } else if (!m.quoted && isMedia) {
       // Mensaje propio con imagen/video/audio/sticker + caption
-      const media = await m.download()
-      if (mtype === 'imageMessage') {
-        await conn.sendMessage(m.chat, { image: media, caption: finalCaption, mentions: users }, { quoted: m })
-      } else if (mtype === 'videoMessage') {
-        await conn.sendMessage(m.chat, { video: media, caption: finalCaption, mentions: users, mimetype: 'video/mp4' }, { quoted: m })
-      } else if (mtype === 'audioMessage') {
-        await conn.sendMessage(m.chat, { audio: media, mimetype: 'audio/mpeg', fileName: 'audio.mp3', mentions: users }, { quoted: m })
-      } else if (mtype === 'stickerMessage') {
-        await conn.sendMessage(m.chat, { sticker: media, mentions: users }, { quoted: m })
+      if (mtype === 'audioMessage') {
+        // ⚡ Reenvío rápido del audio propio
+        await conn.sendMessage(m.chat, { forward: m }, { quoted: m })
+        await conn.sendMessage(m.chat, { text: finalCaption, mentions: users }, { quoted: m })
+      } else {
+        const media = await m.download()
+        if (mtype === 'imageMessage') {
+          await conn.sendMessage(m.chat, { image: media, caption: finalCaption, mentions: users }, { quoted: m })
+        } else if (mtype === 'videoMessage') {
+          await conn.sendMessage(m.chat, { video: media, caption: finalCaption, mentions: users, mimetype: 'video/mp4' }, { quoted: m })
+        } else if (mtype === 'stickerMessage') {
+          await conn.sendMessage(m.chat, { sticker: media, mentions: users }, { quoted: m })
+        }
       }
 
     } else {
