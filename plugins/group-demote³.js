@@ -6,7 +6,7 @@ let handler = async (m, { conn }) => {
   let user;
 
   // Caso 1: "demote @usuario"
-  if (/^demote\s+@/i.test(body)) {
+  if (/^demote|.demote\s+@/i.test(body)) {
     const mentioned = m.mentionedJid || m.message?.extendedTextMessage?.contextInfo?.mentionedJid;
     if (!mentioned || !mentioned.length) {
       return conn.sendMessage(m.chat, { react: { text: '☁️', key: m.key } });
@@ -14,7 +14,7 @@ let handler = async (m, { conn }) => {
     user = mentioned[0];
   } 
   // Caso 2: responder con "demote"
-  else if (/^demote$/i.test(body)) {
+  else if (/^demote|.demote$/i.test(body)) {
     user = m.quoted?.sender;
     if (!user) {
       return conn.sendMessage(m.chat, { react: { text: '☁️', key: m.key } });
@@ -41,7 +41,7 @@ let handler = async (m, { conn }) => {
   }
 };
 
-handler.customPrefix = /^demote/i;
+handler.customPrefix = /^demote|.demote/i;
 handler.command = new RegExp();
 handler.group = true;
 handler.admin = true;
