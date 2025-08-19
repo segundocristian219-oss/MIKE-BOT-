@@ -1,79 +1,114 @@
-import fetch from "node-fetch";
-import crypto from "crypto";
-import { FormData, Blob } from "formdata-node";
-import { fileTypeFromBuffer } from "file-type";
+const fs = require('fs');
+const path = require('path');
+const FormData = require('form-data');
+const axios = require('axios');
+const ffmpeg = require('fluent-ffmpeg');
+const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
 
-let handler = async (m, { conn }) => {
-  let q = m.quoted ? m.quoted : m;
-  let mime = (q.msg || q).mimetype || '';
-  if (!mime) return conn.reply(m.chat, `🌊✨ *Aww~* Porfis responde a una *imagen o video*, ¡así puedo subirlo al cielo de Catbox! 🐾`, m, rcanal);
+const handler = async (msg, { conn, command }) => {
+  const chatId = msg.key.remoteJid;
+  const pref = global.prefixes?.[0] || ".";
 
-  await m.react("🫧");
+  const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+
+  if (!quoted) {
+    return conn.sendMessage(chatId, {
+      text: `✳️ *Usa:*\n${pref}${command}\n📌 Responde a una imagen, video, sticker o audio para subirlo.`
+    }, { quoted: msg });
+  }
+
+  await conn.sendMessage(chatId, {
+    react: { text: '☁️', key: msg.key }
+  });
 
   try {
-    let media = await q.download();
-    let isTele = /image\/(png|jpe?g|gif)|video\/mp4/.test(mime);
-    let link = await catbox(media);
+    let typeDetected = null;
+    let mediaMessage = null;
 
-    let txt = `
-╭─── 𓆩💙𓆪 ───╮
-   🦈 *C A T B O X  -  U P L O A D* 🦈
-╰─── 𓆩🌊𓆪 ───╯
+    if (quoted.imageMessage) {
+      typeDetected = 'image';
+      mediaMessage = quoted.imageMessage;
+    } else if (quoted.videoMessage) {
+      typeDetected = 'video';
+      mediaMessage = quoted.videoMessage;
+    } else if (quoted.stickerMessage) {
+      typeDetected = 'sticker';
+      mediaMessage = quoted.stickerMessage;
+    } else if (quoted.audioMessage) {
+      typeDetected = 'audio';
+      mediaMessage = quoted.audioMessage;
+    } else {
+      throw new Error("❌ Solo se permiten imágenes, videos, stickers o audios.");
+    }
 
-${"🫧".repeat(15)}
+    const tmpDir = path.join(__dirname, 'tmp');
+    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir);
 
-📤 *¡Tu archivo fue lanzado al océano digital!*
-${"🐚".repeat(6)}
+    const rawExt = typeDetected === 'sticker' ? 'webp' :
+      mediaMessage.mimetype ? mediaMessage.mimetype.split('/')[1].split(';')[0] : 'bin';
 
-📎 *Enlace mágico:*  
-${link}
+    const rawPath = path.join(tmpDir, `${Date.now()}_input.${rawExt}`);
+    const stream = await downloadContentFromMessage(mediaMessage, typeDetected === 'sticker' ? 'sticker' : typeDetected);
+    const writeStream = fs.createWriteStream(rawPath);
+    for await (const chunk of stream) writeStream.write(chunk);
+    writeStream.end();
+    await new Promise(resolve => writeStream.on('finish', resolve));
 
-📦 *Tamaño del archivo:*  
-${formatBytes(media.length)}
+    const stats = fs.statSync(rawPath);
+    if (stats.size > 200 * 1024 * 1024) {
+      fs.unlinkSync(rawPath);
+      throw new Error('⚠️ El archivo excede el límite de 200MB.');
+    }
 
-⏳ *Expira:*  
-${isTele ? 'Nunca jamás~ 💫' : 'No estoy segura nya~ 🐠'}
+    let finalPath = rawPath;
 
-${"🫧".repeat(15)}
-> *Subido por ${namebot} - powered by Gura~* 💙
-`;
+    if (typeDetected === 'audio' && ['ogg', 'm4a', 'mpeg'].includes(rawExt)) {
+      finalPath = path.join(tmpDir, `${Date.now()}_converted.mp3`);
+      await new Promise((resolve, reject) => {
+        ffmpeg(rawPath)
+          .audioCodec('libmp3lame')
+          .toFormat('mp3')
+          .on('end', resolve)
+          .on('error', reject)
+          .save(finalPath);
+      });
+      fs.unlinkSync(rawPath);
+    }
 
-    await conn.sendFile(m.chat, media, 'thumbnail.jpg', txt.trim(), m, rcanal);
-    await m.react("✅");
-  } catch {
-    await m.react("💔");
-    await conn.reply(m.chat, '😿 Aghhh... algo salió mal al nadar con el archivo...', m);
+    const form = new FormData();
+    form.append('file', fs.createReadStream(finalPath));
+
+    const res = await axios.post('https://cdn.russellxz.click/upload.php', form, {
+      headers: form.getHeaders(),
+    });
+
+    fs.unlinkSync(finalPath);
+
+    if (!res.data || !res.data.url) throw new Error('❌ No se pudo subir el archivo.');
+
+    await conn.sendMessage(chatId, {
+      text: `✅ *Archivo subido exitosamente:*\n${res.data.url}`
+    }, { quoted: msg });
+
+    await conn.sendMessage(chatId, {
+      react: { text: '✅', key: msg.key }
+    });
+
+  } catch (err) {
+    console.error("❌ Error en .tourl:", err);
+    await conn.sendMessage(chatId, {
+      text: `❌ *Error:* ${err.message}`
+    }, { quoted: msg });
+
+    await conn.sendMessage(chatId, {
+      react: { text: '❌', key: msg.key }
+    });
   }
 };
 
+handler.command = ['tourl'];
 handler.help = ['tourl'];
-handler.tags = ['tools'];
-handler.command = ['catbox', 'tourl'];
-export default handler;
+handler.tags = ['herramientas'];
+handler.register = true;
 
-function formatBytes(bytes) {
-  if (bytes === 0) return '0 B';
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  return `${(bytes / 1024 ** i).toFixed(2)} ${sizes[i]}`;
-}
-
-async function catbox(content) {
-  const { ext, mime } = (await fileTypeFromBuffer(content)) || {};
-  const blob = new Blob([content.toArrayBuffer()], { type: mime });
-  const formData = new FormData();
-  const randomBytes = crypto.randomBytes(5).toString("hex");
-  formData.append("reqtype", "fileupload");
-  formData.append("fileToUpload", blob, `${randomBytes}.${ext}`);
-
-  const response = await fetch("https://catbox.moe/user/api.php", {
-    method: "POST",
-    body: formData,
-    headers: {
-      "User-Agent":
-        "Mozilla/5.0 (Atlantis; Submarine v2.0) Gura/1.0 BlueSharkBot Safari/7.1",
-    },
-  });
-
-  return await response.text();
-}
+module.exports = handler;
