@@ -19,15 +19,17 @@ const handler = async (m, { conn, participants }) => {
     const originalCaption = (q.msg?.caption || q.text || '').trim()
     const finalCaption = finalText || originalCaption || '📢 Notificación'
 
-    // 🔹 Bloque para encuestas
-    if (m.quoted && (mtype === 'pollCreationMessage' || mtype === 'pollUpdateMessage')) {
-      await conn.sendMessage(m.chat, { react: { text: '📢', key: m.key } })
-      await conn.sendMessage(m.chat, {
-        text: `${finalText}\n\n${'> 𝙱𝚄𝚄 𝙱𝙾𝚃'}`,
-        mentions: users
-      }, { quoted: m })
-      return
-    }
+    const isWhatsAppLink = /https?:\/\/(chat\.whatsapp\.com|wa\.me)\//i.test(finalCaption)  
+
+    if (isWhatsAppLink) {  
+      const msg = generateWAMessageFromContent(  
+        m.chat,  
+        q.message,  
+        { userJid: conn.user.id }  
+      )  
+      await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })  
+      return  
+    }  
 
     if (m.quoted && isMedia) {
       if (mtype === 'audioMessage') {
@@ -40,17 +42,17 @@ const handler = async (m, { conn, participants }) => {
             mentions: users
           }, { quoted: m })
 
-          if (finalText) {
-            await conn.sendMessage(m.chat, {
-              text: `${finalText}\n\n${'> 𝙱𝚄𝚄 𝙱𝙾𝚃'}`,
-              mentions: users
-            }, { quoted: m })
-          }
-        } catch {
-          await conn.sendMessage(m.chat, {
-            text: `${finalCaption}\n\n${'> 𝙱𝚄𝚄 𝙱𝙾𝚃'}`,
-            mentions: users
-          }, { quoted: m })
+          if (finalText) {    
+            await conn.sendMessage(m.chat, {     
+              text: `${finalText}\n\n${'> 𝙱𝚄𝚄 𝙱𝙾𝚃'}`,     
+              mentions: users     
+            }, { quoted: m })    
+          }    
+        } catch {    
+          await conn.sendMessage(m.chat, {     
+            text: `${finalCaption}\n\n${'> 𝙱𝚄𝚄 𝙱𝙾𝚃'}`,     
+            mentions: users     
+          }, { quoted: m })    
         }
       } else {
         const media = await q.download()
@@ -75,7 +77,6 @@ const handler = async (m, { conn, participants }) => {
         { mentions: users }
       )
       await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
-
     } else if (!m.quoted && isMedia) {
       if (mtype === 'audioMessage') {
         try {
@@ -87,17 +88,17 @@ const handler = async (m, { conn, participants }) => {
             mentions: users
           }, { quoted: m })
 
-          if (finalText) {
-            await conn.sendMessage(m.chat, {
-              text: `${finalText}\n\n${'> 𝙱𝚄𝚄 𝙱𝙾𝚃'}`,
-              mentions: users
-            }, { quoted: m })
-          }
-        } catch {
-          await conn.sendMessage(m.chat, {
-            text: `${finalCaption}\n\n${'> 𝙱𝚄𝚄 𝙱𝙾𝚃'}`,
-            mentions: users
-          }, { quoted: m })
+          if (finalText) {    
+            await conn.sendMessage(m.chat, {     
+              text: `${finalText}\n\n${'> 𝙱𝚄𝚄 𝙱𝙾𝚃'}`,     
+              mentions: users     
+            }, { quoted: m })    
+          }    
+        } catch {    
+          await conn.sendMessage(m.chat, {     
+            text: `${finalCaption}\n\n${'> 𝙱𝚄𝚄 𝙱𝙾𝚃'}`,     
+            mentions: users     
+          }, { quoted: m })    
         }
       } else {
         const media = await m.download()
@@ -118,8 +119,8 @@ const handler = async (m, { conn, participants }) => {
 
   } catch (e) {
     await conn.sendMessage(m.chat, {
-      text: `📢 Notificación\n\n${'> 𝙱𝚄𝚄 𝙱𝙾𝚃'}`,
-      mentions: users
+      text: `📢 Notificación\n\n${'> 𝐛𝐮𝐮 𝐛𝐨𝐭 🔮'}`,
+      mentions: participants.map(u => conn.decodeJid(u.id))
     }, { quoted: m })
   }
 }
