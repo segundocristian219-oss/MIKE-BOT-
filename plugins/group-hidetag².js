@@ -19,42 +19,27 @@ const handler = async (m, { conn, participants }) => {
     const originalCaption = (q.msg?.caption || q.text || '').trim()
     const finalCaption = finalText || originalCaption || '📢 Notificación'
 
-    const sendWithPreview = async (text) => {
-      const msg = generateWAMessageFromContent(
-        m.chat,
-        {
-          extendedTextMessage: {
-            text,
-            contextInfo: { 
-              externalAdReply: {
-                title: "📢 Notificación",
-                body: "Enviado por el bot",
-                sourceUrl: text,
-                mediaType: 1,
-                renderLargerThumbnail: true
-              }
-            }
-          }
-        },
-        { userJid: conn.user.id }
-      )
-      await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
-    }
+    const isWhatsAppLink = /https?:\/\/(chat\.whatsapp\.com|wa\.me)\//i.test(finalCaption)
 
     if (m.quoted && isMedia) {
       const media = await q.download()
       if (mtype === 'imageMessage') {
         await conn.sendMessage(m.chat, { image: media, caption: `${finalCaption}\n\n${'> 𝐛𝐮𝐮 𝐛𝐨𝐭 🔮'}`, mentions: users }, { quoted: m })
       } else if (mtype === 'videoMessage') {
-        await conn.sendMessage(m.chat, { video: media, caption: `${finalCaption}\n\n${'> 𝐛𝐮𝐮 𝐛𝐨𝐭 🔮'}`, mentions: users }, { quoted: m })
+        await conn.sendMessage(m.chat, { video: media, caption: `${finalCaption}\n\n${'> 𝐛𝐛𝐮𝐮 𝐛𝐨𝐭 🔮'}`, mentions: users }, { quoted: m })
       } else if (mtype === 'stickerMessage') {
         await conn.sendMessage(m.chat, { sticker: media, mentions: users }, { quoted: m })
       } else if (mtype === 'audioMessage') {
         await conn.sendMessage(m.chat, { audio: media, mimetype: 'audio/ogg; codecs=opus', ptt: true, mentions: users }, { quoted: m })
       }
     } else {
-      if (/https?:\/\//i.test(finalCaption)) {
-        await sendWithPreview(finalCaption)
+      if (isWhatsAppLink) {
+        const msg = generateWAMessageFromContent(
+          m.chat,
+          { extendedTextMessage: { text: finalCaption } },
+          { userJid: conn.user.id }
+        )
+        await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
       } else {
         await conn.sendMessage(m.chat, {
           text: `${finalCaption}\n\n${'> 𝐛𝐮𝐮 𝐛𝐨𝐭 🔮'}`,
