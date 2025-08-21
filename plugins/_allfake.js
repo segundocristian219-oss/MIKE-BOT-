@@ -56,7 +56,7 @@ newsletterName: '',
 },
 externalAdReply: { 
 showAdAttribution: true,
-title: '𝐁𝐔𝐔 - 𝐁𝐎𝐓 🔮',
+title: '𝗕𝗔𝗞𝗜 - 𝗕𝗢𝗧',
 body: '',
 previewType: "PHOTO",
 thumbnailUrl: 'https://files.catbox.moe/29s497.jpg',
