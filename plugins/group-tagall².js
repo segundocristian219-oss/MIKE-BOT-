@@ -5,17 +5,24 @@ const handler = async (m, { conn, participants, isAdmin, isOwner }) => {
   if (!isAdmin && !isOwner) return global.dfail?.('admin', m, conn);
 
   const chatId = m.chat;
-  const text = m.text || m.msg?.caption || '';
+  const text = (m.text || m.msg?.caption || '').trim();
 
-  // Extraer comando y argumento según customPrefix
-  const match = text.match(/^(?:\.?todos|\.?setemoji)\s*(.*)/i);
-  if (!match) return; // No coincide con nuestro prefijo
-  const argsText = match[1]?.trim(); // Esto es el resto del mensaje después del comando
-  const command = text.split(' ')[0].replace(/^\./, '').toLowerCase();
+  // Detectar comando y argumento
+  let command = '';
+  let argsText = '';
+
+  if (/^\.?setemoji/i.test(text)) {
+    command = 'setemoji';
+    argsText = text.replace(/^\.?setemoji/i, '').trim();
+  } else if (/^\.?todos/i.test(text)) {
+    command = 'todos';
+  } else {
+    return; // No es ninguno de nuestros comandos
+  }
 
   if (command === 'setemoji') {
     if (!argsText) return conn.sendMessage(chatId, { text: '❌ Envía un emoji después del comando' });
-    groupEmojis[chatId] = argsText.split(' ')[0]; // solo el primer "token" como emoji
+    groupEmojis[chatId] = argsText.split(' ')[0]; // solo el primer token como emoji
     return conn.sendMessage(chatId, { text: `✅ Emoji cambiado a: ${groupEmojis[chatId]}` });
   }
 
