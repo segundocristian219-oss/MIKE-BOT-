@@ -50,7 +50,7 @@ const handler = async (msg, { conn }) => {
     let buf = Buffer.alloc(0);
     for await (const chunk of stream) buf = Buffer.concat([buf, chunk]);
 
-    const credit = "> 🔓 Recuperado por:\n`pene`";
+    const credit = "";
     const opts = { mimetype: mediaMsg.mimetype };
 
     if (mediaType === "image") {
