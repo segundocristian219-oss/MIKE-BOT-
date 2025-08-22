@@ -7,25 +7,27 @@ const handler = async (m, { conn, participants, isAdmin, isOwner }) => {
   const chatId = m.chat;
   const text = (m.text || m.msg?.caption || '').trim();
 
-  // Detectar comando y argumento
+  // Detectar comando y argumento según tu customPrefix
   let command = '';
   let argsText = '';
 
   if (/^\.?setemoji/i.test(text)) {
     command = 'setemoji';
-    argsText = text.replace(/^\.?setemoji/i, '').trim();
+    argsText = text.replace(/^\.?setemoji/i, '').trim(); // todo lo que viene después del comando
   } else if (/^\.?todos/i.test(text)) {
     command = 'todos';
   } else {
-    return; // No es ninguno de nuestros comandos
+    return; // no es nuestro comando
   }
 
+  // Comando .setemoji
   if (command === 'setemoji') {
     if (!argsText) return conn.sendMessage(chatId, { text: '❌ Envía un emoji después del comando' });
     groupEmojis[chatId] = argsText.split(' ')[0]; // solo el primer token como emoji
     return conn.sendMessage(chatId, { text: `✅ Emoji cambiado a: ${groupEmojis[chatId]}` });
   }
 
+  // Comando .todos
   if (command === 'todos') {
     const emoji = groupEmojis[chatId] || '🗣️';
     const total = participants.length;
@@ -45,6 +47,7 @@ const handler = async (m, { conn, participants, isAdmin, isOwner }) => {
   }
 };
 
+// Mantener tu customPrefix
 handler.customPrefix = /^(todos|\.todos|\.setemoji)/i;
 handler.group = true;
 handler.admin = true;
