@@ -98,7 +98,7 @@ function generarVersus(escuadra, suplentes, mexText = '  ', colText = '  ') {
     return out.trimEnd() || '─ ┇ Sin suplentes'
   }
 
-  return `*𝐈𝐍𝐓𝐄𝐑𝐍𝐀 4 𝐕𝐄𝐑𝐒𝐔𝐒 4*
+  return `*𝐈𝐍𝐓𝐄𝐑𝐍𝐀  4 𝐕𝐄𝐑𝐒𝐔𝐒 4*
 
 *𝐇𝐎𝐑𝐀𝐑𝐈𝐎𝐒*;
 *🇲🇽 MEXICO* : ${mexText}
