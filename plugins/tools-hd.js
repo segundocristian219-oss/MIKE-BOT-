@@ -56,7 +56,7 @@ const handler = async (msg, { conn, command }) => {
     // 6) Enviar la imagen mejorada
     await conn.sendMessage(chatId, {
       image: { url: rem.data.data.url },
-      caption: '✨ Imagen mejorada con éxito por *La Suki Bot*'
+      caption: ''
     }, { quoted: msg });
     await conn.sendMessage(chatId, { react: { text: '✅', key: msg.key } });
 
@@ -72,6 +72,6 @@ const handler = async (msg, { conn, command }) => {
 handler.command = ['hd'];
 handler.help    = ['hd'];
 handler.tags    = ['tools'];
-handler.register= true;
+handler.register= false;
 
 export default handler;
