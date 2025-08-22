@@ -1,92 +1,182 @@
-const handler = async (m, { conn, args }) => {
-    // Verificar si se proporcionaron los argumentos necesarios
-    if (args.length < 2) {
-        conn.reply(m.chat, 'Debes proporcionar la hora (HH:MM) y el país (MX, CO, CL, AR).', m);
-        return;
+let versusData = {} // Guarda el estado por mensaje
+
+const aliasesMX = ['mx', 'méxico', 'mexico', 'méx', 'mex']
+const aliasesCO = ['co', 'colombia', 'col']
+
+let handler = async (m, { conn, args }) => {
+  if (args.length === 0) {
+    await conn.sendMessage(m.chat, { text: '𝐓𝐢𝐞𝐧𝐞𝐬 𝐪𝐮𝐞 𝐞𝐬𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐫 𝐥𝐚 𝐡𝐨𝐫𝐚 𝐲 𝐞𝐥 𝐩𝐚𝐢́𝐬 ❇️' })
+    return
+  }
+
+  let lastArgRaw = args[args.length - 1]
+  let lastArg = lastArgRaw.toLowerCase().replace(/,$/, '')
+
+  let zonaInput = null
+  if (aliasesMX.includes(lastArg)) {
+    zonaInput = 'mx'
+    args.pop()
+  } else if (aliasesCO.includes(lastArg)) {
+    zonaInput = 'co'
+    args.pop()
+  } else {
+    await conn.sendMessage(m.chat, { text: '𝐄𝐬𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚 𝐮𝐧 𝐩𝐚𝐢́𝐬 𝐯𝐚́𝐥𝐢𝐝𝐨.\nEj: 𝟑 𝐩𝐦 𝐦𝐱, 𝟏𝟔 𝐜𝐨, 𝟒 𝐩𝐦 𝐦é𝐱𝐢𝐜𝐨' })
+    return
+  }
+
+  const timeStr = args.join(' ').toUpperCase().trim()
+  const match = timeStr.match(/^(\d{1,2})(?:\s*(AM|PM))?$/i)
+
+  let horaInput = null
+  if (match) {
+    let hour = parseInt(match[1])
+    const ampm = match[2] || null
+    if (ampm) {
+      if (ampm === 'PM' && hour < 12) hour += 12
+      if (ampm === 'AM' && hour === 12) hour = 0
     }
+    if (hour >= 0 && hour <= 23) horaInput = hour
+  }
 
-    // Validar el formato de la hora
-    const horaRegex = /^([01]\d|2[0-3]):?([0-5]\d)$/;
-    if (!horaRegex.test(args[0])) {
-        conn.reply(m.chat, 'Formato de hora incorrecto. Debe ser HH:MM en formato de 24 horas.', m);
-        return;
-    }
+  if (horaInput === null) {
+    await conn.sendMessage(m.chat, { text: '𝐇𝐨𝐫𝐚 𝐢𝐧𝐯𝐚́𝐥𝐢𝐝𝐚. Ej:\n.4vs4 3 pm mx\n.4vs4 16 co' })
+    return
+  }
 
-    const horaUsuario = args[0]; // Hora proporcionada por el usuario
-    const pais = args[1].toUpperCase(); // País proporcionado por el usuario
+  function format12h(h) {
+    let ampm = h >= 12 ? 'PM' : 'AM'
+    let hour12 = h % 12
+    if (hour12 === 0) hour12 = 12
+    return `${hour12} ${ampm}`
+  }
 
-    // Definir la diferencia horaria de cada país con respecto a México
-    const diferenciasHorarias = {
-        MX: 0, // México tiene la misma hora
-        CO: 1, // Colombia tiene una hora más
-        CL: 2, // Chile tiene dos horas más
-        AR: 3  // Argentina tiene tres horas más
-    };
+  let mexHora, colHora
+  if (zonaInput === 'mx') {
+    mexHora = horaInput
+    colHora = (horaInput + 1) % 24
+  } else {
+    colHora = horaInput
+    mexHora = (horaInput + 23) % 24
+  }
 
-    if (!(pais in diferenciasHorarias)) {
-        conn.reply(m.chat, 'País no válido. Usa MX para México, CO para Colombia, CL para Chile o AR para Argentina.', m);
-        return;
-    }
+  const mexText = format12h(mexHora)
+  const colText = format12h(colHora)
 
-    // Obtener la diferencia horaria del país seleccionado
-    const diferenciaHoraria = diferenciasHorarias[pais];
+  const template = generarVersus([], [], mexText, colText)
+  const sent = await conn.sendMessage(m.chat, { text: template, mentions: [] })
 
-    // Calcular las cuatro horas consecutivas en cada país según la hora proporcionada y la diferencia horaria
-    const hora = parseInt(horaUsuario.split(':')[0], 10);
-    const minutos = parseInt(horaUsuario.split(':')[1], 10);
-
-    const horasEnPais = [];
-    for (let i = 0; i < 4; i++) {
-        const horaActual = new Date();
-        horaActual.setHours(hora + i);
-        horaActual.setMinutes(minutos);
-        horaActual.setSeconds(0);
-        horaActual.setMilliseconds(0);
-
-        const horaEnPais = new Date(horaActual.getTime() - (3600000 * diferenciaHoraria)); // Restar la diferencia horaria
-        horasEnPais.push(horaEnPais);
-    }
-
-    // Formatear las horas según el formato de 24 horas y obtener solo la hora y minutos
-    const formatTime = (date) => date.toLocaleTimeString('es', { hour12: false, hour: '2-digit', minute: '2-digit' });
-
-    const horaActual = formatTime(new Date()); // Obtener la hora actual sin modificación
-
-    const message = `
-╭──────⚔──────╮
-           4 𝐕𝐄𝐑𝐒𝐔𝐒 4 
-              *INTERNA*
-╰──────⚔──────╯
-
-🇲🇽 𝐌𝐄𝐗𝐈𝐂𝐎 : ${formatTime(horasEnPais[0])}
-🇨🇴 𝐂𝐎𝐋𝐎𝐌𝐁𝐈𝐀 : ${formatTime(horasEnPais[1])}
-🇨🇱 𝐂𝐇𝐈𝐋𝐄 : ${formatTime(horasEnPais[2])}
-🇦🇷 𝐀𝐑𝐆𝐄𝐍𝐓𝐈𝐍𝐀 : ${formatTime(horasEnPais[3])}
-
-𝐇𝐎𝐑𝐀 𝐀𝐂𝐓𝐔𝐀𝐋 𝐄𝐍 𝐌𝐄𝐗𝐈𝐂𝐎🇲🇽 : ${horaActual}
-
-𝗘𝗦𝗖𝗨𝗔𝗗𝗥𝗔 1
-
-👑 ┇ 
-🥷🏻 ┇  
-🥷🏻 ┇ 
-🥷🏻 ┇ 
-
-𝗘𝗦𝗖𝗨𝗔𝗗𝗥𝗔 2
-
-👑 ┇ 
-🥷🏻 ┇  
-🥷🏻 ┇ 
-🥷🏻 ┇ 
-
-ㅤʚ 𝐒𝐔𝐏𝐋𝐄𝐍𝐓𝐄:
-🥷🏻 ┇ 
-🥷🏻 ┇
-`.trim();
-    
-    conn.sendMessage(m.chat, { text: message }, { quoted: m });
-};
-handler.help = ['interna4']
+  versusData[sent.key.id] = {
+    chat: m.chat,
+    escuadra: [],
+    suplentes: [],
+    mexText,
+    colText
+  }
+}
+handler.help = ['interna4vs4']
 handler.tags = ['freefire']
-handler.command = /^(interno4|invs4|interna4)$/i;
-export default handler;
+handler.command = /^\.?(interna4vs4)$/i
+handler.group = true
+handler.botAdmin = true
+export default handler
+
+function generarVersus(escuadra, suplentes, mexText = '  ', colText = '  ') {
+  function formatEscuadra(arr) {
+    let out = ''
+    for (let i = 0; i < 4; i++) { // máximo 4 jugadores
+      let icon = i === 0 ? '👑' : '🥷🏻'
+      out += arr[i] ? `${icon} ┇ @${arr[i].split('@')[0]}\n` : `${icon} ┇ \n`
+    }
+    return out.trimEnd() || '─ ┇ Sin jugadores'
+  }
+
+  function formatSuplentes(arr) {
+    let out = ''
+    for (let i = 0; i < 2; i++) {
+      out += arr[i] ? `🥷🏻 ┇ @${arr[i].split('@')[0]}\n` : `🥷🏻 ┇ \n`
+    }
+    return out.trimEnd() || '─ ┇ Sin suplentes'
+  }
+
+  return `*𝐈𝐍𝐓𝐄𝐑𝐍𝐀 4 𝐕𝐄𝐑𝐒𝐔𝐒 4*
+
+*𝐇𝐎𝐑𝐀𝐑𝐈𝐎𝐒*;
+*🇲🇽 MEXICO* : ${mexText}
+*🇨🇴 COLOMBIA* : ${colText}
+
+*𝐉𝐔𝐆𝐀𝐃𝐎𝐑𝐄𝐒 𝐏𝐑𝐄𝐒𝐄𝐍𝐓𝐄𝐒*;
+
+*𝗘𝗦𝗖𝗨𝗔𝗗𝗥𝗔 Ú𝗡𝗜𝗖𝗔*
+${formatEscuadra(escuadra)}
+
+ㅤʚ *𝐒𝐔𝐏𝐋𝐄𝐍𝐓𝐄𝐒*:
+${formatSuplentes(suplentes)}
+
+
+*𝖲𝗈𝗅𝗈 𝗋𝖾𝖺𝖼𝖼𝗂𝗈𝗇𝖺 𝖼𝗈𝗇:*
+
+> 「 ❤️ 」𝐏𝐚𝐫𝐭𝐢𝐜𝐢𝐩𝐚𝐫  
+> 「 👍 」𝐒𝐮𝐩𝐥𝐞𝐧𝐭𝐞  
+> 「 👎 」𝐒𝐚𝐥𝐢𝐫 𝐃𝐞 𝐋𝐚 𝐋𝐢𝐬𝐭𝐚  
+> 「 ❌ 」𝐑𝐞𝐢𝐧𝐢𝐜𝐢𝐚𝐫 𝐋𝐢𝐬𝐭𝐚      
+`
+}
+
+conn.ev.on('messages.upsert', async ({ messages }) => {
+  for (let msg of messages) {
+    if (!msg.message?.reactionMessage) continue
+    let msgID = msg.message.reactionMessage.key.id
+    let data = versusData[msgID]
+    if (!data) continue
+
+    let user = msg.key.participant || msg.key.remoteJid
+    let emoji = msg.message.reactionMessage.text
+    const isInAnyList =
+      data.escuadra.includes(user) ||
+      data.suplentes.includes(user)
+
+    if (emoji === '👎' && !isInAnyList) continue
+
+    let isAdmin = false
+    try {
+      let groupMetadata = await conn.groupMetadata(data.chat)
+      let participant = groupMetadata.participants.find(p => p.id === user)
+      isAdmin = participant?.admin === 'admin' || participant?.admin === 'superadmin'
+    } catch {}
+
+    if (emoji === '❌' && isAdmin) {
+      data.escuadra = []
+      data.suplentes = []
+
+      // Texto de lista vacía visible
+      let nuevoTexto = generarVersus(data.escuadra, data.suplentes, data.mexText, data.colText)
+
+      // Borrar mensaje original
+      try { await conn.sendMessage(data.chat, { delete: msg.message.reactionMessage.key }) } catch {}
+
+      // Enviar nuevo mensaje vacío
+      let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions: [] })
+      delete versusData[msgID]
+      versusData[sent.key.id] = data
+      continue
+    }
+
+    data.escuadra = data.escuadra.filter(u => u !== user)
+    data.suplentes = data.suplentes.filter(u => u !== user)
+
+    if (emoji === '❤️') {
+      if (data.escuadra.length < 4) data.escuadra.push(user)
+    } else if (emoji === '👍') {
+      if (data.suplentes.length < 2) data.suplentes.push(user)
+    } else if (emoji === '👎') {
+      // Ya fue eliminado arriba
+    } else continue
+
+    let nuevoTexto = generarVersus(data.escuadra, data.suplentes, data.mexText, data.colText)
+    let mentions = [...data.escuadra, ...data.suplentes]
+    try { await conn.sendMessage(data.chat, { delete: msg.message.reactionMessage.key }) } catch {}
+    let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions })
+    delete versusData[msgID]
+    versusData[sent.key.id] = data
+  }
+})
