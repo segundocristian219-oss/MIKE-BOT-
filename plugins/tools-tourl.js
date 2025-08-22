@@ -87,7 +87,9 @@ const handler = async (msg, { conn, command }) => {
     if (!res.data || !res.data.url) throw new Error('❌ No se pudo subir el archivo.');
 
     await conn.sendMessage(chatId, {
-      text: `✅ *Archivo subido exitosamente:*\n${res.data.url}`
+      text: `➤ `𝖮𝖱𝖣𝖤𝖭 𝖤𝖩𝖤𝖢𝖴𝖳𝖠𝖣𝖠` ✅
+
+𝖠𝖱𝖢𝖧𝖨𝖵𝖮 𝖲𝖴𝖡𝖨𝖣𝖮 𝖢𝖮𝖱𝖱𝖤𝖢𝖳𝖠𝖬𝖤𝖭𝖳𝖤 𝖠𝖰𝖴𝖨 𝖳𝖨𝖤𝖭𝖤 𝖲𝖴 𝖴𝖱𝖫 𝖫𝖨𝖲𝖳𝖠\n${res.data.url}`
     }, { quoted: msg });
 
     await conn.sendMessage(chatId, {
