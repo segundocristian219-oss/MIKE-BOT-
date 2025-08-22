@@ -1,30 +1,74 @@
-let handler = async (m, { isPrems, conn }) => {
-let time = global.db.data.users[m.sender].lastcofre + 0 // 36000000 10 Horas //86400000 24 Horas
-if (new Date - global.db.data.users[m.sender].lastcofre < 0) throw `[❗𝐈𝐍𝐅𝐎❗] 𝚈𝙰 𝚁𝙴𝙲𝙻𝙰𝙼𝙰𝚂𝚃𝙴 𝚃𝚄 𝙲𝙾𝙵𝚁𝙴\𝚗𝚅𝚄𝙴𝙻𝚅𝙴 𝙴𝙽 *${msToTime(time - new Date())}* 𝙿𝙰𝚁𝙰 𝚅𝙾𝙻𝚅𝙴𝚁 𝙰 𝚁𝙴𝙲𝙻𝙰𝙼𝙰𝚁`
+// plugins/addco.js
+import fs from "fs";
+import path from "path";
 
-let img = 'https://cdn.russellxz.click/f157cc40.jpeg' 
-let texto = `» 𝙈𝘼𝙋𝘼 𝘽𝙀𝙍𝙈𝙐𝘿𝘼 𝙁𝙍𝙀𝙀 𝙁𝙄𝙍𝙀 ✅`
+const handler = async (msg, { conn, args }) => {
+  const chatId = msg.key.remoteJid;
+  const isGroup = chatId.endsWith("@g.us");
+  const senderId = msg.key.participant || msg.key.remoteJid;
+  const senderNum = senderId.replace(/[^0-9]/g, "");
+  const isOwner = global.owner.some(([id]) => id === senderNum);
+  const isFromMe = msg.key.fromMe;
 
-const fkontak = {
-        "key": {
-    "participants":"0@s.whatsapp.net",
-                "remoteJid": "status@broadcast",
-                "fromMe": false,
-                "id": "Halo"
-        },
-        "message": {
-                "contactMessage": {
-                        "vcard": `BEGIN:VCARD\nVERSION:3.0\nN:Sy;Bot;;;\nFN:y\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
-                }
-        },
-        "participant": "0@s.whatsapp.net"
-}
-await conn.sendFile(m.chat, img, 'hades.jpg', texto, fkontak)
-global.db.data.users[m.sender].lastcofre = new Date * 1
-}
-handler.help = ['bermuda']
-handler.tags = ['freefire']
-handler.command = ['kalahari'] 
-handler.register = false
-handler.admin = true
-export default handler
+  // 🔒 Verificación de permisos
+  if (isGroup && !isOwner && !isFromMe) {
+    const metadata = await conn.groupMetadata(chatId);
+    const participant = metadata.participants.find(p => p.id === senderId);
+    const isAdmin = participant?.admin === "admin" || participant?.admin === "superadmin";
+
+    if (!isAdmin) {
+      return conn.sendMessage(chatId, {
+        text: "🚫 *Solo los administradores, el owner o el bot pueden usar este comando.*"
+      }, { quoted: msg });
+    }
+  } else if (!isGroup && !isOwner && !isFromMe) {
+    return conn.sendMessage(chatId, {
+      text: "🚫 *Solo el owner o el mismo bot pueden usar este comando en privado.*"
+    }, { quoted: msg });
+  }
+
+  // 📌 Verifica que se responda a un sticker
+  const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+  if (!quoted?.stickerMessage) {
+    return conn.sendMessage(chatId, {
+      text: "❌ *Responde a un sticker para asignarle un comando.*"
+    }, { quoted: msg });
+  }
+
+  const comando = args.join(" ").trim();
+  if (!comando) {
+    return conn.sendMessage(chatId, {
+      text: "⚠️ *Especifica el comando a asignar. Ejemplo:* addco kick"
+    }, { quoted: msg });
+  }
+
+  const fileSha = quoted.stickerMessage.fileSha256?.toString("base64");
+  if (!fileSha) {
+    return conn.sendMessage(chatId, {
+      text: "❌ *No se pudo obtener el ID único del sticker.*"
+    }, { quoted: msg });
+  }
+
+  const jsonPath = path.resolve("./comandos.json");
+  const data = fs.existsSync(jsonPath)
+    ? JSON.parse(fs.readFileSync(jsonPath, "utf-8"))
+    : {};
+
+  data[fileSha] = comando;
+  fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2));
+
+  await conn.sendMessage(chatId, {
+    react: { text: "✅", key: msg.key }
+  });
+
+  return conn.sendMessage(chatId, {
+    text: `✅ *Sticker vinculado al comando con éxito:* \`${comando}\``,
+    quoted: msg
+  });
+};
+
+handler.command = ["addco"];
+handler.tags = ["tools"];
+handler.help = ["addco <comando>"];
+
+export default handler;
