@@ -1,9 +1,9 @@
-const fs = require('fs');
-const path = require('path');
-const FormData = require('form-data');
-const axios = require('axios');
-const ffmpeg = require('fluent-ffmpeg');
-const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
+import fs from 'fs';
+import path from 'path';
+import FormData from 'form-data';
+import axios from 'axios';
+import ffmpeg from 'fluent-ffmpeg';
+import { downloadContentFromMessage } from '@whiskeysockets/baileys';
 
 const handler = async (msg, { conn, command }) => {
   const chatId = msg.key.remoteJid;
@@ -41,7 +41,7 @@ const handler = async (msg, { conn, command }) => {
       throw new Error("❌ Solo se permiten imágenes, videos, stickers o audios.");
     }
 
-    const tmpDir = path.join(__dirname, 'tmp');
+    const tmpDir = path.join(process.cwd(), 'tmp');
     if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir);
 
     const rawExt = typeDetected === 'sticker' ? 'webp' :
@@ -111,4 +111,4 @@ handler.help = ['tourl'];
 handler.tags = ['herramientas'];
 handler.register = true;
 
-module.exports = handler;
+export default handler;
