@@ -1,6 +1,7 @@
-// plugins/addco.js
 import fs from "fs"
 import path from "path"
+import crypto from "crypto"
+import { downloadContentFromMessage } from "@whiskeysockets/baileys"
 
 const handler = async (msg, { conn, args }) => {
   const chatId = msg.key.remoteJid
@@ -15,7 +16,6 @@ const handler = async (msg, { conn, args }) => {
     const metadata = await conn.groupMetadata(chatId)
     const participant = metadata.participants.find(p => p.id === senderId)
     const isAdmin = participant?.admin === "admin" || participant?.admin === "superadmin"
-
     if (!isAdmin) {
       return conn.sendMessage(chatId, {
         text: "🚫 *Solo los administradores, el owner o el bot pueden usar este comando.*"
@@ -42,22 +42,20 @@ const handler = async (msg, { conn, args }) => {
     }, { quoted: msg })
   }
 
-  // 🔑 Obtener hash único del sticker (base64 siempre)
+  // 🔑 Obtener hash único del sticker en formato "array de bytes string"
   let fileSha = null
-  if (quoted.stickerMessage.fileSha256) {
-    fileSha = Buffer.from(quoted.stickerMessage.fileSha256).toString("base64")
-  } else if (quoted.stickerMessage.fileEncSha256) {
-    fileSha = Buffer.from(quoted.stickerMessage.fileEncSha256).toString("base64")
-  }
-
-  // fallback: usar stanzaId si no hay hash
-  if (!fileSha && msg.message?.extendedTextMessage?.contextInfo?.stanzaId) {
-    fileSha = msg.message.extendedTextMessage.contextInfo.stanzaId
-  }
-
-  if (!fileSha) {
+  try {
+    const stream = await downloadContentFromMessage(quoted.stickerMessage, "sticker")
+    let buffer = Buffer.from([])
+    for await (const chunk of stream) {
+      buffer = Buffer.concat([buffer, chunk])
+    }
+    // digest en binario y luego pasamos a array.join(",")
+    const hashBuffer = crypto.createHash("sha256").update(buffer).digest()
+    fileSha = hashBuffer.toJSON().data.join(",")
+  } catch (e) {
     return conn.sendMessage(chatId, {
-      text: "❌ *No se pudo obtener un ID único del sticker.*"
+      text: "❌ *No se pudo procesar el sticker.*"
     }, { quoted: msg })
   }
 
