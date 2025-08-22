@@ -1,73 +1,86 @@
-// plugins/kick.js
-import fs from "fs";
-import path from "path";
+// plugins/addco.js
+const fs = require("fs");
+const path = require("path");
 
-const handler = async (msg, { conn }) => {
-  const rawID = conn.user?.id || "";
-  const subbotID = rawID.split(":")[0] + "@s.whatsapp.net";
+const handler = async (msg, { conn, args }) => {
+  const chatId = msg.key.remoteJid;
+  const isGroup = chatId.endsWith("@g.us");
+  const senderId = msg.key.participant || msg.key.remoteJid;
+  const senderNum = senderId.replace(/[^0-9]/g, "");
+  const isOwner = global.owner.some(([id]) => id === senderNum);
+  const isFromMe = msg.key.fromMe;
 
-  const prefixPath = path.resolve("prefixes.json");
-  let prefixes = {};
-  if (fs.existsSync(prefixPath)) {
-    prefixes = JSON.parse(fs.readFileSync(prefixPath, "utf-8"));
-  }
-  const usedPrefix = prefixes[subbotID] || ".";
+  // 🛡️ Verificación de permisos
+  if (isGroup && !isOwner && !isFromMe) {
+    const metadata = await conn.groupMetadata(chatId);
+    const participant = metadata.participants.find(p => p.id === senderId);
+    const isAdmin = participant?.admin === "admin" || participant?.admin === "superadmin";
 
-  if (!msg.key.remoteJid.includes("@g.us")) {
-    return await conn.sendMessage(msg.key.remoteJid, {
-      text: "❌ *Este comando solo funciona en grupos.*"
-    }, { quoted: msg });
-  }
-
-  const chat = await conn.groupMetadata(msg.key.remoteJid);
-  const senderId = msg.key.participant.replace(/@s\.whatsapp\.net/, "");
-  const groupAdmins = chat.participants.filter(p => p.admin);
-  const isAdmin = groupAdmins.some(admin => admin.id === msg.key.participant);
-
-  let isOwner = false;
-  try {
-    const ownerFile = path.join(process.cwd(), "config.js");
-    if (fs.existsSync(ownerFile)) {
-      const config = await import(pathToFileURL(ownerFile).href);
-      if (config.owner) isOwner = config.owner.some(o => o[0] === senderId);
+    if (!isAdmin) {
+      return conn.sendMessage(chatId, {
+        text: "🚫 *Solo los administradores, el owner o el bot pueden usar este comando.*"
+      }, { quoted: msg });
     }
-  } catch {}
-
-  if (!isAdmin && !isOwner) {
-    return await conn.sendMessage(msg.key.remoteJid, {
-      text: "🚫 *No tienes permisos para expulsar a miembros del grupo.*\n⚠️ *Solo los administradores o el dueño del bot pueden usar este comando.*"
+  } else if (!isGroup && !isOwner && !isFromMe) {
+    return conn.sendMessage(chatId, {
+      text: "🚫 *Solo el owner o el mismo bot pueden usar este comando en privado.*"
     }, { quoted: msg });
   }
 
-  let userToKick = null;
-  const mention = msg.message?.extendedTextMessage?.contextInfo?.mentionedJid;
-  if (mention?.length > 0) userToKick = mention[0];
-
-  if (!userToKick && msg.message?.extendedTextMessage?.contextInfo?.participant) {
-    userToKick = msg.message.extendedTextMessage.contextInfo.participant;
-  }
-
-  if (!userToKick) {
-    return await conn.sendMessage(msg.key.remoteJid, {
-      text: "⚠️ *Debes mencionar o responder a un usuario para expulsarlo.*"
+  // 🖼️ Verifica que se responda a un sticker
+  const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+  if (!quoted?.stickerMessage) {
+    return conn.sendMessage(chatId, {
+      text: "❌ *Responde a un sticker para asignarle un comando.*"
     }, { quoted: msg });
   }
 
-  // ⚠️ Verificar si el objetivo también es admin
-  const isTargetAdmin = groupAdmins.some(admin => admin.id === userToKick);
-  if (isTargetAdmin) {
-    return await conn.sendMessage(msg.key.remoteJid, {
-      text: "❌ *No puedes expulsar a un administrador del grupo.*"
+  const comando = args.join(" ").trim();
+  if (!comando) {
+    return conn.sendMessage(chatId, {
+      text: "⚠️ *Especifica el comando a asignar. Ejemplo:* .addco kick"
     }, { quoted: msg });
   }
 
-  await conn.groupParticipantsUpdate(msg.key.remoteJid, [userToKick], "remove");
+  // 🔑 Obtener hash único del sticker (base64 siempre)
+  let fileSha = null;
+  if (quoted.stickerMessage.fileSha256) {
+    fileSha = Buffer.from(quoted.stickerMessage.fileSha256).toString("base64");
+  } else if (quoted.stickerMessage.fileEncSha256) {
+    fileSha = Buffer.from(quoted.stickerMessage.fileEncSha256).toString("base64");
+  }
 
-  return await conn.sendMessage(msg.key.remoteJid, {
-    text: `🚷 *El usuario @${userToKick.split("@")[0]} ha sido expulsado del grupo.*`,
-    mentions: [userToKick]
-  }, { quoted: msg });
+  // fallback: usar stanzaId si no hay hash
+  if (!fileSha && msg.message?.extendedTextMessage?.contextInfo?.stanzaId) {
+    fileSha = msg.message.extendedTextMessage.contextInfo.stanzaId;
+  }
+
+  if (!fileSha) {
+    return conn.sendMessage(chatId, {
+      text: "❌ *No se pudo obtener un ID único del sticker.*"
+    }, { quoted: msg });
+  }
+
+  // 📂 Guardar en comandos.json
+  const jsonPath = path.resolve("./comandos.json");
+  const data = fs.existsSync(jsonPath)
+    ? JSON.parse(fs.readFileSync(jsonPath, "utf-8"))
+    : {};
+
+  data[fileSha] = comando;
+  fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2));
+
+  await conn.sendMessage(chatId, {
+    react: { text: "✅", key: msg.key }
+  });
+
+  return conn.sendMessage(chatId, {
+    text: `✅ *Sticker vinculado al comando con éxito:* \`${comando}\``,
+    quoted: msg
+  });
 };
 
-handler.command = ["kick"];
-export default handler;
+handler.command = ["addco"];
+handler.tags = ["tools"];
+handler.help = ["addco <comando>"];
+module.exports = handler;
