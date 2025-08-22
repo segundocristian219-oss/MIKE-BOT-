@@ -1,5 +1,6 @@
-import fs from "fs";
-import path from "path";
+// plugins/addco.js
+const fs = require("fs");
+const path = require("path");
 
 const handler = async (msg, { conn, args }) => {
   const chatId = msg.key.remoteJid;
@@ -9,7 +10,7 @@ const handler = async (msg, { conn, args }) => {
   const isOwner = global.owner.some(([id]) => id === senderNum);
   const isFromMe = msg.key.fromMe;
 
-  // 🔒 Verificación de permisos
+  // 🛡️ Verificación de permisos
   if (isGroup && !isOwner && !isFromMe) {
     const metadata = await conn.groupMetadata(chatId);
     const participant = metadata.participants.find(p => p.id === senderId);
@@ -26,7 +27,7 @@ const handler = async (msg, { conn, args }) => {
     }, { quoted: msg });
   }
 
-  // 📌 Verifica que se responda a un sticker
+  // 🖼️ Verifica que se responda a un sticker
   const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
   if (!quoted?.stickerMessage) {
     return conn.sendMessage(chatId, {
@@ -37,21 +38,30 @@ const handler = async (msg, { conn, args }) => {
   const comando = args.join(" ").trim();
   if (!comando) {
     return conn.sendMessage(chatId, {
-      text: "⚠️ *Especifica el comando a asignar. Ejemplo:* addco kick"
+      text: "⚠️ *Especifica el comando a asignar. Ejemplo:* .addco kick"
     }, { quoted: msg });
   }
 
-  // 🔑 Obtener hash único del sticker
-  const fileSha = quoted.stickerMessage.fileSha256
-    ? Buffer.from(quoted.stickerMessage.fileSha256).toString("base64")
-    : null;
+  // 🔑 Obtener hash único del sticker (base64 siempre)
+  let fileSha = null;
+  if (quoted.stickerMessage.fileSha256) {
+    fileSha = Buffer.from(quoted.stickerMessage.fileSha256).toString("base64");
+  } else if (quoted.stickerMessage.fileEncSha256) {
+    fileSha = Buffer.from(quoted.stickerMessage.fileEncSha256).toString("base64");
+  }
+
+  // fallback: usar stanzaId si no hay hash
+  if (!fileSha && msg.message?.extendedTextMessage?.contextInfo?.stanzaId) {
+    fileSha = msg.message.extendedTextMessage.contextInfo.stanzaId;
+  }
 
   if (!fileSha) {
     return conn.sendMessage(chatId, {
-      text: "❌ *No se pudo obtener el ID único del sticker.*"
+      text: "❌ *No se pudo obtener un ID único del sticker.*"
     }, { quoted: msg });
   }
 
+  // 📂 Guardar en comandos.json
   const jsonPath = path.resolve("./comandos.json");
   const data = fs.existsSync(jsonPath)
     ? JSON.parse(fs.readFileSync(jsonPath, "utf-8"))
@@ -73,5 +83,4 @@ const handler = async (msg, { conn, args }) => {
 handler.command = ["addco"];
 handler.tags = ["tools"];
 handler.help = ["addco <comando>"];
-
-export default handler;
+module.exports = handler;
