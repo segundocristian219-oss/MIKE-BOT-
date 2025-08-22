@@ -1,4 +1,3 @@
-// Guardamos el emoji por grupo en memoria
 const groupEmojis = {}; // { chatId: emoji }
 
 const handler = async (m, { conn, participants, isAdmin, isOwner }) => {
@@ -8,18 +7,17 @@ const handler = async (m, { conn, participants, isAdmin, isOwner }) => {
   const chatId = m.chat;
   const text = m.text || m.msg?.caption || '';
 
-  // Separar comando y argumentos
-  const args = text.trim().split(/\s+/);
-  const cmd = args[0].toLowerCase();
-  const param = args.slice(1).join(' ');
+  // Detectar comando con regex
+  const setEmojiMatch = text.match(/^\.setemoji\s+(.+)$/i);
+  const todosMatch = text.match(/^\.todos$/i);
 
-  if (cmd === '.setemoji') {
-    if (!param) return conn.sendMessage(chatId, { text: '❌ Envía un emoji después del comando' });
-    groupEmojis[chatId] = param;
-    return conn.sendMessage(chatId, { text: `✅ Emoji cambiado a: ${param}` });
+  if (setEmojiMatch) {
+    const newEmoji = setEmojiMatch[1].trim();
+    groupEmojis[chatId] = newEmoji;
+    return conn.sendMessage(chatId, { text: `✅ Emoji cambiado a: ${newEmoji}` });
   }
 
-  if (cmd === '.todos') {
+  if (todosMatch) {
     const emoji = groupEmojis[chatId] || '🗣️';
     const total = participants.length;
 
@@ -39,7 +37,6 @@ const handler = async (m, { conn, participants, isAdmin, isOwner }) => {
 };
 
 handler.customPrefix = /^\.?(todos|setemoji)$/i;
-handler.command = new RegExp
 handler.group = true;
 handler.admin = true;
 
