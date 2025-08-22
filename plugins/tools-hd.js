@@ -1,60 +1,77 @@
-import fetch from 'node-fetch'
-import FormData from 'form-data'
+import fs from 'fs';
+import path from 'path';
+import FormData from 'form-data';
+import axios from 'axios';
+import { downloadContentFromMessage } from '@whiskeysockets/baileys';
+// import { downloadContentFromMessage } from '@adiwajshing/baileys'; // según tu versión
 
-let handler = async (m, { conn, usedPrefix, command }) => {
-  const quoted = m.quoted ? m.quoted : m
-  const mime = quoted.mimetype || quoted.msg?.mimetype || ''
+const handler = async (msg, { conn, command }) => {
+  const chatId = msg.key.remoteJid;
+  const pref   = global.prefixes?.[0] || '.';
 
-  if (!/image\/(jpe?g|png)/i.test(mime)) {
-    await conn.sendMessage(m.chat, { react: { text: '❗', key: m.key } })
-    return m.reply(`☁️` 𝙀𝙉𝙑𝙄𝘼 𝙊 𝙍𝙀𝙎𝙋𝙊𝙉𝘿𝙀 𝘼 𝙐𝙉𝘼 𝙄𝙈𝘼𝙂𝙀𝙉 𝙋𝘼𝙍𝘼 𝙈𝙀𝙅𝙊𝙍𝘼𝙍 𝙇𝘼 𝘾𝘼𝙇𝙄𝘿𝘼𝘿)
+  // 1) Verificar que responda a una imagen
+  const quotedCtx = msg.message?.extendedTextMessage?.contextInfo;
+  const quoted    = quotedCtx?.quotedMessage;
+  if (!quoted?.imageMessage) {
+    return conn.sendMessage(chatId, {
+      text: `✳️ *Usa:*\n${pref}${command}\n📌 Responde a una imagen para mejorarla.`
+    }, { quoted: msg });
   }
+
+  // 2) Reacción “procesando”
+  await conn.sendMessage(chatId, { react: { text: '🧪', key: msg.key } });
 
   try {
-    await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
+    // 3) Descargar la imagen en un archivo temporal
+    const tmpDir = path.join(process.cwd(), 'tmp');
+    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
 
-    const media = await quoted.download()
-    const ext = mime.split('/')[1]
-    const filename = `mejorada_${Date.now()}.${ext}`
+    const stream = await downloadContentFromMessage(quoted.imageMessage, 'image');
+    const tmpFile = path.join(tmpDir, `${Date.now()}_hd.jpg`);
+    const ws = fs.createWriteStream(tmpFile);
+    for await (const chunk of stream) ws.write(chunk);
+    ws.end();
+    await new Promise(resolve => ws.on('finish', resolve));
 
-    const form = new FormData()
-    form.append('image', media, { filename, contentType: mime })
-    form.append('scale', '2')
+    // 4) Subir al CDN
+    const uploadForm = new FormData();
+    uploadForm.append('file', fs.createReadStream(tmpFile));
+    const up = await axios.post('https://cdn.russellxz.click/upload.php', uploadForm, {
+      headers: uploadForm.getHeaders()
+    });
+    fs.unlinkSync(tmpFile);
+    if (!up.data?.url) throw new Error('No se obtuvo URL al subir al CDN.');
+    const imageUrl = up.data.url;
 
-    const headers = {
-      ...form.getHeaders(),
-      'accept': 'application/json',
-      'x-client-version': 'web',
-      'x-locale': 'es'
+    // 5) Llamar a la API de Remini
+    const API_KEY    = 'russellxz';
+    const REMINI_URL = 'https://api.neoxr.eu/api/remini';
+    const rem = await axios.get(
+      `${REMINI_URL}?image=${encodeURIComponent(imageUrl)}&apikey=${API_KEY}`
+    );
+    if (!rem.data?.status || !rem.data.data?.url) {
+      throw new Error('La API no devolvió URL de imagen mejorada.');
     }
 
-    const res = await fetch('https://api2.pixelcut.app/image/upscale/v1', {
-      method: 'POST',
-      headers,
-      body: form
-    })
+    // 6) Enviar la imagen mejorada
+    await conn.sendMessage(chatId, {
+      image: { url: rem.data.data.url },
+      caption: '✨ Imagen mejorada con éxito por *La Suki Bot*'
+    }, { quoted: msg });
+    await conn.sendMessage(chatId, { react: { text: '✅', key: msg.key } });
 
-    const json = await res.json()
-
-    if (!json?.result_url || !json.result_url.startsWith('http')) {
-      throw new Error('No se pudo obtener la imagen mejorada desde Pixelcut.')
-    }
-
-    const resultBuffer = await (await fetch(json.result_url)).buffer()
-
-    await conn.sendMessage(m.chat, {
-      image: resultBuffer
-    }, { quoted: m })
-
-    await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
-  } catch (err) {
-    await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
-    m.reply(`❌ 𝙃𝙐𝘽𝙊 𝙐𝙉 𝙀𝙍𝙍𝙊𝙍 𝙄𝙉𝙀𝙎𝙋𝙀𝙍𝘼𝘿𝙊`)
+  } catch (e) {
+    console.error('❌ Error en comando .hd:', e);
+    await conn.sendMessage(chatId, {
+      text: `❌ *Error:* ${e.message}`
+    }, { quoted: msg });
+    await conn.sendMessage(chatId, { react: { text: '❌', key: msg.key } });
   }
-}
+};
 
-handler.help = ['hd']
-handler.tags = ['herramientas', 'imagen']
 handler.command = ['hd'];
+handler.help    = ['hd'];
+handler.tags    = ['tools'];
+handler.register= true;
 
-export default handler
+export default handler;
