@@ -1,36 +1,48 @@
-// _sticker-listener.js
-const fs = require("fs");
-const path = require("path");
+// plugins/stickerCommand.js
+import fs from "fs"
+import path from "path"
+import crypto from "crypto"
+import { downloadContentFromMessage } from "@whiskeysockets/baileys"
 
-module.exports = async function stickerListener(msg, conn) {
-  const quoted = msg.message?.stickerMessage;
-  if (!quoted) return;
+const handler = async (msg, { conn }) => {
+  // 🖼️ Solo responder a stickers
+  const sticker = msg.message?.stickerMessage
+  if (!sticker) return
 
-  let fileSha = null;
-  if (quoted.fileSha256) {
-    fileSha = Buffer.from(quoted.fileSha256).toString("base64");
-  } else if (quoted.fileEncSha256) {
-    fileSha = Buffer.from(quoted.fileEncSha256).toString("base64");
+  // 📂 Cargar base de datos
+  const jsonPath = path.resolve("./comandos.json")
+  if (!fs.existsSync(jsonPath)) return
+  const data = JSON.parse(fs.readFileSync(jsonPath, "utf-8"))
+
+  // 🔑 Calcular hash igual que en addco (array de bytes string)
+  let fileSha = null
+  try {
+    const stream = await downloadContentFromMessage(sticker, "sticker")
+    let buffer = Buffer.from([])
+    for await (const chunk of stream) {
+      buffer = Buffer.concat([buffer, chunk])
+    }
+    const hashBuffer = crypto.createHash("sha256").update(buffer).digest()
+    fileSha = hashBuffer.toJSON().data.join(",")
+  } catch (e) {
+    return
   }
 
-  if (!fileSha) return;
+  // 📌 Buscar comando
+  const comando = data[fileSha]
+  if (!comando) return
 
-  const jsonPath = path.resolve("./comandos.json");
-  if (!fs.existsSync(jsonPath)) return;
-  const data = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
-
-  const comando = data[fileSha];
-  if (!comando) return;
-
-  // ⚡ fake mensaje con texto normal
+  // 🚀 Simular mensaje de texto con el comando
   const fakeMsg = {
     ...msg,
+    text: `.${comando}`, // 👉 cambia el prefijo si usas otro
     message: {
-      conversation: comando // 👈 ahora sí parece texto normal
-    },
-    text: comando
-  };
+      conversation: `.${comando}`
+    }
+  }
 
-  // reinyectar para que lo procese tu handler
-  conn.ev.emit("messages.upsert", { messages: [fakeMsg], type: "notify" });
-};
+  // Emitir como si lo hubiera escrito el usuario
+  conn.emit("messages.upsert", { messages: [fakeMsg], type: "notify" })
+}
+
+export default handler
