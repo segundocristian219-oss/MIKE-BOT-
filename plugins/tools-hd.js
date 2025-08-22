@@ -10,24 +10,22 @@ const handler = async (msg, { conn, command }) => {
 
   const quotedCtx = msg.message?.extendedTextMessage?.contextInfo;
   const quoted    = quotedCtx?.quotedMessage;
-  const mediaMsg  = quoted?.imageMessage || quoted?.videoMessage || msg.message?.imageMessage || msg.message?.videoMessage;
+  const imageMsg  = quoted?.imageMessage || msg.message?.imageMessage;
 
-  if (!mediaMsg) {
+  if (!imageMsg) {
     return conn.sendMessage(chatId, {
-      text: `✳️ *Usa:*\n${pref}${command}\n📌 Envía o responde a una imagen o video para mejorarlo.`
+      text: `✳️ *Usa:*\n${pref}${command}\n📌 Envía o responde a una imagen para mejorarla.`
     }, { quoted: msg });
   }
 
-  const type = mediaMsg.mimetype?.startsWith('video') ? 'video' : 'image';
   await conn.sendMessage(chatId, { react: { text: '🧪', key: msg.key } });
 
   try {
     const tmpDir = path.join(process.cwd(), 'tmp');
     if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
 
-    const ext = type === 'video' ? 'mp4' : 'jpg';
-    const tmpFile = path.join(tmpDir, `${Date.now()}_hd.${ext}`);
-    const stream = await downloadContentFromMessage(mediaMsg, type);
+    const stream = await downloadContentFromMessage(imageMsg, 'image');
+    const tmpFile = path.join(tmpDir, `${Date.now()}_hd.jpg`);
     const ws = fs.createWriteStream(tmpFile);
     for await (const chunk of stream) ws.write(chunk);
     ws.end();
@@ -40,29 +38,21 @@ const handler = async (msg, { conn, command }) => {
     });
     fs.unlinkSync(tmpFile);
     if (!up.data?.url) throw new Error('No se obtuvo URL al subir al CDN.');
-    const mediaUrl = up.data.url;
+    const imageUrl = up.data.url;
 
     const API_KEY    = 'russellxz';
     const REMINI_URL = 'https://api.neoxr.eu/api/remini';
     const rem = await axios.get(
-      `${REMINI_URL}?image=${encodeURIComponent(mediaUrl)}&apikey=${API_KEY}`
+      `${REMINI_URL}?image=${encodeURIComponent(imageUrl)}&apikey=${API_KEY}`
     );
     if (!rem.data?.status || !rem.data.data?.url) {
-      throw new Error('La API no devolvió URL de imagen/video mejorado.');
+      throw new Error('La API no devolvió URL de imagen mejorada.');
     }
 
-    if (type === 'video') {
-      await conn.sendMessage(chatId, {
-        video: { url: rem.data.data.url },
-        caption: '✨ Video mejorado con éxito por *La Suki Bot*'
-      }, { quoted: msg });
-    } else {
-      await conn.sendMessage(chatId, {
-        image: { url: rem.data.data.url },
-        caption: '✨ Imagen mejorada con éxito por *La Suki Bot*'
-      }, { quoted: msg });
-    }
-
+    await conn.sendMessage(chatId, {
+      image: { url: rem.data.data.url },
+      caption: ''
+    }, { quoted: msg });
     await conn.sendMessage(chatId, { react: { text: '✅', key: msg.key } });
 
   } catch (e) {
