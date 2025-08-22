@@ -36,7 +36,8 @@ const handler = async (m, { conn, participants, isAdmin, isOwner }) => {
   }
 };
 
-handler.command = ['setemoji', 'todos'];
+handler.customPrefix = /^(todos|.todos|.setemoji)\s+/i;
+handler.command = new RegExp;
 handler.group = true;
 handler.admin = true;
 
