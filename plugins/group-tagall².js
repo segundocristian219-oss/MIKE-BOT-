@@ -7,13 +7,15 @@ const handler = async (m, { conn, participants, isAdmin, isOwner }) => {
   const chatId = m.chat;
   const text = m.text || m.msg?.caption || '';
 
-  // Separar comando y argumento
-  const [prefixCmd, ...args] = text.trim().split(/\s+/);
-  const command = prefixCmd.replace(/^\./, '').toLowerCase(); // quitar punto si existe
+  // Extraer comando y argumento según customPrefix
+  const match = text.match(/^(?:\.?todos|\.?setemoji)\s*(.*)/i);
+  if (!match) return; // No coincide con nuestro prefijo
+  const argsText = match[1]?.trim(); // Esto es el resto del mensaje después del comando
+  const command = text.split(' ')[0].replace(/^\./, '').toLowerCase();
 
   if (command === 'setemoji') {
-    if (!args[0]) return conn.sendMessage(chatId, { text: '❌ Envía un emoji después del comando' });
-    groupEmojis[chatId] = args[0];
+    if (!argsText) return conn.sendMessage(chatId, { text: '❌ Envía un emoji después del comando' });
+    groupEmojis[chatId] = argsText.split(' ')[0]; // solo el primer "token" como emoji
     return conn.sendMessage(chatId, { text: `✅ Emoji cambiado a: ${groupEmojis[chatId]}` });
   }
 
@@ -36,8 +38,7 @@ const handler = async (m, { conn, participants, isAdmin, isOwner }) => {
   }
 };
 
-handler.customPrefix = /^(todos|.todos|.setemoji)\s+/i;
-handler.command = new RegExp;
+handler.customPrefix = /^(todos|\.todos|\.setemoji)/i;
 handler.group = true;
 handler.admin = true;
 
