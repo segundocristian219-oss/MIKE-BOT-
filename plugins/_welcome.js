@@ -5,7 +5,7 @@ export async function before(m, { conn, participants, groupMetadata }) {
 
   const defaultPP = 'https://cdn.russellxz.click/262f94ad.jpeg'
   const welcomeAudioUrl = 'https://qu.ax/sjtTL.opus'
-  const byeAudioUrl = 'https://qu.ax/LhbNi.opus'
+  const byeAudioUrl = 'https://cdn.russellxz.click/fe08b3e9.mp3'
 
   let chat = global.db.data.chats[m.chat]
   let userJid = m.messageStubParameters[0]
