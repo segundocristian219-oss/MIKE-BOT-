@@ -1,4 +1,3 @@
-// plugins/addco.js
 import fs from "fs";
 import path from "path";
 
@@ -42,7 +41,11 @@ const handler = async (msg, { conn, args }) => {
     }, { quoted: msg });
   }
 
-  const fileSha = quoted.stickerMessage.fileSha256?.toString("base64");
+  // 🔑 Obtener hash único del sticker
+  const fileSha = quoted.stickerMessage.fileSha256
+    ? Buffer.from(quoted.stickerMessage.fileSha256).toString("base64")
+    : null;
+
   if (!fileSha) {
     return conn.sendMessage(chatId, {
       text: "❌ *No se pudo obtener el ID único del sticker.*"
