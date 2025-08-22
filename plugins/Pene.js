@@ -1,37 +1,73 @@
-var handler = async (m, { conn, text }) => {
-  let user1, user2
-  let mentioned = m.mentionedJid || []
+// plugins/kick.js
+import fs from "fs";
+import path from "path";
 
-  if (mentioned.length >= 2) {
-    // ✅ Obtenemos los nombres bonitos
-    user1 = await conn.getName(mentioned[0])
-    user2 = await conn.getName(mentioned[1])
-  } else if (text) {
-    let [first, ...rest] = text.split(' ')
-    user1 = first
-    user2 = rest.join(' ')
+const handler = async (msg, { conn }) => {
+  const rawID = conn.user?.id || "";
+  const subbotID = rawID.split(":")[0] + "@s.whatsapp.net";
+
+  const prefixPath = path.resolve("prefixes.json");
+  let prefixes = {};
+  if (fs.existsSync(prefixPath)) {
+    prefixes = JSON.parse(fs.readFileSync(prefixPath, "utf-8"));
+  }
+  const usedPrefix = prefixes[subbotID] || ".";
+
+  if (!msg.key.remoteJid.includes("@g.us")) {
+    return await conn.sendMessage(msg.key.remoteJid, {
+      text: "❌ *Este comando solo funciona en grupos.*"
+    }, { quoted: msg });
   }
 
-  if (!user1 || !user2) {
-    throw `🍭 𝙀𝙎𝘾𝙍𝙄𝘽𝙀 𝙀𝙇 𝙉𝙊𝙈𝘽𝙍𝙀 𝘿𝙀 𝘿𝙊𝙎 𝙋𝙀𝙍𝙎𝙊𝙉𝘼𝙎 𝙊 𝙀𝙏𝙄𝙌𝙐𝙀𝙏𝘼𝙇𝙊𝙎 𝙋𝘼𝙍𝘼 𝘾𝘼𝙇𝘾𝙐𝙇𝘼𝙍 𝙎𝙐 𝘼𝙈𝙊𝙍.`
+  const chat = await conn.groupMetadata(msg.key.remoteJid);
+  const senderId = msg.key.participant.replace(/@s\.whatsapp\.net/, "");
+  const groupAdmins = chat.participants.filter(p => p.admin);
+  const isAdmin = groupAdmins.some(admin => admin.id === msg.key.participant);
+
+  let isOwner = false;
+  try {
+    const ownerFile = path.join(process.cwd(), "config.js");
+    if (fs.existsSync(ownerFile)) {
+      const config = await import(pathToFileURL(ownerFile).href);
+      if (config.owner) isOwner = config.owner.some(o => o[0] === senderId);
+    }
+  } catch {}
+
+  if (!isAdmin && !isOwner) {
+    return await conn.sendMessage(msg.key.remoteJid, {
+      text: "🚫 *No tienes permisos para expulsar a miembros del grupo.*\n⚠️ *Solo los administradores o el dueño del bot pueden usar este comando.*"
+    }, { quoted: msg });
   }
 
-  let porcentaje = Math.floor(Math.random() * 100)
+  let userToKick = null;
+  const mention = msg.message?.extendedTextMessage?.contextInfo?.mentionedJid;
+  if (mention?.length > 0) userToKick = mention[0];
 
-  let love = `
-━━━━━━━━━━━━━━━
-❤️ *${user1}* 𝙏𝙐 𝙊𝙋𝙊𝙍𝙏𝙐𝙉𝙄𝘿𝘼𝘿 𝘿𝙀 𝙀𝙉𝘼𝙈𝙊𝙍𝘼𝙍𝙏𝙀 𝘿𝙀 ${usuario} 𝙀𝙎 𝘿𝙀 *${porcentaje}%* 👩🏻‍❤️‍👨🏻
-━━━━━━━━━━━━━━━
-`.trim()
+  if (!userToKick && msg.message?.extendedTextMessage?.contextInfo?.participant) {
+    userToKick = msg.message.extendedTextMessage.contextInfo.participant;
+  }
 
-  await conn.sendMessage(m.chat, {
-    text: love,
-    mentions: mentioned // 🔵 menciona en azul, aunque en texto salga el nombre
-  }, { quoted: m })
-}
+  if (!userToKick) {
+    return await conn.sendMessage(msg.key.remoteJid, {
+      text: "⚠️ *Debes mencionar o responder a un usuario para expulsarlo.*"
+    }, { quoted: msg });
+  }
 
-handler.help = ['love', 'ship']
-handler.tags = ['fun']
-handler.command = /^(enamorar|ship)$/i
+  // ⚠️ Verificar si el objetivo también es admin
+  const isTargetAdmin = groupAdmins.some(admin => admin.id === userToKick);
+  if (isTargetAdmin) {
+    return await conn.sendMessage(msg.key.remoteJid, {
+      text: "❌ *No puedes expulsar a un administrador del grupo.*"
+    }, { quoted: msg });
+  }
 
-export default handler
+  await conn.groupParticipantsUpdate(msg.key.remoteJid, [userToKick], "remove");
+
+  return await conn.sendMessage(msg.key.remoteJid, {
+    text: `🚷 *El usuario @${userToKick.split("@")[0]} ha sido expulsado del grupo.*`,
+    mentions: [userToKick]
+  }, { quoted: msg });
+};
+
+handler.command = ["kick"];
+export default handler;
