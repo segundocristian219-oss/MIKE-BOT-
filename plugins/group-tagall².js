@@ -1,23 +1,18 @@
 const groupEmojis = {}; // { chatId: emoji }
 
-const handler = async (m, { conn, participants, isAdmin, isOwner }) => {
+const handler = async (m, { conn, participants, isAdmin, isOwner, command, text }) => {
   if (!m.isGroup) return;
   if (!isAdmin && !isOwner) return global.dfail?.('admin', m, conn);
 
   const chatId = m.chat;
-  const text = m.text || m.msg?.caption || '';
 
-  // Detectar comando con regex
-  const setEmojiMatch = text.match(/^\.setemoji\s+(.+)$/i);
-  const todosMatch = text.match(/^\.todos$/i);
-
-  if (setEmojiMatch) {
-    const newEmoji = setEmojiMatch[1].trim();
-    groupEmojis[chatId] = newEmoji;
-    return conn.sendMessage(chatId, { text: `✅ Emoji cambiado a: ${newEmoji}` });
+  if (command === 'setemoji') {
+    if (!text) return conn.sendMessage(chatId, { text: '❌ Envía un emoji después del comando' });
+    groupEmojis[chatId] = text.trim();
+    return conn.sendMessage(chatId, { text: `✅ Emoji cambiado a: ${groupEmojis[chatId]}` });
   }
 
-  if (todosMatch) {
+  if (command === 'todos') {
     const emoji = groupEmojis[chatId] || '🗣️';
     const total = participants.length;
 
@@ -37,8 +32,7 @@ const handler = async (m, { conn, participants, isAdmin, isOwner }) => {
 };
 
 handler.customPrefix = /^\.?(todos|setemoji)$/i;
-handler.command = new RegExp
 handler.group = true;
 handler.admin = true;
-
+handler.command = new RegExp(); // DS6-Meta lo requiere
 export default handler;
