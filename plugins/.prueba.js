@@ -1,8 +1,6 @@
 // plugins/stickerListener.js
 import fs from "fs"
 import path from "path"
-import crypto from "crypto"
-import { downloadContentFromMessage } from "@whiskeysockets/baileys"
 
 export default function stickerListener(conn){
   const jsonPath = path.resolve("./comandos.json")
@@ -13,20 +11,14 @@ export default function stickerListener(conn){
 
   conn.ev.on("messages.upsert", async ({messages})=>{
     for(const m of messages){
-      if(!m.message?.stickerMessage) continue
+      const sticker = m.message?.stickerMessage
+      if(!sticker) continue
 
-      let fileSha
-      try{
-        const stream = await downloadContentFromMessage(m.message.stickerMessage, "sticker")
-        let buffer = Buffer.from([])
-        for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk])
-        fileSha = crypto.createHash("sha256").update(buffer).digest().toJSON().data.join(",")
-      }catch{continue}
-
-      const comando = comandos[fileSha]
+      const stickerId = sticker.url || sticker.fileName || JSON.stringify(sticker)
+      const comando = comandos[stickerId]
       if(!comando) continue
 
-      // inyecta mensaje como si se hubiera escrito
+      // inyecta comando
       conn.emit("messages.upsert",{
         messages:[{
           key:m.key,
