@@ -1,14 +1,19 @@
-const groupEmojis = {}; // { chatId: emoji }
+const groupEmojis = {}; // Emoji por grupo
 
-const handler = async (m, { conn, participants, isAdmin, isOwner, command, text }) => {
+const handler = async (m, { conn, participants, isAdmin, isOwner }) => {
   if (!m.isGroup) return;
   if (!isAdmin && !isOwner) return global.dfail?.('admin', m, conn);
 
   const chatId = m.chat;
+  const text = m.text || m.msg?.caption || '';
+
+  // Separar comando y argumento
+  const [prefixCmd, ...args] = text.trim().split(/\s+/);
+  const command = prefixCmd.replace(/^\./, '').toLowerCase(); // quitar punto si existe
 
   if (command === 'setemoji') {
-    if (!text) return conn.sendMessage(chatId, { text: '❌ Envía un emoji después del comando' });
-    groupEmojis[chatId] = text.trim();
+    if (!args[0]) return conn.sendMessage(chatId, { text: '❌ Envía un emoji después del comando' });
+    groupEmojis[chatId] = args[0];
     return conn.sendMessage(chatId, { text: `✅ Emoji cambiado a: ${groupEmojis[chatId]}` });
   }
 
@@ -31,8 +36,8 @@ const handler = async (m, { conn, participants, isAdmin, isOwner, command, text 
   }
 };
 
-handler.customPrefix = /^\.?(todos|setemoji)$/i;
+handler.command = ['setemoji', 'todos'];
 handler.group = true;
 handler.admin = true;
-handler.command = new RegExp(); // DS6-Meta lo requiere
+
 export default handler;
