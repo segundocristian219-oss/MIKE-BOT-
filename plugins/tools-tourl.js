@@ -9,22 +9,27 @@ const handler = async (msg, { conn, command }) => {
   const chatId = msg.key.remoteJid;
   const pref = global.prefixes?.[0] || ".";
 
-  const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+  // 📌 Detectar si viene un archivo directo o citado
+  let quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+  let mediaMessage = null;
+  let typeDetected = null;
 
+  // 🔹 Si no hay quoted, intentamos detectar en el mismo mensaje
   if (!quoted) {
-    return conn.sendMessage(chatId, {
-      text: `✳️ *Usa:*\n${pref}${command}\n📌 Responde a una imagen, video, sticker o audio para subirlo.`
-    }, { quoted: msg });
-  }
-
-  await conn.sendMessage(chatId, {
-    react: { text: '☁️', key: msg.key }
-  });
-
-  try {
-    let typeDetected = null;
-    let mediaMessage = null;
-
+    if (msg.message?.imageMessage) {
+      typeDetected = 'image';
+      mediaMessage = msg.message.imageMessage;
+    } else if (msg.message?.videoMessage) {
+      typeDetected = 'video';
+      mediaMessage = msg.message.videoMessage;
+    } else if (msg.message?.stickerMessage) {
+      typeDetected = 'sticker';
+      mediaMessage = msg.message.stickerMessage;
+    } else if (msg.message?.audioMessage) {
+      typeDetected = 'audio';
+      mediaMessage = msg.message.audioMessage;
+    }
+  } else {
     if (quoted.imageMessage) {
       typeDetected = 'image';
       mediaMessage = quoted.imageMessage;
@@ -37,10 +42,18 @@ const handler = async (msg, { conn, command }) => {
     } else if (quoted.audioMessage) {
       typeDetected = 'audio';
       mediaMessage = quoted.audioMessage;
-    } else {
-      throw new Error("❌ Solo se permiten imágenes, videos, stickers o audios.");
     }
+  }
 
+  if (!mediaMessage) {
+    return conn.sendMessage(chatId, {
+      text: `✳️ *Usa:*\n${pref}${command}\n📌 Envía o responde a una imagen, video, sticker o audio para subirlo.`
+    }, { quoted: msg });
+  }
+
+  await conn.sendMessage(chatId, { react: { text: '☁️', key: msg.key } });
+
+  try {
     const tmpDir = path.join(process.cwd(), 'tmp');
     if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir);
 
@@ -61,7 +74,6 @@ const handler = async (msg, { conn, command }) => {
     }
 
     let finalPath = rawPath;
-
     if (typeDetected === 'audio' && ['ogg', 'm4a', 'mpeg'].includes(rawExt)) {
       finalPath = path.join(tmpDir, `${Date.now()}_converted.mp3`);
       await new Promise((resolve, reject) => {
@@ -77,7 +89,6 @@ const handler = async (msg, { conn, command }) => {
 
     const form = new FormData();
     form.append('file', fs.createReadStream(finalPath));
-
     const res = await axios.post('https://cdn.russellxz.click/upload.php', form, {
       headers: form.getHeaders(),
     });
@@ -87,24 +98,17 @@ const handler = async (msg, { conn, command }) => {
     if (!res.data || !res.data.url) throw new Error('❌ No se pudo subir el archivo.');
 
     await conn.sendMessage(chatId, {
-  text: `➤ 𝖮𝖱𝖣𝖤𝖭 𝖤𝖩𝖤𝖢𝖴𝖳𝖠𝖣𝖠 ✅
+      text: `➤ 𝖮𝖱𝖣𝖤𝖭 𝖤𝖩𝖤𝖢𝖴𝖳𝖠𝖣𝖠 ✅
 
 𝖠𝖱𝖢𝖧𝖨𝖵𝖮 𝖲𝖴𝖡𝖨𝖣𝖮 𝖢𝖮𝖱𝖱𝖤𝖢𝖳𝖠𝖬𝖤𝖭𝖳𝖤. 𝖠𝖰𝖴𝖨 𝖳𝖨𝖤𝖭𝖤 𝖲𝖴 𝖴𝖱𝖫:\n${res.data.url}`
-}, { quoted: msg });
+    }, { quoted: msg });
 
-    await conn.sendMessage(chatId, {
-      react: { text: '✅', key: msg.key }
-    });
+    await conn.sendMessage(chatId, { react: { text: '✅', key: msg.key } });
 
   } catch (err) {
     console.error("❌ Error en .tourl:", err);
-    await conn.sendMessage(chatId, {
-      text: `❌ *Error:* ${err.message}`
-    }, { quoted: msg });
-
-    await conn.sendMessage(chatId, {
-      react: { text: '❌', key: msg.key }
-    });
+    await conn.sendMessage(chatId, { text: `❌ *Error:* ${err.message}` }, { quoted: msg });
+    await conn.sendMessage(chatId, { react: { text: '❌', key: msg.key } });
   }
 };
 
