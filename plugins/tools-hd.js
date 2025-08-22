@@ -14,7 +14,7 @@ const handler = async (msg, { conn, command }) => {
 
   if (!imageMsg) {
     return conn.sendMessage(chatId, {
-      text: `✳️ *Usa:*\n${pref}${command}\n📌 Envía o responde a una imagen para mejorarla.`
+      text: `☁️ Responde a una *imagen* Para mejorar la calidad`
     }, { quoted: msg });
   }
 
