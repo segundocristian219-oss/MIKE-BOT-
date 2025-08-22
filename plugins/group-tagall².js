@@ -1,14 +1,23 @@
+// Guardamos el emoji globalmente por grupo
+const groupEmojis = {}; // { chatId: emoji }
+
 const handler = async (m, { conn, participants, isAdmin, isOwner, command, text }) => {
   if (!m.isGroup) return;
   if (!isAdmin && !isOwner) return global.dfail?.('admin', m, conn);
 
-  const total = participants.length;
+  const chatId = m.chat;
 
-  // Detectar si se puso un emoji en el mensaje
-  let emoji = '🗣️'; // emoji por defecto
-  if (text && text.trim()) {
-    emoji = text.trim().split(' ')[0]; // toma el primer "token" como emoji
+  if (command.toLowerCase() === 'setemoji') {
+    // Cambiar emoji
+    const newEmoji = text?.trim();
+    if (!newEmoji) return conn.sendMessage(chatId, { text: '❌ Envía un emoji después del comando' });
+    groupEmojis[chatId] = newEmoji;
+    return conn.sendMessage(chatId, { text: `✅ Emoji cambiado a: ${newEmoji}` });
   }
+
+  // Comando .todos
+  const emoji = groupEmojis[chatId] || '🗣️';
+  const total = participants.length;
 
   let mensaje = `*!  MENCION GENERAL  !*\n`;
   mensaje += `*PARA ${total} MIEMBROS* ${emoji}\n\n`;
@@ -18,14 +27,13 @@ const handler = async (m, { conn, participants, isAdmin, isOwner, command, text 
     mensaje += `${emoji} @${numero}\n`;
   }
 
-  await conn.sendMessage(m.chat, {
+  await conn.sendMessage(chatId, {
     text: mensaje,
     mentions: participants.map(p => p.id)
   });
 };
 
-handler.customPrefix = /^\.?(todos|.todos|.setemoji)$/i;
-handler.command = new RegExp(); // lo puedes dejar así
+handler.customPrefix = /^\.?(todos|setemoji)$/i;
 handler.group = true;
 handler.admin = true;
 
