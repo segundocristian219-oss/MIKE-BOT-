@@ -20,12 +20,12 @@ const handler = async (m, { conn, participants }) => {
     const finalCaption = finalText || originalCaption || '📢 Notificación'
 
     if (m.quoted?.message?.pollCreationMessage) {
-      await conn.sendMessage(m.chat, {
-        text: `${finalText}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`,
-        mentions: users
-      }, { quoted: m })
-      return
-    }
+  await conn.sendMessage(m.chat, {
+    text: `${userText}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`,
+    mentions: users
+  }, { quoted: m })
+  return
+}
 
     if (m.quoted && isMedia) {
       if (mtype === 'audioMessage') {
