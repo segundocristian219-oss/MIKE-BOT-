@@ -16,15 +16,12 @@ const handler = async (m, { conn, participants }) => {
     const q = m.quoted ? m.quoted : m
     const mtype = q.mtype || ''
     const isMedia = ['imageMessage','videoMessage','audioMessage','stickerMessage'].includes(mtype)
-    const isPoll = ['pollCreationMessage','pollUpdateMessage'].includes(mtype)
     const originalCaption = (q.msg?.caption || q.text || '').trim()
     const finalCaption = finalText || originalCaption || '📢 Notificación'
 
-    if (m.quoted && isPoll) {
-      let pollText = q.message?.pollCreationMessage?.name || "📊 Encuesta"
-      let userMessage = finalText ? `${finalText}\n\n${pollText}` : pollText
+    if (m.quoted?.message?.pollCreationMessage) {
       await conn.sendMessage(m.chat, {
-        text: `${userMessage}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`,
+        text: `${finalText}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`,
         mentions: users
       }, { quoted: m })
       return
@@ -62,7 +59,6 @@ const handler = async (m, { conn, participants }) => {
           await conn.sendMessage(m.chat, { sticker: media, mentions: users }, { quoted: m })
         }
       }
-
     } else if (m.quoted && !isMedia) {
       const msg = conn.cMod(
         m.chat,
@@ -76,7 +72,6 @@ const handler = async (m, { conn, participants }) => {
         { mentions: users }
       )
       await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
-
     } else if (!m.quoted && isMedia) {
       if (mtype === 'audioMessage') {
         try {
@@ -109,14 +104,12 @@ const handler = async (m, { conn, participants }) => {
           await conn.sendMessage(m.chat, { sticker: media, mentions: users }, { quoted: m })
         }
       }
-
     } else {
       await conn.sendMessage(m.chat, {
         text: `${finalCaption}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`,
         mentions: users
       }, { quoted: m })
     }
-
   } catch (e) {
     const users = participants.map(u => conn.decodeJid(u.id))
     await conn.sendMessage(m.chat, {
