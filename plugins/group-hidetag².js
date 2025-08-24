@@ -15,26 +15,20 @@ const handler = async (m, { conn, participants }) => {
     const users = participants.map(u => conn.decodeJid(u.id))
     const q = m.quoted ? m.quoted : m
     const mtype = q.mtype || ''
-
     const isMedia = ['imageMessage','videoMessage','audioMessage','stickerMessage'].includes(mtype)
-
-    // 📊 Nuevo: detectar encuestas
     const isPoll = ['pollCreationMessage','pollUpdateMessage'].includes(mtype)
-
     const originalCaption = (q.msg?.caption || q.text || '').trim()
     const finalCaption = finalText || originalCaption || '📢 Notificación'
 
-    // ✅ Caso nuevo: si es encuesta
     if (m.quoted && isPoll) {
       let pollText = q.message?.pollCreationMessage?.name || "📊 Encuesta"
+      let userMessage = finalText ? `${finalText}\n\n${pollText}` : pollText
       await conn.sendMessage(m.chat, {
-        text: `${finalCaption || pollText}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`,
+        text: `${userMessage}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`,
         mentions: users
       }, { quoted: m })
       return
     }
-
-    // 🔽 De aquí para abajo tu lógica original (NO la moví)
 
     if (m.quoted && isMedia) {
       if (mtype === 'audioMessage') {
@@ -46,7 +40,6 @@ const handler = async (m, { conn, participants }) => {
             ptt: true, 
             mentions: users 
           }, { quoted: m })
-
           if (finalText) {
             await conn.sendMessage(m.chat, { 
               text: `${finalText}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`, 
@@ -94,7 +87,6 @@ const handler = async (m, { conn, participants }) => {
             ptt: true, 
             mentions: users 
           }, { quoted: m })
-
           if (finalText) {
             await conn.sendMessage(m.chat, { 
               text: `${finalText}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`, 
