@@ -18,33 +18,106 @@ const handler = async (m, { conn, participants }) => {
 
     const isMedia = ['imageMessage','videoMessage','audioMessage','stickerMessage'].includes(mtype)
 
-    // 📌 Extra: manejar encuestas
+    // 📊 Nuevo: detectar encuestas
     const isPoll = ['pollCreationMessage','pollUpdateMessage'].includes(mtype)
 
     const originalCaption = (q.msg?.caption || q.text || '').trim()
     const finalCaption = finalText || originalCaption || '📢 Notificación'
 
-    if (m.quoted && isMedia) {
-      // ... (lo tuyo igual, no lo toco)
-    } else if (m.quoted && isPoll) {
-      // ✅ Si citaste una encuesta, la convertimos en texto
+    // ✅ Caso nuevo: si es encuesta
+    if (m.quoted && isPoll) {
       let pollText = q.message?.pollCreationMessage?.name || "📊 Encuesta"
       await conn.sendMessage(m.chat, {
         text: `${finalCaption || pollText}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`,
         mentions: users
       }, { quoted: m })
+      return
+    }
+
+    // 🔽 De aquí para abajo tu lógica original (NO la moví)
+
+    if (m.quoted && isMedia) {
+      if (mtype === 'audioMessage') {
+        try {
+          const media = await q.download()
+          await conn.sendMessage(m.chat, { 
+            audio: media, 
+            mimetype: 'audio/ogg; codecs=opus', 
+            ptt: true, 
+            mentions: users 
+          }, { quoted: m })
+
+          if (finalText) {
+            await conn.sendMessage(m.chat, { 
+              text: `${finalText}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`, 
+              mentions: users 
+            }, { quoted: m })
+          }
+        } catch {
+          await conn.sendMessage(m.chat, { 
+            text: `${finalCaption}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`, 
+            mentions: users 
+          }, { quoted: m })
+        }
+      } else {
+        const media = await q.download()
+        if (mtype === 'imageMessage') {
+          await conn.sendMessage(m.chat, { image: media, caption: `${finalCaption}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`, mentions: users }, { quoted: m })
+        } else if (mtype === 'videoMessage') {
+          await conn.sendMessage(m.chat, { video: media, caption: `${finalCaption}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`, mentions: users, mimetype: 'video/mp4' }, { quoted: m })
+        } else if (mtype === 'stickerMessage') {
+          await conn.sendMessage(m.chat, { sticker: media, mentions: users }, { quoted: m })
+        }
+      }
 
     } else if (m.quoted && !isMedia) {
-      // ... (igual que ya tenías, para textos normales)
+      const msg = conn.cMod(
+        m.chat,
+        generateWAMessageFromContent(
+          m.chat,
+          { [mtype || 'extendedTextMessage']: q.message?.[mtype] || { text: finalCaption } },
+          { quoted: m, userJid: conn.user.id }
+        ),
+        `${finalCaption}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`,
+        conn.user.jid,
+        { mentions: users }
+      )
+      await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
+
     } else if (!m.quoted && isMedia) {
-      // ... (igual que ya tenías)
-    } else if (!m.quoted && isPoll) {
-      // ✅ Si mandaste directamente una encuesta sin citar nada
-      let pollText = q.message?.pollCreationMessage?.name || "📊 Encuesta"
-      await conn.sendMessage(m.chat, {
-        text: `${finalCaption || pollText}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`,
-        mentions: users
-      }, { quoted: m })
+      if (mtype === 'audioMessage') {
+        try {
+          const media = await m.download()
+          await conn.sendMessage(m.chat, { 
+            audio: media, 
+            mimetype: 'audio/ogg; codecs=opus', 
+            ptt: true, 
+            mentions: users 
+          }, { quoted: m })
+
+          if (finalText) {
+            await conn.sendMessage(m.chat, { 
+              text: `${finalText}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`, 
+              mentions: users 
+            }, { quoted: m })
+          }
+        } catch {
+          await conn.sendMessage(m.chat, { 
+            text: `${finalCaption}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`, 
+            mentions: users 
+          }, { quoted: m })
+        }
+      } else {
+        const media = await m.download()
+        if (mtype === 'imageMessage') {
+          await conn.sendMessage(m.chat, { image: media, caption: `${finalCaption}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`, mentions: users }, { quoted: m })
+        } else if (mtype === 'videoMessage') {
+          await conn.sendMessage(m.chat, { video: media, caption: `${finalCaption}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`, mentions: users, mimetype: 'video/mp4' }, { quoted: m })
+        } else if (mtype === 'stickerMessage') {
+          await conn.sendMessage(m.chat, { sticker: media, mentions: users }, { quoted: m })
+        }
+      }
+
     } else {
       await conn.sendMessage(m.chat, {
         text: `${finalCaption}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`,
