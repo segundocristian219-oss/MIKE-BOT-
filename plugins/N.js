@@ -1,7 +1,7 @@
-import { generateWAMessageFromContent } from '@whiskeysockets/baileys'
+import { generateWAMessageFromContent, proto } from '@whiskeysockets/baileys'
 
 let handler = async (m, { conn }) => {
-  const msg = generateWAMessageFromContent(m.chat, {
+  const template = generateWAMessageFromContent(m.chat, proto.Message.fromObject({
     templateMessage: {
       hydratedTemplate: {
         hydratedContentText: "Menú de botones 👇",
@@ -16,15 +16,15 @@ let handler = async (m, { conn }) => {
           {
             urlButton: {
               displayText: "📞 WhatsApp Owner",
-              url: "https://wa.me/521XXXXXXXXXX" // pon tu número
+              url: "https://wa.me/521XXXXXXXXXX"
             }
           }
         ]
       }
     }
-  }, { quoted: m })
+  }), { userJid: m.chat, quoted: m })
 
-  await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
+  await conn.relayMessage(m.chat, template.message, { messageId: template.key.id })
 }
 
 handler.command = /^botones$/i
