@@ -1,13 +1,20 @@
 let handler = async (m, { conn }) => {
   await conn.sendMessage(m.chat, {
-    text: "Contacto del Owner 👑",
+    text: "Menú de botones 👇",
     footer: "DS6 Meta Bot",
     templateButtons: [
       {
         index: 1,
+        quickReplyButton: {
+          displayText: "👤 Owner",
+          id: ".owner"
+        }
+      },
+      {
+        index: 2,
         urlButton: {
-          displayText: "📞 Owner",
-          url: "https://wa.me/521XXXXXXXXXX" // pon tu número con lada
+          displayText: "📞 WhatsApp Owner",
+          url: "https://wa.me/5217227584934" // pon tu número con lada
         }
       }
     ]
