@@ -1,30 +1,13 @@
-import { generateWAMessageFromContent, proto } from '@whiskeysockets/baileys'
-
 let handler = async (m, { conn }) => {
-  const template = generateWAMessageFromContent(m.chat, proto.Message.fromObject({
-    templateMessage: {
-      hydratedTemplate: {
-        hydratedContentText: "Menú de botones 👇",
-        hydratedFooterText: "DS6 Meta Bot",
-        hydratedButtons: [
-          {
-            quickReplyButton: {
-              displayText: "👤 Owner",
-              id: ".owner"
-            }
-          },
-          {
-            urlButton: {
-              displayText: "📞 WhatsApp Owner",
-              url: "https://wa.me/521XXXXXXXXXX"
-            }
-          }
-        ]
-      }
-    }
-  }), { userJid: m.chat, quoted: m })
-
-  await conn.relayMessage(m.chat, template.message, { messageId: template.key.id })
+  await conn.sendMessage(m.chat, {
+    buttons: [
+      { buttonId: '.owner', buttonText: { displayText: '👤 Owner' }, type: 1 },
+      { buttonId: '.menu', buttonText: { displayText: '📜 Menú' }, type: 1 }
+    ],
+    text: "Menú de botones 👇",
+    footer: "DS6 Meta Bot",
+    headerType: 1
+  }, { quoted: m })
 }
 
 handler.command = /^botones$/i
