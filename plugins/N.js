@@ -1,12 +1,19 @@
 let handler = async (m, { conn }) => {
   await conn.sendMessage(m.chat, {
-    buttons: [
-      { buttonId: '.owner', buttonText: { displayText: '👤 Owner' }, type: 1 },
-      { buttonId: '.menu', buttonText: { displayText: '📜 Menú' }, type: 1 }
-    ],
-    text: "Menú de botones 👇",
+    text: "Menú de opciones 👇",
     footer: "DS6 Meta Bot",
-    headerType: 1
+    title: "Botones disponibles",
+    buttonText: "Abrir menú",
+    sections: [
+      {
+        title: "Opciones principales",
+        rows: [
+          { title: "👤 Owner", rowId: ".owner" },
+          { title: "📜 Menú", rowId: ".menu" },
+          { title: "⚙️ Configuración", rowId: ".config" }
+        ]
+      }
+    ]
   }, { quoted: m })
 }
 
