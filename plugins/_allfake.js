@@ -56,7 +56,7 @@ newsletterName: '',
 },
 externalAdReply: { 
 showAdAttribution: true,
-title: '𝗕𝗔𝗞𝗜 - 𝗕𝗢𝗧',
+title: '*FabxSai',
 body: '',
 previewType: "PHOTO",
 thumbnailUrl: 'https://files.catbox.moe/jfov52.jpg',
