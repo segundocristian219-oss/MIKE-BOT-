@@ -27,7 +27,7 @@ global.prems = []
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
 global.packname = 'FabxSai`
-global.author = '{\n "bot": {\n   "name": "𝐁𝐔𝐔 - 𝐁𝐎𝐓",\n     "author": "𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧",\n   "status_bot": "active"\n }\n}'
+global.author = '{\n "bot": {\n   "name": "FabxSai",\n     "author": "𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧",\n   "status_bot": "active"\n }\n}'
 global.wait = 'FabxSai'
 global.botname = 'FabxSai'
 global.textbot = `FabxSai`
