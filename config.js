@@ -14,8 +14,8 @@ global.owner = [
   ['38354561278087@lid', 'lid', '𝐀𝐧𝐠𝐞𝐥', true],
   ['5215565238431', 'jid', '𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧', true],
   ['151600148549841@lid', 'lid', '𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧', true],
-  ['50765609370'],
-  ['50765609370'],
+  ['227045091090524@lid', 'lid', 'Erick', true],
+  ['5218110030725'],
   ['584123989549']
 ]
 
@@ -26,13 +26,13 @@ global.prems = []
 
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
-global.packname = `𝐁𝐔𝐔 - 𝐁𝐎𝐓 🔮`
+global.packname = 'FabxSai`
 global.author = '{\n "bot": {\n   "name": "𝐁𝐔𝐔 - 𝐁𝐎𝐓",\n     "author": "𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧",\n   "status_bot": "active"\n }\n}'
-global.wait = '𝐁𝐔𝐔 - 𝐁𝐎𝐓 🔮'
-global.botname = '𝐁𝐔𝐔 - 𝐁𝐎𝐓 🔮'
-global.textbot = `𝐁𝐔𝐔 𝐁𝐎𝐓 🔮`
+global.wait = 'FabxSai'
+global.botname = 'FabxSai'
+global.textbot = `FabxSai`
 global.listo = '𝐋𝐢𝐬𝐭𝐨 🔮'
-global.namechannel = '𝐁𝐔𝐔 𝐁𝐎𝐓 🔮'
+global.namechannel = 'FabxSai'
 global.baileys = '@whiskeysockets/baileys'
 
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
