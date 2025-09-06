@@ -15,7 +15,7 @@ global.owner = [
   ['151600148549841@lid', 'lid', 'cristian', true],
   ['5215565238431', 'jid', 'Cristian', true],
   ['584124472867', 'jid', 'fabian', true],
-  ['142524563853479@lid', 'lid', 'fabian' true],
+  ['142524563853479@lid', 'lid', 'fabian', true],
   ['']
 ]
 
