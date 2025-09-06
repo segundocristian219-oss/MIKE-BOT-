@@ -33,13 +33,13 @@ const handler = async (m, { conn, participants }) => {
 
                     if (finalText) {
                         await conn.sendMessage(m.chat, {
-                            text: `${finalText}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`,
+                            text: `${finalText}\n\n${'> FabxSai'}`,
                             mentions: users
                         }, { quoted: m })
                     }
                 } catch {
                     await conn.sendMessage(m.chat, {
-                        text: `${finalCaption}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`,
+                        text: `${finalCaption}\n\n${'> FabxSai'}`,
                         mentions: users
                     }, { quoted: m })
                 }
@@ -56,7 +56,7 @@ const handler = async (m, { conn, participants }) => {
                     { [mtype || 'extendedTextMessage']: q.message?.[mtype] || { text: finalCaption } },
                     { quoted: m, userJid: conn.user.id }
                 ),
-                `${finalCaption}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`,
+                `${finalCaption}\n\n${'> FabxSai'}`,
                 conn.user.jid,
                 { mentions: users }
             )
@@ -74,13 +74,13 @@ const handler = async (m, { conn, participants }) => {
 
                     if (finalText) {
                         await conn.sendMessage(m.chat, {
-                            text: `${finalText}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`,
+                            text: `${finalText}\n\n${'> FabxSai'}`,
                             mentions: users
                         }, { quoted: m })
                     }
                 } catch {
                     await conn.sendMessage(m.chat, {
-                        text: `${finalCaption}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`,
+                        text: `${finalCaption}\n\n${'> FabxSai'}`,
                         mentions: users
                     }, { quoted: m })
                 }
@@ -91,7 +91,7 @@ const handler = async (m, { conn, participants }) => {
             }
         } else {
             await conn.sendMessage(m.chat, {
-                text: `${finalCaption}\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`,
+                text: `${finalCaption}\n\n${'> FabxSai'}`,
                 mentions: users
             }, { quoted: m })
         }
