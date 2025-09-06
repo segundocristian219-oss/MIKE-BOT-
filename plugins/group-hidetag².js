@@ -99,7 +99,7 @@ const handler = async (m, { conn, participants }) => {
     } catch (e) {
         const users = participants.map(u => conn.decodeJid(u.id))
         await conn.sendMessage(m.chat, {
-            text: `📢 Notificación\n\n${'> 𝙱𝙰𝙺𝙸 - 𝙱𝙾𝚃'}`,
+            text: `📢 Notificación\n\n${'> FabxSai'}`,
             mentions: users
         }, { quoted: m })
     }
