@@ -12,8 +12,8 @@ import moment from 'moment-timezone'
 global.owner = [
   ['5217711941041', 'jid', 'sai', true],
   ['111497485226127@lid', 'lid', 'sai', true],
-  ['151600148549841@lid', 'lid', 'cristian', true],
-  ['5215565238431', 'jid', 'Cristian', true],
+  ['59627769213003@lid', 'lid', 'cristian', true],
+  ['5215561076182', 'jid', 'Cristian', true],
   ['584124472867', 'jid', 'fabian', true],
   ['142524563853479@lid', 'lid', 'fabian', true],
   ['']
