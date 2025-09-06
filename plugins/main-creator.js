@@ -3,15 +3,15 @@ import PhoneNumber from 'awesome-phonenumber'
 let handler = async (m, { conn }) => {
   if (m.quoted?.fromMe || m.isButton) return
 
-  m.react('🔮')
+  m.react('⛩️')
 
   const imageUrl = 'https://cdn.russellxz.click/854032d2.jpeg'
   const numCreador = '5215561076182'
   const ownerJid = numCreador + '@s.whatsapp.net'
 
-  const name = '𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧 🔮'
+  const name = '𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧 ⛩️'
   const about = '𝐒𝐨𝐲 𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧, 𝐃𝐮𝐞𝐧̃𝐨 𝐃𝐞𝐥 𝐁𝐨𝐭: FabxSai'
-  const empresa = '𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧 - 𝐒𝐞𝐫𝐯𝐢𝐜𝐢𝐨𝐬 𝐭𝐞𝐜𝐧𝐨𝐥𝐨́𝐠𝐢𝐜𝐨𝐬 🔮'
+  const empresa = '𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧 - 𝐒𝐞𝐫𝐯𝐢𝐜𝐢𝐨𝐬 𝐭𝐞𝐜𝐧𝐨𝐥𝐨́𝐠𝐢𝐜𝐨𝐬 ⛩️'
   const instagramUrl = ''
 
   const vcard = `
