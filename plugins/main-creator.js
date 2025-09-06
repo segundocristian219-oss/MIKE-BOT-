@@ -5,7 +5,7 @@ let handler = async (m, { conn }) => {
 
   m.react('🔮')
 
-  const imageUrl = 'https://cdn.russellxz.click/aa176879.jpeg'
+  const imageUrl = 'https://cdn.russellxz.click/854032d2.jpeg'
   const numCreador = '5215561076182'
   const ownerJid = numCreador + '@s.whatsapp.net'
 
