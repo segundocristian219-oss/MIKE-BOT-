@@ -56,7 +56,7 @@ newsletterName: '',
 },
 externalAdReply: { 
 showAdAttribution: true,
-title: '*FabxSai',
+title: 'FabxSai',
 body: '',
 previewType: "PHOTO",
 thumbnailUrl: 'https://cdn.russellxz.click/eb376cd9.jpeg',
