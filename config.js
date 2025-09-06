@@ -10,15 +10,14 @@ import moment from 'moment-timezone'
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
 global.owner = [
-  ['5217711941041', 'jid', 'Sai𝐥', true],
-  ['111497485226127@lid', 'lid', 'Sai', true],
-  ['5215561076182', 'jid', '𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧', true],
-  ['59627769213003@lid ', 'lid', '𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧', true],
-  ['142524563853479@lid ', 'lid', 'Sai', true],
-  ['5217711941041', 'jid', 'Sai', true]
-  ['142524563853479@lid', 'lid', 'Fabian', true],
-  ['584124472867'
-  ]
+  ['5217227584934', 'jid', '𝘼𝙉𝙂𝙀𝙇', true],
+  ['38354561278087@lid', 'lid', 'Angel', true],
+  ['151600148549841@lid', 'lid', 'cristian', true],
+  ['5215565238431', 'jid', 'Cristian', true],
+  ['584124472867', 'jid', 'fabian', true],
+  ['142524563853479@lid', 'lid', 'fabian' true],
+  ['']
+]
 
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
@@ -27,24 +26,24 @@ global.prems = []
 
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
-global.packname = 'FabxSai'
-global.author = '{\n "bot": {\n   "name": "FabxSai",\n     "author": "𝐂𝐫𝐢𝐬𝐭𝐢𝐚𝐧",\n   "status_bot": "active"\n }\n}'
-global.wait = 'FabxSai'
-global.botname = 'FabxSai'
-global.textbot = `FabxSai`
-global.listo = '𝐋𝐢𝐬𝐭𝐨 🔮'
-global.namechannel = 'FabxSai'
+global.packname = `𝘼𝙉𝙂𝙀𝙇 - 𝘽𝙊𝙏`
+global.author = '{\n "𝗕𝗼𝘁": {\n   "name": "𝘼𝙉𝙂𝙀𝙇 - 𝘽𝙊𝙏",\n     "author": "𝘼𝙉𝙂𝙀𝙇",\n   "status_bot": "active"\n }\n}'
+global.wait = '𝘼𝙉𝙂𝙀𝙇 - 𝘽𝙊𝙏'
+global.botname = '𝘼𝙉𝙂𝙀𝙇 - 𝘽𝙊𝙏'
+global.textbot = `𝗪𝗵𝗮𝘁𝘀𝗮𝗽𝗽 𝘼𝙉𝙂𝙀𝙇 𝘽𝙊𝙏 ☕`
+global.listo = '𝗙𝗶𝗻𝗮𝗹𝗶𝘇𝗮𝗱𝗼 ☕'
+global.namechannel = '𝘼𝙉𝙂𝙀𝙇 𝘽𝙊𝙏 ☕'
 global.baileys = '@whiskeysockets/baileys'
 
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
-global.catalogo = 'https://files.catbox.moe/5k7vwl.jpg'
-global.miniurl = 'https://files.catbox.moe/5k7vwl.jpg'
+global.catalogo = 'https://files.catbox.moe/ntyp5r.jpg'
+global.miniurl = 'https://files.catbox.moe/ntyp5r.jpg'
 
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
-global.group = 'https://chat.whatsapp.com/GYOUzzKUAAq4aYgoa0pbzq?mode=r_c'
-global.canal = 'https://whatsapp.com/channel/0029VbAj2nTCcW4ufY9dQ01N'
+global.group = ''
+global.canal = ''
 
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
