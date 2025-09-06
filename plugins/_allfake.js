@@ -59,7 +59,7 @@ showAdAttribution: true,
 title: '*FabxSai',
 body: '',
 previewType: "PHOTO",
-thumbnailUrl: 'https://files.catbox.moe/jfov52.jpg',
+thumbnailUrl: 'https://cdn.russellxz.click/eb376cd9.jpeg',
 sourceUrl: '',
 mediaType: 1,
 renderLargerThumbnail: false
