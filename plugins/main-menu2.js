@@ -1,5 +1,5 @@
 let handler = async (m, { conn }) => {
-  let img = 'https://files.catbox.moe/skcpb6.mp4';
+  let img = 'https://cdn.russellxz.click/f59a2a08.mp4';
   let text = `*_M E N Ú - A U D I O S_* 🗣️
 「 *.on audios* 」  
 
@@ -47,7 +47,7 @@ let handler = async (m, { conn }) => {
 42. _Tengo los calzones_.
 43. _Entrada_.
 44. _Bien pensado woody_.
-45. _Esto va a ser epico papus_.
+45. _us_.
 46. _Fino señores_.
 47. _Me voy_.
 48. _Homero chino_.
