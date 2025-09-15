@@ -42,7 +42,7 @@ const defaultMenu = {
  %readmore
 *~•~•~•~•~•~•~•~•~•~•~•~•~•~•~•~•~*
 
-\t\t\tF A B x S A I
+\t\t\t𝑭𝒍𝒖𝒙𝑩𝒐𝒕
 `.trimStart(),
 header: '┣━━━ *〔* *%category* *〕*━━━┫',
 body: '*┃⋗ 🥃* *%cmd*\n',
@@ -148,7 +148,7 @@ let handler = async (m, { conn, usedPrefix: _p, __dirname }) => {
     }
     text = text.replace(new RegExp(`%(${Object.keys(replace).sort((a, b) => b.length - a.length).join`|`})`, 'g'), (_, name) => '' + replace[name])
 
-    let pp = 'https://cdn.russellxz.click/9186a684.mp4'
+    let pp = 'https://cdn.russellxz.click/5a7b9936.mp4'
     await conn.sendMessage(m.chat, {
   video: { url: 'https://cdn.russellxz.click/f59a2a08.mp4' },
   caption: text.trim(),
