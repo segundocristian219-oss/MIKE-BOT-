@@ -148,9 +148,9 @@ let handler = async (m, { conn, usedPrefix: _p, __dirname }) => {
     }
     text = text.replace(new RegExp(`%(${Object.keys(replace).sort((a, b) => b.length - a.length).join`|`})`, 'g'), (_, name) => '' + replace[name])
 
-    let pp = 'https://cdn.russellxz.click/5a7b9936.mp4'
+    let pp = 'https://cdn.russellxz.click/f6c66c2a.mp4'
     await conn.sendMessage(m.chat, {
-  video: { url: 'https://cdn.russellxz.click/5a7b9936.mp4' },
+  video: { url: 'https://cdn.russellxz.click/f6c66c2a.mp4' },
   caption: text.trim(),
   gifPlayback: true
 }, { quoted: m })
