@@ -44,8 +44,8 @@ END:VCARD`.trim()
       contextInfo: {
         mentionedJid: [m.sender],
         externalAdReply: {
-          title: 'FabxSai',
-          body: 'FabxSai',
+          title: '𝑭𝒍𝒖𝒙𝑩𝒐𝒕',
+          body: '𝑭𝒍𝒖𝒙𝑩𝒐𝒕',
           thumbnailUrl: imageUrl,
           sourceUrl: instagramUrl,
           mediaType: 1,
