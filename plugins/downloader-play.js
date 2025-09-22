@@ -1,165 +1,107 @@
-import axios from "axios"
-import yts from "yt-search"
-import fs from "fs"
-import path from "path"
-import { promisify } from "util"
-import { pipeline } from "stream"
+import axios from "axios";
+import yts from "yt-search";
+import fs from "fs";
+import path from "path";
+import ffmpeg from "fluent-ffmpeg";
+import { promisify } from "util";
+import { pipeline } from "stream";
 
-const streamPipe = promisify(pipeline)
-const MAX_FILE_SIZE = 60 * 1024 * 1024
+const streamPipe = promisify(pipeline);
 
 const handler = async (msg, { conn, text }) => {
+  const pref = global.prefixes?.[0] || ".";
+
   if (!text || !text.trim()) {
     return conn.sendMessage(
       msg.key.remoteJid,
-      { text: "*🎬 Ingresa el nombre de algún video*" },
+      { text: `✳️ Usa:\n${pref}play <término>\nEj: *${pref}play* bad bunny diles` },
       { quoted: msg }
-    )
+    );
   }
 
   await conn.sendMessage(msg.key.remoteJid, {
     react: { text: "🕒", key: msg.key }
-  })
+  });
 
-  const res = await yts(text)
-  const video = res.videos[0]
+  const res = await yts(text);
+  const video = res.videos[0];
   if (!video) {
     return conn.sendMessage(
       msg.key.remoteJid,
       { text: "❌ Sin resultados." },
       { quoted: msg }
-    )
+    );
   }
 
-  const { url: videoUrl, title, timestamp: duration, author } = video
-  const artista = author.name
-  const posibles = ["1080p", "720p", "480p", "360p"]
-
-  let videoDownloadUrl = null
-  let calidadElegida = "Desconocida"
-  let apiUsada = "Desconocida"
-  let errorLogs = []
+  const { url: videoUrl, title, timestamp: duration, author, thumbnail } = video;
+  const artista = author.name;
 
   try {
-    const tryApi = (apiName, urlBuilder) => {
-      return new Promise(async (resolve, reject) => {
-        const controller = new AbortController()
-        try {
-          for (const q of posibles) {
-            const apiUrl = urlBuilder(q)
-            const r = await axios.get(apiUrl, {
-              timeout: 80000,
-              signal: controller.signal
-            })
-            if (r.data?.status && (r.data?.result?.url || r.data?.data?.url)) {
-              resolve({
-                url: r.data.result?.url || r.data.data?.url,
-                quality: r.data.result?.quality || r.data.data?.quality || q,
-                api: apiName,
-                controller
-              })
-              return
-            }
-          }
-          reject(new Error(`${apiName}: No entregó un URL válido`))
-        } catch (err) {
-          reject(new Error(`${apiName}: ${err.message}`))
-        }
-      })
-    }
+    const infoMsg = `
+> *𝚈𝙾𝚄𝚃𝚄𝙱𝙴 𝙳𝙾𝚆𝙽𝙻𝙾𝙰𝙳𝙴𝚁*
 
-    const mayApi = tryApi("MayAPI", q =>
-      `https://mayapi.ooguy.com/ytdl?url=${encodeURIComponent(videoUrl)}&type=mp4&quality=${q}&apikey=may-0595dca2`
-    )
+🎵 *𝚃𝚒𝚝𝚞𝚕𝚘:* ${title}
+🎤 *𝙰𝚛𝚝𝚒𝚜𝚝𝚊:* ${artista}
+🕑 *𝙳𝚞𝚛𝚊𝚌𝚒ó𝚗:* ${duration}
+`.trim();
 
-    const neoxApi = tryApi("NeoxR", q =>
-      `https://api.neoxr.eu/api/youtube?url=${encodeURIComponent(videoUrl)}&type=video&quality=${q}&apikey=russellxz`
-    )
+    await conn.sendMessage(
+      msg.key.remoteJid,
+      { image: { url: thumbnail }, caption: infoMsg },
+      { quoted: msg }
+    );
 
-    let winner
-    try {
-      winner = await Promise.any([mayApi, neoxApi])
-    } catch (err) {
-      throw new Error(
-        "No se pudo obtener el video en ninguna calidad.\n\n*Logs:*\n" +
-        errorLogs.join("\n")
-      )
-    }
+    const api = `https://api.neoxr.eu/api/youtube?url=${encodeURIComponent(videoUrl)}&type=audio&quality=128kbps&apikey=russellxz`;
+    const r = await axios.get(api);
+    if (!r.data?.status || !r.data.data?.url) throw new Error("No se pudo obtener el audio");
 
-    ;[mayApi, neoxApi].forEach(p => {
-      if (p !== winner && p.controller) {
-        p.controller.abort()
-      }
-    })
+    const tmp = path.join(process.cwd(), "tmp");
+    if (!fs.existsSync(tmp)) fs.mkdirSync(tmp);
+    const inFile = path.join(tmp, `${Date.now()}_in.m4a`);
+    const outFile = path.join(tmp, `${Date.now()}_out.mp3`);
 
-    videoDownloadUrl = winner.url
-    calidadElegida = winner.quality
-    apiUsada = winner.api
+    const dl = await axios.get(r.data.data.url, { responseType: "stream" });
+    await streamPipe(dl.data, fs.createWriteStream(inFile));
 
-    const tmp = path.join(process.cwd(), "tmp")
-    if (!fs.existsSync(tmp)) fs.mkdirSync(tmp)
-    const file = path.join(tmp, `${Date.now()}_vid.mp4`)
+    await new Promise((res, rej) =>
+      ffmpeg(inFile)
+        .audioCodec("libmp3lame")
+        .audioBitrate("128k")
+        .format("mp3")
+        .save(outFile)
+        .on("end", res)
+        .on("error", rej)
+    );
 
-    const dl = await axios.get(videoDownloadUrl, { responseType: "stream", timeout: 0 })
-    let totalSize = 0
-    dl.data.on("data", chunk => {
-      totalSize += chunk.length
-      if (totalSize > MAX_FILE_SIZE) {
-        dl.data.destroy()
-      }
-    })
-
-    await streamPipe(dl.data, fs.createWriteStream(file))
-
-    const stats = fs.statSync(file)
-    if (stats.size > MAX_FILE_SIZE) {
-      fs.unlinkSync(file)
-      throw new Error("El archivo excede el límite de 60 MB permitido por WhatsApp.")
-    }
+    const buffer = fs.readFileSync(outFile);
 
     await conn.sendMessage(
       msg.key.remoteJid,
       {
-        video: fs.readFileSync(file),
-        mimetype: "video/mp4",
-        fileName: `${title}.mp4`,
-        caption: `
-> *𝚅𝙸𝙳𝙴𝙾 𝙳𝙾𝚆𝙽𝙻𝙾𝙰𝙳𝙴𝚁*
-
-⭒ ִֶָ७ ꯭🎵˙⋆｡ - *𝚃𝚒́𝚝𝚞𝚕𝚘:* ${title}
-⭒ ִֶָ७ ꯭🎤˙⋆｡ - *𝙰𝚛𝚝𝚒𝚜𝚝𝚊:* ${artista}
-⭒ ִֶָ७ ꯭🕑˙⋆｡ - *𝙳𝚞𝚛𝚊𝚌𝚒𝚘́𝚗:* ${duration}
-⭒ ִֶָ७ ꯭📺˙⋆｡ - *𝙲𝚊𝚕𝚒𝚍𝚊𝚍:* ${calidadElegida}
-⭒ ִֶָ७ ꯭🌐˙⋆｡ - *𝙰𝚙𝚒:* ${apiUsada}
-
-*» 𝘌𝘕𝘝𝘐𝘈𝘕𝘋𝘖 𝘈𝘜𝘋𝘐𝘖  🎧*
-*» 𝘈𝘎𝘜𝘈𝘙𝘋𝘌 𝘜𝘕 𝘗𝘖𝘊𝘖...*
-
-*⇆‌ ㅤ◁ㅤㅤ❚❚ㅤㅤ▷ㅤ↻*
-
-> \`\`\`© 𝖯𝗈𝗐𝖾𝗋𝖾𝖽 𝖻𝗒 ba.𝗑𝗒𝗓\`\`\`
-`.trim(),
-        supportsStreaming: true,
-        contextInfo: { isHd: true }
+        audio: buffer,
+        mimetype: "audio/mpeg",
+        fileName: `${title}.mp3`,
+        ptt: false
       },
       { quoted: msg }
-    )
+    );
 
-    fs.unlinkSync(file)
+    fs.unlinkSync(inFile);
+    fs.unlinkSync(outFile);
 
     await conn.sendMessage(msg.key.remoteJid, {
       react: { text: "✅", key: msg.key }
-    })
+    });
   } catch (e) {
-    console.error(e)
+    console.error(e);
     await conn.sendMessage(
       msg.key.remoteJid,
-      { text: `⚠️ Error al descargar el video:\n\n${e.message}` },
+      { text: "⚠️ Error al descargar el audio." },
       { quoted: msg }
-    )
+    );
   }
-}
+};
 
-handler.command = ["play2"]
+handler.command = ["play"];
 
-export default handler
+export default handler;
